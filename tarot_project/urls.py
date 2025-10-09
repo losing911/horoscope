@@ -7,6 +7,7 @@ urlpatterns = [
     # Custom admin dashboard URL'leri önce gelmeli
     path('', include('tarot.urls')),
     path('zodiac/', include('zodiac.urls')),
+    path('blog/', include('blog.urls')),
     # Django admin paneli
     path('admin/', admin.site.urls),
 ]
