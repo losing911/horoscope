@@ -6,12 +6,15 @@ from django.views.decorators.http import require_http_methods
 from django.db.models import Q
 from datetime import datetime, timedelta
 import random
+import logging
 
 from .models import (
     ZodiacSign, DailyHoroscope, WeeklyHoroscope,
     MonthlyHoroscope, CompatibilityReading, BirthChart
 )
 from tarot.services import AIService, ImageGenerationService
+
+logger = logging.getLogger(__name__)
 
 
 def zodiac_home(request):
@@ -250,8 +253,26 @@ def compatibility_check(request):
 # Helper Functions
 
 def generate_daily_horoscope(zodiac_sign, date):
-    """AI ile günlük burç yorumu oluştur"""
+    """
+    AI ile günlük burç yorumu oluştur
+    
+    Özellikler:
+    - İlk olarak database'de mevcut yorum var mı kontrol eder
+    - Akıllı fallback: Gemini -> OpenAI -> Template
+    - Kota sınırlarını otomatik yönetir
+    """
     try:
+        # Önce database'de var mı kontrol et (cache gibi çalışır)
+        existing = DailyHoroscope.objects.filter(
+            zodiac_sign=zodiac_sign,
+            date=date
+        ).first()
+        
+        if existing:
+            logger.info(f"📦 Cache'den alındı: {zodiac_sign.name} - {date}")
+            return existing
+        
+        # Yeni yorum oluştur
         ai_service = AIService()
         
         prompt = f"""Sen profesyonel bir astrolog ve burç yorumcususun. 

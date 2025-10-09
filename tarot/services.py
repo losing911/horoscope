@@ -63,22 +63,60 @@ class AIService:
         prompt = self._create_prompt(question, cards, spread_name)
         logger.info(f"📄 Prompt uzunluğu: {len(prompt)} karakter")
         
-        try:
-            if self.provider_name == 'openai':
-                logger.info("🤖 AstroTarot AI yanıt üretiyor...")
-                return self._generate_openai(prompt)
-            elif self.provider_name == 'gemini':
-                logger.info("🤖 AstroTarot AI yanıt üretiyor...")
-                return self._generate_gemini(prompt)
-            else:
-                error_msg = f"Desteklenmeyen AI provider: {self.provider_name}"
-                logger.error(f"❌ {error_msg}")
-                raise Exception(error_msg)
-        except Exception as e:
-            logger.error(f"❌ AI Service Error: {str(e)}")
-            logger.error(f"📋 Traceback:\n{traceback.format_exc()}")
-            # Hata durumunda basit bir yorum döndür
+        # Akıllı Fallback Sistemi: İlk provider başarısız olursa diğerini dene
+        providers_to_try = []
+        
+        if self.provider_name == 'openai':
+            providers_to_try = ['openai', 'gemini']
+        elif self.provider_name == 'gemini':
+            providers_to_try = ['gemini', 'openai']
+        else:
+            logger.error(f"❌ Desteklenmeyen AI provider: {self.provider_name}")
             return self._generate_fallback_interpretation(question, cards, spread_name)
+        
+        # Her provider'ı sırayla dene
+        for provider in providers_to_try:
+            try:
+                logger.info(f"🤖 {provider.upper()} ile yanıt üretiliyor...")
+                
+                if provider == 'openai':
+                    # OpenAI için API key kontrolü
+                    if not self.site_settings.openai_api_key:
+                        logger.warning("⚠️ OpenAI API key yok, atlanıyor...")
+                        continue
+                    result = self._generate_openai(prompt)
+                    logger.info(f"✅ {provider.upper()} başarılı!")
+                    return result
+                    
+                elif provider == 'gemini':
+                    # Gemini için API key kontrolü
+                    if not self.site_settings.gemini_api_key:
+                        logger.warning("⚠️ Gemini API key yok, atlanıyor...")
+                        continue
+                    result = self._generate_gemini(prompt)
+                    logger.info(f"✅ {provider.upper()} başarılı!")
+                    return result
+                    
+            except Exception as e:
+                error_msg = str(e)
+                logger.error(f"❌ {provider.upper()} başarısız: {error_msg}")
+                
+                # Kota hatası mı kontrol et
+                if 'quota' in error_msg.lower() or 'rate limit' in error_msg.lower():
+                    logger.warning(f"⚠️ {provider.upper()} kota sınırına ulaşıldı, sonraki provider deneniyor...")
+                elif '429' in error_msg:
+                    logger.warning(f"⚠️ {provider.upper()} rate limit, sonraki provider deneniyor...")
+                else:
+                    logger.error(f"📋 Hata detayları:\n{traceback.format_exc()}")
+                
+                # Son provider değilse devam et
+                if provider != providers_to_try[-1]:
+                    logger.info(f"🔄 Sonraki provider deneniyor...")
+                    continue
+        
+        # Tüm provider'lar başarısız olursa fallback
+        logger.warning("⚠️ Tüm AI provider'lar başarısız oldu, fallback yorumu kullanılıyor...")
+        return self._generate_fallback_interpretation(question, cards, spread_name)
     
     def _create_prompt(self, question, cards, spread_name):
         """AI için prompt oluştur"""

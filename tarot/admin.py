@@ -9,17 +9,33 @@ class SiteSettingsAdminForm(forms.ModelForm):
         model = SiteSettings
         fields = '__all__'
         widgets = {
-            'openai_model': forms.RadioSelect(attrs={
-                'class': 'model-selector',
+            'default_ai_provider': forms.Select(attrs={
+                'class': 'admin-select',
+                'style': 'width: 100%; max-width: 400px; padding: 8px; font-size: 14px;'
             }),
-            'gemini_model': forms.RadioSelect(attrs={
-                'class': 'model-selector',
+            'openai_model': forms.Select(attrs={
+                'class': 'admin-select model-select',
+                'style': 'width: 100%; max-width: 500px; padding: 10px; font-size: 14px; background: #f8f9fa;'
+            }),
+            'gemini_model': forms.Select(attrs={
+                'class': 'admin-select model-select',
+                'style': 'width: 100%; max-width: 500px; padding: 10px; font-size: 14px; background: #f8f9fa;'
+            }),
+            'ai_response_max_length': forms.NumberInput(attrs={
+                'style': 'width: 150px; padding: 8px;'
             }),
         }
         help_texts = {
-            'default_ai_provider': '🤖 AstroTarot AI motor seçimi',
-            'openai_model': '🎯 AstroTarot AI model seçimi - Maliyet ve kalite dengesine göre seçim yapın',
-            'gemini_model': '🆓 AstroTarot AI alternatif motor - Günlük limit vardır (50 istek)',
+            'default_ai_provider': '🤖 <strong>Ana AI Motor:</strong> Tarot ve burç yorumları için kullanılacak AI motoru',
+            'openai_model': '<div style="background:#e3f2fd;padding:10px;border-radius:5px;margin-top:5px;">'
+                           '🎯 <strong>Standard (gpt-4o-mini):</strong> Hızlı, ekonomik (~$0.001/istek) - Önerilen ✅<br>'
+                           '💎 <strong>Advanced (gpt-4o):</strong> Güçlü, detaylı (~$0.01/istek)<br>'
+                           '🧠 <strong>Expert (o1-preview/o1-mini):</strong> En akıllı (~$0.10/istek)</div>',
+            'gemini_model': '<div style="background:#fff3cd;padding:10px;border-radius:5px;margin-top:5px;">'
+                           '🆓 <strong>Ücretsiz alternatif:</strong> Günlük 50 istek limiti vardır<br>'
+                           '⚠️ Kota dolduğunda otomatik olarak AstroTarot AI aktif olur</div>',
+            'openai_api_key': '🔑 OpenAI API anahtarınız (sk-... ile başlar)',
+            'gemini_api_key': '🔑 Google Gemini API anahtarınız',
         }
 
 @admin.register(SiteSettings)
