@@ -1,0 +1,271 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white text-center mb-4">
+                <i class="fas fa-cog me-3"></i>Site Ayarları
+            </h1>
+            
+            <!-- Navigation -->
+            <div class="admin-nav" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard/">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users/">
+                            <i class="fas fa-users me-2"></i>Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/readings/">
+                            <i class="fas fa-cards me-2"></i>Okumalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/statistics/">
+                            <i class="fas fa-chart-bar me-2"></i>İstatistikler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/settings/">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Form -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <form method="post" class="card">
+                {% csrf_token %}
+                
+                <!-- Genel Ayarlar -->
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Genel Ayarlar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="site_title" class="form-label">Site Başlığı</label>
+                            <input type="text" class="form-control" id="site_title" name="site_title" value="{{ settings.site_title }}" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="default_ai_provider" class="form-label">Varsayılan AI Sağlayıcı</label>
+                            <select class="form-select" id="default_ai_provider" name="default_ai_provider">
+                                <option value="gemini" {% if settings.default_ai_provider == 'gemini' %}selected{% endif %}>Google Gemini</option>
+                                <option value="openai" {% if settings.default_ai_provider == 'openai' %}selected{% endif %}>OpenAI GPT</option>
+                            </select>
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label for="site_description" class="form-label">Site Açıklaması</label>
+                            <textarea class="form-control" id="site_description" name="site_description" rows="3">{{ settings.site_description }}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Ayarları -->
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>AI Ayarları</h5>
+                </div>
+                <div class="card-body">
+                    <!-- OpenAI -->
+                    <h6 class="text-primary mb-3"><i class="fab fa-openai me-2"></i>OpenAI Ayarları</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="openai_api_key" class="form-label">OpenAI API Anahtarı</label>
+                            <input type="password" class="form-control" id="openai_api_key" name="openai_api_key" value="{{ settings.openai_api_key }}" placeholder="sk-...">
+                            <small class="text-muted">OpenAI API key'inizi buraya girin</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="openai_model" class="form-label">OpenAI Model</label>
+                            <select class="form-select" id="openai_model" name="openai_model">
+                                <option value="gpt-4o" {% if settings.openai_model == 'gpt-4o' %}selected{% endif %}>GPT-4o (En Güçlü - Pahalı)</option>
+                                <option value="gpt-4o-mini" {% if settings.openai_model == 'gpt-4o-mini' %}selected{% endif %}>GPT-4o Mini (Hızlı ve Uygun) ⭐</option>
+                                <option value="gpt-4-turbo" {% if settings.openai_model == 'gpt-4-turbo' %}selected{% endif %}>GPT-4 Turbo (Güçlü)</option>
+                                <option value="gpt-4" {% if settings.openai_model == 'gpt-4' %}selected{% endif %}>GPT-4 (Standart)</option>
+                                <option value="gpt-3.5-turbo" {% if settings.openai_model == 'gpt-3.5-turbo' %}selected{% endif %}>GPT-3.5 Turbo (Ekonomik)</option>
+                            </select>
+                            <small class="text-muted">⭐ = Önerilen</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Gemini -->
+                    <h6 class="text-success mb-3"><i class="fab fa-google me-2"></i>Google Gemini Ayarları</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="gemini_api_key" class="form-label">Google Gemini API Anahtarı</label>
+                            <input type="password" class="form-control" id="gemini_api_key" name="gemini_api_key" value="{{ settings.gemini_api_key }}" placeholder="AI...">
+                            <small class="text-muted">Google Gemini API key'inizi buraya girin</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="gemini_model" class="form-label">Gemini Model</label>
+                            <select class="form-select" id="gemini_model" name="gemini_model">
+                                <option value="gemini-2.0-flash-exp" {% if settings.gemini_model == 'gemini-2.0-flash-exp' %}selected{% endif %}>Gemini 2.0 Flash (Deneysel - En Hızlı) 🚀</option>
+                                <option value="gemini-1.5-pro" {% if settings.gemini_model == 'gemini-1.5-pro' %}selected{% endif %}>Gemini 1.5 Pro (En Güçlü)</option>
+                                <option value="gemini-1.5-flash" {% if settings.gemini_model == 'gemini-1.5-flash' %}selected{% endif %}>Gemini 1.5 Flash (Hızlı ve Dengeli) ⭐</option>
+                                <option value="gemini-pro" {% if settings.gemini_model == 'gemini-pro' %}selected{% endif %}>Gemini Pro (Standart)</option>
+                            </select>
+                            <small class="text-muted">⭐ = Önerilen | 🚀 = En yeni (deneysel)</small>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>API Key Alma:</strong>
+                        <ul class="mb-0 mt-2">
+                            <li><strong>Google Gemini (ÜCRETSİZ):</strong> <a href="https://makersuite.google.com/app/apikey" target="_blank">https://makersuite.google.com/app/apikey</a></li>
+                            <li><strong>OpenAI (Ücretli):</strong> <a href="https://platform.openai.com/api-keys" target="_blank">https://platform.openai.com/api-keys</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="alert alert-success mt-3">
+                        <h6><i class="fas fa-lightbulb me-2"></i>Model Önerileri:</h6>
+                        <ul class="mb-0">
+                            <li><strong>Başlangıç:</strong> Gemini 1.5 Flash (ücretsiz, hızlı, yeterince güçlü)</li>
+                            <li><strong>Deneysel:</strong> Gemini 2.0 Flash (en yeni teknoloji, çok hızlı)</li>
+                            <li><strong>Kaliteli:</strong> Gemini 1.5 Pro (ücretsiz ama daha yavaş)</li>
+                            <li><strong>Premium:</strong> GPT-4o Mini (ücretli ama mükemmel kalite)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Kullanıcı Limitleri -->
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-users me-2"></i>Kullanıcı Limitleri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="daily_reading_limit" class="form-label">Günlük Okuma Limiti</label>
+                            <input type="number" class="form-control" id="daily_reading_limit" name="daily_reading_limit" value="{{ settings.daily_reading_limit }}" min="1" max="50">
+                            <small class="text-muted">Kullanıcıların günde yapabileceği maksimum okuma sayısı (Test aşamasında devre dışı)</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="max_question_length" class="form-label">Maksimum Soru Uzunluğu</label>
+                            <input type="number" class="form-control" id="max_question_length" name="max_question_length" value="{{ settings.max_question_length }}" min="50" max="2000">
+                            <small class="text-muted">Karakter cinsinden maksimum soru uzunluğu</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Site Durumu -->
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-toggle-on me-2"></i>Site Durumu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="maintenance_mode" name="maintenance_mode" {% if settings.maintenance_mode %}checked{% endif %}>
+                                <label class="form-check-label" for="maintenance_mode">
+                                    <strong>Bakım Modu</strong><br>
+                                    <small class="text-muted">Aktif olduğunda site kullanıcılara kapalı</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="allow_registration" name="allow_registration" {% if settings.allow_registration %}checked{% endif %}>
+                                <label class="form-check-label" for="allow_registration">
+                                    <strong>Kayıt Olma İzni</strong><br>
+                                    <small class="text-muted">Yeni kullanıcı kaydına izin ver</small>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="allow_guest_reading" name="allow_guest_reading" {% if settings.allow_guest_reading %}checked{% endif %}>
+                                <label class="form-check-label" for="allow_guest_reading">
+                                    <strong>Misafir Okuma</strong><br>
+                                    <small class="text-muted">Giriş yapmadan okuma yapılabilsin</small>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/admin/dashboard/" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                        </a>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-save me-2"></i>Ayarları Kaydet
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Current Settings Info -->
+            <div class="card mt-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Mevcut Durum</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>AI Durumu:</h6>
+                            <ul class="list-unstyled">
+                                <li>
+                                    <i class="fas fa-circle {% if settings.gemini_api_key %}text-success{% else %}text-danger{% endif %} me-2"></i>
+                                    Google Gemini: {% if settings.gemini_api_key %}<span class="badge bg-success">Yapılandırılmış</span>{% else %}<span class="badge bg-danger">Yapılandırılmamış</span>{% endif %}
+                                    {% if settings.gemini_api_key %}
+                                    <br><small class="text-muted ms-4">Model: {{ settings.gemini_model }}</small>
+                                    {% endif %}
+                                </li>
+                                <li>
+                                    <i class="fas fa-circle {% if settings.openai_api_key %}text-success{% else %}text-danger{% endif %} me-2"></i>
+                                    OpenAI: {% if settings.openai_api_key %}<span class="badge bg-success">Yapılandırılmış</span>{% else %}<span class="badge bg-danger">Yapılandırılmamış</span>{% endif %}
+                                    {% if settings.openai_api_key %}
+                                    <br><small class="text-muted ms-4">Model: {{ settings.openai_model }}</small>
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Site Bilgileri:</h6>
+                            <ul class="list-unstyled">
+                                <li><strong>Son Güncelleme:</strong> {{ settings.updated_at|date:"d/m/Y H:i" }}</li>
+                                <li><strong>Oluşturulma:</strong> {{ settings.created_at|date:"d/m/Y H:i" }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-pills .nav-link {
+    border-radius: 10px;
+    margin: 0 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+
+.form-check-input:checked {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+</style>
+{% endblock %}

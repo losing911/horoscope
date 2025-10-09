@@ -1,0 +1,223 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ zodiac_sign.name }} Burcu - Özellikler ve Yorum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Sign Header -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-4 mb-md-0">
+                            {% if zodiac_sign.image_url %}
+                            <img src="{{ zodiac_sign.image_url }}" alt="{{ zodiac_sign.name }}" class="img-fluid rounded shadow" style="max-height: 300px;">
+                            {% else %}
+                            <div class="display-1" style="font-size: 8rem; color: #6B1B3D;">{{ zodiac_sign.symbol }}</div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-8">
+                            <h1 class="display-4 mb-3">{{ zodiac_sign.symbol }} {{ zodiac_sign.name }}</h1>
+                            <p class="lead text-muted mb-4">{{ zodiac_sign.date_range }}</p>
+                            
+                            <div class="row">
+                                <div class="col-sm-6 mb-3">
+                                    <strong>Element:</strong>
+                                    <span class="badge bg-info ms-2">{{ zodiac_sign.get_element_display }}</span>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <strong>Nitelik:</strong>
+                                    <span class="badge bg-secondary ms-2">{{ zodiac_sign.get_quality_display }}</span>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <strong>Yöneten Gezegen:</strong>
+                                    <span class="ms-2 text-dark">{{ zodiac_sign.ruling_planet }}</span>
+                                </div>
+                                <div class="col-sm-6 mb-3">
+                                    <strong>Şanslı Gün:</strong>
+                                    <span class="ms-2 text-dark">{{ zodiac_sign.lucky_day }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title">Genel Özellikler</h3>
+                    <p class="card-text">{{ zodiac_sign.description }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Traits, Strengths, Weaknesses -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">✨ Karakter Özellikleri</h5>
+                    <p class="card-text">{{ zodiac_sign.traits }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-success">
+                <div class="card-body">
+                    <h5 class="card-title text-success">💪 Güçlü Yanları</h5>
+                    <p class="card-text">{{ zodiac_sign.strengths }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm border-warning">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">⚠️ Zayıf Yanları</h5>
+                    <p class="card-text">{{ zodiac_sign.weaknesses }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lucky Factors -->
+    <div class="row mb-4">
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🍀 Şanslı Sayılar</h5>
+                    <p class="display-6 text-primary">{{ zodiac_sign.lucky_numbers }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">🎨 Şanslı Renkler</h5>
+                    <p class="text-muted">{{ zodiac_sign.lucky_colors }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">❤️ Uyumlu Burçlar</h5>
+                    <p class="text-muted">{{ zodiac_sign.compatibility }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reklam -->
+    {% include 'includes/ad_inline.html' %}
+
+    <!-- Today's Horoscope -->
+    {% if daily_horoscope %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">📅 Bugünün Yorumu ({{ daily_horoscope.date|date:"d F Y" }})</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Ruh Hali Skoru:</strong> 
+                                <span class="badge bg-info">{{ daily_horoscope.mood_score }}/10</span>
+                            </p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Şanslı Sayı:</strong> {{ daily_horoscope.lucky_number }}</p>
+                        </div>
+                        <div class="col-md-3">
+                            <p><strong>Şanslı Renk:</strong> {{ daily_horoscope.lucky_color }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h5>🌟 Genel</h5>
+                            <p>{{ daily_horoscope.general }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5>❤️ Aşk</h5>
+                            <p>{{ daily_horoscope.love }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5>💼 Kariyer</h5>
+                            <p>{{ daily_horoscope.career }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5>💪 Sağlık</h5>
+                            <p>{{ daily_horoscope.health }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <h5>💰 Finans</h5>
+                            <p>{{ daily_horoscope.money }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-robot me-1"></i>Bu yorum AstroTarot AI tarafından oluşturulmuştur
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reklam -->
+    {% include 'includes/ad_inline.html' %}
+    {% else %}
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="alert alert-info text-center">
+                <h5>📅 Günlük yorum hazırlanıyor...</h5>
+                <p>Bu burç için bugünün yorumu henüz oluşturulmamış. Lütfen biraz sonra tekrar kontrol edin.</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Action Buttons -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-primary me-2">
+                📅 Tüm Günlük Yorumlar
+            </a>
+            <a href="{% url 'zodiac:signs_list' %}" class="btn btn-outline-primary me-2">
+                🌟 Tüm Burçlar
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-success">
+                💕 Uyum Analizi
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- AdSense Alanı -->
+<div class="container mt-4 mb-5">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="ad-placeholder" style="background: #f0f0f0; padding: 50px; border-radius: 8px;">
+                <small class="text-muted">Reklam Alanı - 728x90</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

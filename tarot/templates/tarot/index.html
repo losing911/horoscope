@@ -1,0 +1,583 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section - Modern & Dramatic -->
+<section class="hero-section-modern" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); padding: 120px 0 80px; position: relative; overflow: hidden;">
+    <!-- Decorative Elements -->
+    <div style="position: absolute; top: -50px; right: -50px; width: 300px; height: 300px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; filter: blur(60px);"></div>
+    <div style="position: absolute; bottom: -100px; left: -100px; width: 400px; height: 400px; background: rgba(255, 255, 255, 0.02); border-radius: 50%; filter: blur(80px);"></div>
+    
+    <div class="container position-relative">
+        <div class="row align-items-center g-5">
+            <!-- Left Column - Text Content -->
+            <div class="col-lg-6">
+                <div class="mb-3">
+                    <span class="badge px-4 py-2" style="background: rgba(255, 214, 0, 0.2); color: #ffd600; border: 1px solid rgba(255, 214, 0, 0.3); border-radius: 30px; font-size: 0.9rem; font-weight: 600;">
+                        <i class="fas fa-sparkles me-2"></i>AI Destekli Fal Platformu
+                    </span>
+                </div>
+                <h1 class="display-3 fw-bold text-white mb-4" style="line-height: 1.2; text-shadow: 2px 2px 10px rgba(0,0,0,0.3);">
+                    Geleceğinizin Sırları <br>
+                    <span style="color: #ffd600;">Tarot'ta Saklı</span>
+                </h1>
+                <p class="lead text-white mb-4" style="font-size: 1.3rem; opacity: 0.95; text-shadow: 1px 1px 5px rgba(0,0,0,0.3);">
+                    Yapay zeka destekli tarot falı ile kartların gizli mesajlarını keşfedin. 
+                    78 kart, sonsuz anlam, kişiselleştirilmiş yorumlar.
+                </p>
+                <div class="d-flex flex-wrap gap-3 mb-4">
+                    <a href="{% url 'tarot:spreads' %}" class="btn btn-warning btn-lg px-5 py-3 d-inline-flex align-items-center" style="border-radius: 50px; font-weight: 700; box-shadow: 0 8px 20px rgba(255, 214, 0, 0.3); transition: all 0.3s ease;">
+                        <i class="fas fa-cards me-2 fs-5"></i>
+                        <span>Hemen Fal Bak</span>
+                    </a>
+                    <a href="{% url 'tarot:daily_card' %}" class="btn btn-outline-light btn-lg px-5 py-3 d-inline-flex align-items-center" style="border-radius: 50px; border-width: 2px; font-weight: 700; backdrop-filter: blur(10px); background: rgba(255,255,255,0.1);">
+                        <i class="fas fa-star me-2 fs-5"></i>
+                        <span>Günlük Kart</span>
+                    </a>
+                </div>
+                <div class="d-flex align-items-center gap-4 text-white" style="opacity: 0.9;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #ffd600;"></i>
+                        <span>Ücretsiz</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #ffd600;"></i>
+                        <span>AI Yorumlu</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-check-circle me-2" style="color: #ffd600;"></i>
+                        <span>7/24 Erişim</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column - Visual Content -->
+            <div class="col-lg-6 text-center">
+                <div class="hero-visual" style="position: relative; animation: floating 6s ease-in-out infinite;">
+                    <!-- Tarot Cards Stack Visual -->
+                    <div style="position: relative; display: inline-block;">
+                        <div style="position: absolute; width: 280px; height: 450px; background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%); border-radius: 20px; backdrop-filter: blur(20px); border: 2px solid rgba(255,255,255,0.2); transform: rotate(-15deg); left: -30px; top: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);"></div>
+                        <div style="position: absolute; width: 280px; height: 450px; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.08) 100%); border-radius: 20px; backdrop-filter: blur(20px); border: 2px solid rgba(255,255,255,0.3); transform: rotate(-5deg); left: 10px; top: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);"></div>
+                        <div style="position: relative; width: 280px; height: 450px; background: linear-gradient(135deg, #ffd600 0%, #ffed4e 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 25px 80px rgba(255, 214, 0, 0.4); border: 3px solid rgba(255,255,255,0.3);">
+                            <div style="text-align: center; color: #6B1B3D;">
+                                <i class="fas fa-moon fs-1 mb-3" style="display: block; font-size: 4rem;"></i>
+                                <div class="fw-bold fs-4">THE MOON</div>
+                                <div class="text-uppercase" style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.7;">XVIII</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Highlight Section -->
+<section class="py-5" style="background: #f8f9fa;">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); color: white; border-radius: 30px; font-size: 0.9rem;">
+                <i class="fas fa-sparkles me-2"></i>Özelliklerimiz
+            </span>
+            <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">Neden Tarot Yorum?</h2>
+            <p class="lead text-muted">Modern teknoloji ile kadim bilgelik bir arada</p>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-highlight-card h-100 border-0" style="border-radius: 20px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(107, 27, 61, 0.3);">
+                            <i class="fas fa-robot text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">AI Destekli Yorumlar</h5>
+                        <p class="text-muted mb-0" style="font-size: 0.95rem;">Yapay zeka ile kişiselleştirilmiş, detaylı tarot yorumları alın</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-highlight-card h-100 border-0" style="border-radius: 20px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ffd600 0%, #ffed4e 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 214, 0, 0.3);">
+                            <i class="fas fa-star text-dark fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">12 Burç Analizi</h5>
+                        <p class="text-muted mb-0" style="font-size: 0.95rem;">Günlük burç yorumları ve detaylı astrolojik analizler</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-highlight-card h-100 border-0" style="border-radius: 20px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(255, 111, 0, 0.3);">
+                            <i class="fas fa-cards text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">Çoklu Yayılım</h5>
+                        <p class="text-muted mb-0" style="font-size: 0.95rem;">Tek karttan 10 karta kadar farklı yayılım seçenekleri</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-3">
+                <div class="card feature-highlight-card h-100 border-0" style="border-radius: 20px; transition: all 0.3s ease; box-shadow: 0 5px 20px rgba(0,0,0,0.08);">
+                    <div class="card-body text-center p-4">
+                        <div class="icon-box mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3);">
+                            <i class="fas fa-shield-check text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">Gizlilik Garantisi</h5>
+                        <p class="text-muted mb-0" style="font-size: 0.95rem;">Verileriniz güvende, sorularınız gizli kalır</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Spreads Section -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Popüler Tarot Yayılımları</h2>
+        <div class="row g-4">
+            {% for spread in popular_spreads %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="card feature-card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-{% if spread.card_count == 1 %}star{% elif spread.card_count == 3 %}fire{% elif spread.card_count <= 5 %}heart{% else %}circle{% endif %} feature-icon"></i>
+                            <h4>{{ spread.name }}</h4>
+                            <p class="text-muted">
+                                {{ spread.description|truncatechars:80 }}
+                            </p>
+                            <div class="mb-3">
+                                <span class="badge bg-primary">{{ spread.card_count }} Kart</span>
+                                <span class="badge bg-secondary">{{ spread.get_difficulty_level_display }}</span>
+                            </div>
+                            <a href="{% url 'tarot:spread_detail' spread.slug %}" class="btn btn-outline-warning">
+                                <i class="fas fa-play me-1"></i>Başla
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center">
+                    <p class="text-muted">Henüz yayılım yok. Admin panelinden yayılım ekleyebilirsiniz.</p>
+                </div>
+            {% endfor %}
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="{% url 'tarot:spreads' %}" class="btn btn-outline-primary">
+                <i class="fas fa-list me-2"></i>Tüm Yayılımları Gör
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Reklam -->
+{% include 'includes/ad_inline.html' %}
+
+<!-- Quick Reading Section -->
+<section class="py-5 content-section">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="mb-4">Hızlı Tarot Falı</h2>
+                <p class="text-muted mb-5">
+                    Bir soru sorun ve kartların size ne söylediğini öğrenin
+                </p>
+                
+                {% if user.is_authenticated %}
+                    <div class="card">
+                        <div class="card-body p-4">
+                            <form method="post" action="{% url 'tarot:create_reading' %}" id="quickReadingForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="spread_id" value="1">
+                                <div class="mb-3">
+                                    <textarea 
+                                        class="form-control" 
+                                        name="question" 
+                                        rows="3" 
+                                        placeholder="Kartlara sormak istediğiniz soruyu yazın..."
+                                        required
+                                    ></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-warning btn-lg">
+                                    <i class="fas fa-magic me-2"></i>Kartları Çek
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle me-2"></i>Tarot Falı İçin Giriş Yapın</h5>
+                        <p class="mb-3">Kişiselleştirilmiş tarot falı için hesap oluşturun</p>
+                        <a href="#" class="btn btn-primary me-2">Giriş Yap</a>
+                        <a href="#" class="btn btn-outline-primary">Kayıt Ol</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Daily Horoscopes Section -->
+{% if daily_horoscopes %}
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="fas fa-star me-2"></i>Günlük Burç Yorumları
+        </h2>
+        <div class="row g-4">
+            {% for item in daily_horoscopes %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 horoscope-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="zodiac-symbol me-3">
+                                    {{ item.sign.symbol }}
+                                </div>
+                                <div>
+                                    <h5 class="mb-0">{{ item.sign.name }}</h5>
+                                    <small class="text-muted">{{ item.sign.date_range }}</small>
+                                </div>
+                            </div>
+                            <p class="card-text">
+                                {{ item.horoscope.general|truncatewords:20 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-success">Aşk: {{ item.horoscope.love_score }}/10</span>
+                                    <span class="badge bg-info">İş: {{ item.horoscope.career_score }}/10</span>
+                                </div>
+                                <a href="{% url 'zodiac:sign_detail' item.sign.slug %}" class="btn btn-sm btn-outline-primary">
+                                    Detay <i class="fas fa-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-calendar-day me-2"></i>Tüm Burç Yorumları
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Reklam -->
+{% include 'includes/ad_inline.html' %}
+
+<!-- Recent Public Readings Section -->
+{% if recent_readings %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="fas fa-users me-2"></i>Son Tarot Okumaları
+        </h2>
+        <div class="row g-4">
+            {% for reading in recent_readings %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 reading-card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="avatar-circle me-2">
+                                    {{ reading.user.username|slice:":1"|upper }}
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ reading.user.username }}</h6>
+                                    <small class="text-muted">{{ reading.created_at|timesince }} önce</small>
+                                </div>
+                            </div>
+                            <h5 class="card-title">{{ reading.spread.name }}</h5>
+                            <p class="card-text text-muted">
+                                <i class="fas fa-question-circle me-1"></i>
+                                {{ reading.question|truncatewords:10 }}
+                            </p>
+                            <div class="mb-3">
+                                <span class="badge bg-warning">{{ reading.cards|length }} Kart</span>
+                                <span class="badge bg-secondary">{{ reading.ai_provider.name }}</span>
+                            </div>
+                            <a href="{% url 'tarot:reading_detail' reading.id %}" class="btn btn-sm btn-outline-warning w-100">
+                                <i class="fas fa-eye me-1"></i>Okumayı Gör
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Stats Section -->
+<section class="py-5" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); position: relative; overflow: hidden;">
+    <!-- Decorative circles -->
+    <div style="position: absolute; top: -100px; right: 10%; width: 400px; height: 400px; background: rgba(255,255,255,0.03); border-radius: 50%; filter: blur(80px);"></div>
+    <div style="position: absolute; bottom: -150px; left: 5%; width: 500px; height: 500px; background: rgba(255,255,255,0.02); border-radius: 50%; filter: blur(100px);"></div>
+    
+    <div class="container position-relative" style="padding: 60px 0;">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-white mb-3">Rakamlarla Tarot Yorum</h2>
+            <p class="lead text-white" style="opacity: 0.9;">Binlerce kullanıcı bize güveniyor</p>
+        </div>
+        
+        <div class="row g-4 text-center text-white">
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4" style="background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-users fs-1" style="color: #ffd600;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2" style="color: #ffd600; text-shadow: 0 0 20px rgba(255,214,0,0.5);">15K+</h2>
+                    <p class="mb-0 text-uppercase" style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Kullanıcı</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4" style="background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-cards fs-1" style="color: #ffd600;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2" style="color: #ffd600; text-shadow: 0 0 20px rgba(255,214,0,0.5);">50K+</h2>
+                    <p class="mb-0 text-uppercase" style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Fal Bakımı</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4" style="background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-star fs-1" style="color: #ffd600;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2" style="color: #ffd600; text-shadow: 0 0 20px rgba(255,214,0,0.5);">12</h2>
+                    <p class="mb-0 text-uppercase" style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Burç Analizi</p>
+                </div>
+            </div>
+            
+            <div class="col-6 col-md-3">
+                <div class="stat-card p-4" style="background: rgba(255,255,255,0.1); border-radius: 20px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); transition: all 0.3s ease;">
+                    <div class="stat-icon mb-3">
+                        <i class="fas fa-clock fs-1" style="color: #ffd600;"></i>
+                    </div>
+                    <h2 class="display-4 fw-bold mb-2" style="color: #ffd600; text-shadow: 0 0 20px rgba(255,214,0,0.5);">24/7</h2>
+                    <p class="mb-0 text-uppercase" style="font-size: 0.9rem; letter-spacing: 2px; opacity: 0.9; font-weight: 600;">Hizmet</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <div class="d-inline-flex align-items-center gap-2 px-4 py-3" style="background: rgba(255,255,255,0.15); border-radius: 50px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                        <i class="fas fa-star text-warning"></i>
+                    </div>
+                    <span class="text-white fw-bold mx-2">4.8/5</span>
+                    <span class="text-white" style="opacity: 0.9;">Ortalama Değerlendirme</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); color: white; border-radius: 30px; font-size: 0.9rem;">
+                <i class="fas fa-heart me-2"></i>Kullanıcı Yorumları
+            </span>
+            <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">Kullanıcılarımız Ne Diyor?</h2>
+            <p class="lead text-muted">Binlerce mutlu kullanıcımızın deneyimleri</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body p-4">
+                        <div class="stars mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-4" style="font-size: 1rem; line-height: 1.7; color: #333;">
+                            "Harika bir uygulama! Tarot yorumları çok detaylı ve kişiselleştirilmiş. AI destekli sistem gerçekten fark yaratıyor. Her gün burç yorumlarımı takip ediyorum."
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">
+                                AK
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold" style="color: #1a1a1a;">Ayşe K.</h6>
+                                <small class="text-muted"><i class="fas fa-star-and-crescent me-1"></i>Koç Burcu</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body p-4">
+                        <div class="stars mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-4" style="font-size: 1rem; line-height: 1.7; color: #333;">
+                            "Yıllardır tarotla ilgileniyorum. Bu platform gerçekten profesyonel. Özellikle keltik haç yayılımının yorumu çok isabetliydi. Herkese tavsiye ederim!"
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #ffd600 0%, #ffed4e 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #6B1B3D; font-weight: bold; font-size: 1.2rem;">
+                                MY
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold" style="color: #1a1a1a;">Mehmet Y.</h6>
+                                <small class="text-muted"><i class="fas fa-star-and-crescent me-1"></i>Aslan Burcu</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 col-lg-4">
+                <div class="card testimonial-card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body p-4">
+                        <div class="stars mb-3">
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                            <i class="fas fa-star text-warning"></i>
+                        </div>
+                        <p class="mb-4" style="font-size: 1rem; line-height: 1.7; color: #333;">
+                            "Günlük tek kart çekiyorum her sabah. Kartların mesajları günümü şekillendiriyor. Arayüz çok şık ve kullanımı kolay. Teşekkürler!"
+                        </p>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3" style="width: 50px; height: 50px; background: linear-gradient(135deg, #ff6f00 0%, #ff8f00 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 1.2rem;">
+                                ZS
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold" style="color: #1a1a1a;">Zeynep S.</h6>
+                                <small class="text-muted"><i class="fas fa-star-and-crescent me-1"></i>Balık Burcu</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Floating Animation */
+@keyframes floating {
+    0%, 100% { 
+        transform: translateY(0px); 
+    }
+    50% { 
+        transform: translateY(-20px); 
+    }
+}
+
+/* Hero Buttons Hover */
+.hero-section-modern .btn-warning:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(255, 214, 0, 0.4) !important;
+}
+
+.hero-section-modern .btn-outline-light:hover {
+    background: rgba(255,255,255,0.2) !important;
+    border-color: white !important;
+    transform: translateY(-3px);
+}
+
+/* Feature Highlight Cards Hover */
+.feature-highlight-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+}
+
+.feature-highlight-card:hover .icon-box {
+    transform: rotate(5deg) scale(1.1);
+}
+
+.feature-highlight-card .icon-box {
+    transition: all 0.3s ease;
+}
+
+/* Stats Cards Hover */
+.stat-card:hover {
+    transform: translateY(-5px) scale(1.05);
+    background: rgba(255,255,255,0.15) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+/* Testimonial Cards Hover */
+.testimonial-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
+}
+
+.horoscope-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.horoscope-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.zodiac-symbol {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.reading-card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.reading-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+</style>
+{% endblock %}

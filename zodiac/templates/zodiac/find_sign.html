@@ -1,0 +1,145 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Burcunu Öğren{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h2 class="mb-0">🔍 Burcunu Öğren</h2>
+                </div>
+                
+                <div class="card-body p-5">
+                    {% if found_sign %}
+                    <!-- Sonuç Gösterimi -->
+                    <div class="text-center mb-4">
+                        <div class="display-1 text-primary mb-3">{{ found_sign.symbol }}</div>
+                        <h3 class="mb-3">Burcunuz: {{ found_sign.name }}</h3>
+                        <p class="text-muted">{{ found_sign.date_range }}</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-6">
+                                <strong>Element:</strong><br>
+                                <span class="badge bg-info">{{ found_sign.get_element_display }}</span>
+                            </div>
+                            <div class="col-6">
+                                <strong>Yöneten Gezegen:</strong><br>
+                                <span>{{ found_sign.ruling_planet }}</span>
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <p class="lead">{{ found_sign.description|truncatewords:50 }}</p>
+                        
+                        <div class="mt-4">
+                            <a href="{% url 'zodiac:sign_detail' found_sign.slug %}" class="btn btn-primary btn-lg me-2">
+                                Burç Detayı
+                            </a>
+                            <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-secondary">
+                                Yeni Arama
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <!-- Form -->
+                    <div class="text-center mb-4">
+                        <p class="lead">Doğum tarihinizi girerek burcunuzu öğrenin</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="birth_day" class="form-label">Gün</label>
+                                <select name="birth_day" id="birth_day" class="form-select" required>
+                                    <option value="">Gün seçin...</option>
+                                    {% for day in "x"|rjust:31 %}
+                                        <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-8 mb-3">
+                                <label for="birth_month" class="form-label">Ay</label>
+                                <select name="birth_month" id="birth_month" class="form-select" required>
+                                    <option value="">Ay seçin...</option>
+                                    <option value="1">Ocak</option>
+                                    <option value="2">Şubat</option>
+                                    <option value="3">Mart</option>
+                                    <option value="4">Nisan</option>
+                                    <option value="5">Mayıs</option>
+                                    <option value="6">Haziran</option>
+                                    <option value="7">Temmuz</option>
+                                    <option value="8">Ağustos</option>
+                                    <option value="9">Eylül</option>
+                                    <option value="10">Ekim</option>
+                                    <option value="11">Kasım</option>
+                                    <option value="12">Aralık</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                🔮 Burcumu Öğren
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="text-center mt-4">
+                        <small class="text-muted">
+                            Yıl bilgisi gerekmez, sadece gün ve ay yeterlidir.
+                        </small>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Info Cards -->
+            <div class="row mt-4">
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5>📅 Günlük Yorumlar</h5>
+                            <p class="small text-muted">Burcunuzun günlük yorumunu okuyun</p>
+                            <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-sm btn-outline-primary">
+                                Yorumlara Git
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center">
+                            <h5>🌟 Tüm Burçlar</h5>
+                            <p class="small text-muted">12 burcun özelliklerini keşfedin</p>
+                            <a href="{% url 'zodiac:signs_list' %}" class="btn btn-sm btn-outline-primary">
+                                Burçları Gör
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+</style>
+{% endblock %}

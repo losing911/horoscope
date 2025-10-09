@@ -1,0 +1,240 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white text-center mb-4">
+                <i class="fas fa-chart-bar me-3"></i>İstatistikler
+            </h1>
+            
+            <!-- Navigation -->
+            <div class="admin-nav" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard/">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users/">
+                            <i class="fas fa-users me-2"></i>Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/readings/">
+                            <i class="fas fa-cards me-2"></i>Okumalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/statistics/">
+                            <i class="fas fa-chart-bar me-2"></i>İstatistikler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/settings/">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Period Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="mb-0">Dönem: {{ start_date }} - {{ end_date }}</h5>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="btn-group" role="group">
+                                <a href="?period=7" class="btn btn-outline-primary {% if period == '7' %}active{% endif %}">7 Gün</a>
+                                <a href="?period=30" class="btn btn-outline-primary {% if period == '30' %}active{% endif %}">30 Gün</a>
+                                <a href="?period=90" class="btn btn-outline-primary {% if period == '90' %}active{% endif %}">90 Gün</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-8">
+            <div class="stat-card">
+                <h5 class="mb-4">Günlük Aktivite Grafiği</h5>
+                <canvas id="activityChart" height="100"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="stat-card h-100">
+                <h5 class="mb-4">Popüler Yayılımlar</h5>
+                <canvas id="spreadsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Users -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-trophy me-2"></i>En Aktif Kullanıcılar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Sıra</th>
+                                    <th>Kullanıcı</th>
+                                    <th>Okuma Sayısı</th>
+                                    <th>İlerleme</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in user_activity %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <i class="fas fa-user me-2"></i>
+                                        {{ user.username }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ user.reading_count }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-success" style="width: {{ user.reading_count }}%">
+                                                {{ user.reading_count }}
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Veri bulunamadı</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-pills .nav-link {
+    border-radius: 10px;
+    margin: 0 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Activity Chart
+const activityCtx = document.getElementById('activityChart').getContext('2d');
+new Chart(activityCtx, {
+    type: 'line',
+    data: {
+        labels: [{% for stat in daily_stats %}'{{ stat.date }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Okumalar',
+            data: [{% for stat in daily_stats %}{{ stat.readings }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            tension: 0.4,
+            fill: true
+        }, {
+            label: 'Yeni Kullanıcılar',
+            data: [{% for stat in daily_stats %}{{ stat.users }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#ffc107',
+            backgroundColor: 'rgba(255, 193, 7, 0.1)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+
+// Spreads Chart
+const spreadsCtx = document.getElementById('spreadsChart').getContext('2d');
+new Chart(spreadsCtx, {
+    type: 'doughnut',
+    data: {
+        labels: [{% for spread in popular_spreads %}'{{ spread.spread__name }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            data: [{% for spread in popular_spreads %}{{ spread.count }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            backgroundColor: [
+                '#667eea',
+                '#764ba2',
+                '#ffc107',
+                '#28a745',
+                '#dc3545',
+                '#17a2b8',
+                '#fd7e14',
+                '#6f42c1',
+                '#e83e8c',
+                '#20c997'
+            ]
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

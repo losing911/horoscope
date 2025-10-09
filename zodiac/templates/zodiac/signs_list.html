@@ -1,0 +1,227 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}12 Burç - Tüm Burçlar{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-4 mb-3">🌟 12 Burç</h1>
+                    <p class="lead text-muted mb-0">
+                        Zodyak kuşağındaki 12 burcun özelliklerini keşfedin
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Element Filter -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="btn-group d-flex flex-wrap justify-content-center" role="group">
+                <button type="button" class="btn btn-outline-primary filter-btn active" data-element="all">
+                    Tümü
+                </button>
+                <button type="button" class="btn btn-outline-danger filter-btn" data-element="fire">
+                    🔥 Ateş
+                </button>
+                <button type="button" class="btn btn-outline-success filter-btn" data-element="earth">
+                    🌍 Toprak
+                </button>
+                <button type="button" class="btn btn-outline-info filter-btn" data-element="air">
+                    💨 Hava
+                </button>
+                <button type="button" class="btn btn-outline-primary filter-btn" data-element="water">
+                    💧 Su
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signs Grid -->
+    <div class="row" id="signs-grid">
+        {% for sign in zodiac_signs %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 sign-card" data-element="{{ sign.element }}">
+            <div class="card h-100 shadow-sm hover-card">
+                {% if sign.image_url %}
+                <img src="{{ sign.image_url }}" class="card-img-top" alt="{{ sign.name }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-gradient-{{ sign.element }} d-flex align-items-center justify-content-center" style="height: 200px;">
+                    <span class="display-1 text-white">{{ sign.symbol }}</span>
+                </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ sign.symbol }} {{ sign.name }}</h5>
+                    <p class="card-text text-muted small mb-2">{{ sign.date_range }}</p>
+                    <p class="card-text">{{ sign.description|truncatewords:15 }}</p>
+                    
+                    <div class="mb-2">
+                        <span class="badge badge-{{ sign.element }}">{{ sign.get_element_display }}</span>
+                        <span class="badge bg-secondary">{{ sign.get_quality_display }}</span>
+                    </div>
+                    
+                    <div class="mt-2 small text-muted">
+                        <div><strong>Yöneten:</strong> {{ sign.ruling_planet }}</div>
+                        <div><strong>Şanslı Gün:</strong> {{ sign.lucky_day }}</div>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'zodiac:sign_detail' sign.slug %}" class="btn btn-sm btn-outline-primary w-100">
+                        Detayları Gör
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                Henüz burç bilgisi eklenmemiş. Lütfen admin panelinden burçları ekleyin.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Info Section -->
+    <div class="row mt-5 mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-4 mb-2">🔥</div>
+                    <h5>Ateş</h5>
+                    <p class="small text-muted">Koç, Aslan, Yay</p>
+                    <p class="small">Tutkulu, enerjik, girişken</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-4 mb-2">🌍</div>
+                    <h5>Toprak</h5>
+                    <p class="small text-muted">Boğa, Başak, Oğlak</p>
+                    <p class="small">Pratik, kararlı, güvenilir</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-4 mb-2">💨</div>
+                    <h5>Hava</h5>
+                    <p class="small text-muted">İkizler, Terazi, Kova</p>
+                    <p class="small">Zeki, sosyal, iletişimci</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3 mb-3">
+            <div class="card shadow-sm text-center">
+                <div class="card-body">
+                    <div class="display-4 mb-2">💧</div>
+                    <h5>Su</h5>
+                    <p class="small text-muted">Yengeç, Akrep, Balık</p>
+                    <p class="small">Duygusal, sezgisel, empatik</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-primary me-2">
+                📅 Günlük Yorumlar
+            </a>
+            <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-primary me-2">
+                🔍 Burcunu Bul
+            </a>
+            {% if user.is_authenticated %}
+            <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-success">
+                💕 Uyum Analizi
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.bg-gradient-fire {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.bg-gradient-earth {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.bg-gradient-air {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.bg-gradient-water {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+
+.badge-fire {
+    background-color: #f5576c;
+    color: white;
+}
+
+.badge-earth {
+    background-color: #00f2fe;
+    color: white;
+}
+
+.badge-air {
+    background-color: #38f9d7;
+    color: white;
+}
+
+.badge-water {
+    background-color: #764ba2;
+    color: white;
+}
+</style>
+
+<script>
+// Element Filter
+document.addEventListener('DOMContentLoaded', function() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const signCards = document.querySelectorAll('.sign-card');
+    
+    filterButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Update active button
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            const element = this.dataset.element;
+            
+            // Filter cards
+            signCards.forEach(card => {
+                if (element === 'all' || card.dataset.element === element) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

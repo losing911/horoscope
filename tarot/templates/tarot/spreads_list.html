@@ -1,0 +1,92 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body text-center py-5">
+                    <h1 class="mb-3">
+                        <i class="fas fa-cards me-2" style="color: #6B1B3D;"></i>
+                        Tarot Yayılımları
+                    </h1>
+                    <p class="lead text-muted mb-0">
+                        İhtiyacınıza uygun yayılımı seçin ve kartların size ne söylediğini keşfedin
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {% for spread in spreads %}
+            <div class="col-lg-4 col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-gradient text-white text-center" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);">
+                        <h4 class="mb-0">{{ spread.name }}</h4>
+                        <small>{{ spread.card_count }} Kart</small>
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text flex-grow-1">{{ spread.description }}</p>
+                        
+                        <div class="mb-3">
+                            <h6>Kart Pozisyonları:</h6>
+                            <ul class="list-unstyled small">
+                                {% for key, value in spread.positions.items %}
+                                    <li><span class="badge bg-light text-dark me-2">{{ key }}</span>{{ value }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <span class="badge bg-primary">{{ spread.card_count }} Kart</span>
+                            <span class="badge bg-{% if spread.difficulty_level == 'beginner' %}success{% elif spread.difficulty_level == 'intermediate' %}warning{% else %}danger{% endif %}">
+                                {{ spread.get_difficulty_level_display }}
+                            </span>
+                        </div>
+                        
+                        <div class="mt-auto">
+                            <a href="{% url 'tarot:spread_detail' spread.slug %}" class="btn btn-warning w-100">
+                                <i class="fas fa-play me-2"></i>Bu Yayılımı Başlat
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="text-center py-5">
+                    <i class="fas fa-cards text-muted" style="font-size: 5rem;"></i>
+                    <h3 class="mt-4 text-muted">Henüz yayılım yok</h3>
+                    <p class="text-muted">Admin panelinden yayılım ekleyebilirsiniz.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card bg-light">
+                <div class="card-body text-center">
+                    <h5><i class="fas fa-lightbulb me-2 text-warning"></i>Hangi Yayılımı Seçmeli?</h5>
+                    <div class="row mt-3">
+                        <div class="col-md-4">
+                            <strong>Yeni Başlayanlar</strong>
+                            <p class="small text-muted">Tek kart veya üç kart yayılımları ile başlayın</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Deneyimliler</strong>
+                            <p class="small text-muted">Aşk veya kariyer yayılımları detaylı rehberlik sunar</p>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>İleri Seviye</strong>
+                            <p class="small text-muted">Kelt Haçı en kapsamlı analiz sağlar</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

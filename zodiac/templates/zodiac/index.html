@@ -1,0 +1,132 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Astroloji - Burç Yorumları{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-3">🌟 Astroloji & Burç Yorumları</h1>
+            <p class="lead text-muted">
+                12 burçun gizli sırlarını keşfedin. Günlük, haftalık ve aylık burç yorumlarınızı öğrenin.
+            </p>
+            
+            {% if user.is_authenticated and user_sign %}
+            <div class="alert alert-info mt-4">
+                <h5>Merhaba {{ user.first_name|default:user.username }}! ✨</h5>
+                <p class="mb-2">Burcunuz: <strong>{{ user_sign.name }} {{ user_sign.symbol }}</strong></p>
+                <a href="{% url 'zodiac:sign_detail' user_sign.slug %}" class="btn btn-primary">
+                    Burç Detayına Git
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Quick Links -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3">📅</div>
+                    <h5 class="card-title">Günlük Burç Yorumları</h5>
+                    <p class="card-text">Bugün için tüm burçların yorumlarını görün</p>
+                    <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-outline-primary">
+                        Günlük Yorumlar
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3">🔍</div>
+                    <h5 class="card-title">Burcunu Öğren</h5>
+                    <p class="card-text">Doğum tarihinizden burcunuzu bulun</p>
+                    <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-primary">
+                        Burcumu Bul
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <div class="display-4 mb-3">💕</div>
+                    <h5 class="card-title">Uyum Analizi</h5>
+                    <p class="card-text">İki burç arasındaki uyumu öğrenin</p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-primary">
+                        Uyumu Kontrol Et
+                    </a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-outline-secondary">
+                        Giriş Yapın
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zodiac Signs Grid -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="text-center mb-4">12 Burç</h2>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for sign in zodiac_signs %}
+        <div class="col-md-3 col-sm-6 mb-4">
+            <a href="{% url 'zodiac:sign_detail' sign.slug %}" class="text-decoration-none">
+                <div class="card h-100 shadow-sm hover-card">
+                    {% if sign.image_url %}
+                    <img src="{{ sign.image_url }}" class="card-img-top" alt="{{ sign.name }}">
+                    {% else %}
+                    <div class="card-img-top bg-gradient-primary d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <span class="display-1">{{ sign.symbol }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="card-body text-center">
+                        <h5 class="card-title">{{ sign.symbol }} {{ sign.name }}</h5>
+                        <p class="card-text text-muted small">{{ sign.date_range }}</p>
+                        <div class="mt-2">
+                            <span class="badge bg-info">{{ sign.get_element_display }}</span>
+                            <span class="badge bg-secondary">{{ sign.get_quality_display }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="alert alert-warning text-center">
+                Henüz burç bilgisi eklenmemiş. Lütfen admin panelinden burçları ekleyin.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<style>
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+    color: white;
+}
+</style>
+{% endblock %}

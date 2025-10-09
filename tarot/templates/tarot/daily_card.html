@@ -1,0 +1,183 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-6">Günlük Tarot Kartınız</h1>
+                <p class="lead text-muted">Bugünün size özel mesajını keşfedin</p>
+            </div>
+
+            {% if daily_card %}
+                <!-- Günlük Kart Gösterimi -->
+                <div class="card shadow-lg border-0">
+                    <div class="card-header bg-gradient-primary text-white text-center py-4">
+                        <h3 class="mb-0">{{ daily_card.card.name }}</h3>
+                        <small>{{ daily_card.date|date:"d F Y" }} - Bugünün Kartı</small>
+                    </div>
+                    <div class="card-body p-5">
+                        <div class="row align-items-center">
+                            <div class="col-md-4 text-center mb-4 mb-md-0">
+                                <!-- Kart Görseli -->
+                                {% if daily_card.card.image_url %}
+                                    <div class="tarot-card-image {% if daily_card.is_reversed %}reversed{% endif %}">
+                                        <img 
+                                            src="{{ daily_card.card.image_url }}" 
+                                            alt="{{ daily_card.card.name }}" 
+                                            class="img-fluid rounded shadow-lg"
+                                            loading="lazy"
+                                            onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                            style="max-height: 300px; object-fit: contain;"
+                                        >
+                                        <div class="card-placeholder bg-light rounded p-4" style="display: none; height: 200px; display: flex; align-items: center; justify-content: center;">
+                                            <div>
+                                                <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                                                <p class="mb-0 fw-bold">{{ daily_card.card.name }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% else %}
+                                    <div class="card-placeholder bg-light rounded p-4" style="height: 200px; display: flex; align-items: center; justify-content: center;">
+                                        <div>
+                                            <i class="fas fa-{% if daily_card.is_reversed %}undo{% else %}star{% endif %} fa-3x text-primary mb-2"></i>
+                                            <p class="mb-0 fw-bold">{{ daily_card.card.name }}</p>
+                                            {% if daily_card.is_reversed %}
+                                                <small class="text-danger">Ters Pozisyon</small>
+                                            {% else %}
+                                                <small class="text-success">Düz Pozisyon</small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                
+                                <!-- Pozisyon Bilgisi -->
+                                <div class="mt-2">
+                                    {% if daily_card.is_reversed %}
+                                        <span class="badge bg-danger">Ters Pozisyon</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Düz Pozisyon</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <h5 class="text-primary mb-3">Kart Anlamı</h5>
+                                <p class="mb-4">{{ daily_card.card.meaning }}</p>
+                                
+                                {% if daily_card.is_reversed %}
+                                    <h5 class="text-danger mb-3">Ters Pozisyon Anlamı</h5>
+                                    <p class="mb-4">{{ daily_card.card.reversed_meaning }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Günlük Mesaj -->
+                {% if daily_card.interpretation %}
+                    <div class="card mt-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Bugün için Özel Mesaj</h5>
+                        </div>
+                        <div class="card-body">
+                            <div style="white-space: pre-line;">{{ daily_card.interpretation }}</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Aksiyon Butonları -->
+                <div class="row mt-4">
+                    <div class="col-md-6 mb-3">
+                        <a href="{% url 'tarot:spreads' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-cards me-2"></i>Tam Okuma Yap
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'tarot:user_readings' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-history me-2"></i>Okumalarım
+                            </a>
+                        {% else %}
+                            <a href="{% url 'account_login' %}" class="btn btn-outline-secondary w-100">
+                                <i class="fas fa-user me-2"></i>Giriş Yap
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Sosyal Paylaşım -->
+                <div class="card bg-light mt-4">
+                    <div class="card-body text-center">
+                        <h6>Bugünün kartınız güzel mi?</h6>
+                        <p class="text-muted small mb-3">Sosyal medyada paylaşarak dostlarınızı da ilhamlandırın!</p>
+                        <div class="btn-group">
+                            <a href="#" class="btn btn-outline-primary btn-sm" onclick="shareToTwitter()">
+                                <i class="fab fa-twitter me-1"></i>Twitter
+                            </a>
+                            <a href="#" class="btn btn-outline-primary btn-sm" onclick="shareToFacebook()">
+                                <i class="fab fa-facebook me-1"></i>Facebook
+                            </a>
+                            <button class="btn btn-outline-secondary btn-sm" onclick="copyToClipboard()">
+                                <i class="fas fa-copy me-1"></i>Bağlantıyı Kopyala
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Kart Çekme Formu -->
+                <div class="card shadow-lg border-0">
+                    <div class="card-body text-center p-5">
+                        <i class="fas fa-sun fa-4x text-warning mb-4"></i>
+                        <h3 class="mb-4">Bugünün Kartınızı Çekin</h3>
+                        <p class="text-muted mb-4">
+                            Her gün sadece bir kez kart çekebilirsiniz. Bu kart, bugün karşılaşabileceğiniz 
+                            durumlar ve alacağınız kararlar hakkında size rehberlik edecektir.
+                        </p>
+                        
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-warning btn-lg px-5">
+                                <i class="fas fa-hand-sparkles me-2"></i>Günlük Kartımı Çek
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Bilgi Kutusu -->
+                <div class="alert alert-info mt-4">
+                    <h5 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Nasıl Çalışır?</h5>
+                    <p>Günlük kart çekimi, o günün enerjisini ve size verilmek istenen mesajı anlamanıza yardımcı olur. 
+                    Çekilen kart, günün başında size rehberlik sağlar ve akşam tekrar değerlendirme yaparken o günü 
+                    nasıl geçirdiğinizi düşünmenize yardımcı olur.</p>
+                    <hr>
+                    <p class="mb-0">
+                        <strong>İpucu:</strong> Kartınızı çektikten sonra anlamını not alın ve gün boyunca 
+                        bu mesajın hayatınızda nasıl yankılandığını gözlemleyin.
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function shareToTwitter() {
+    const text = "{{ daily_card.card.name }} - Bugünün tarot kartım! {{ request.build_absolute_uri }}";
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareToFacebook() {
+    const url = "{{ request.build_absolute_uri }}";
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+}
+
+function copyToClipboard() {
+    const url = "{{ request.build_absolute_uri }}";
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Bağlantı kopyalandı!');
+    });
+}
+</script>
+{% endblock %}

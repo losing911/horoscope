@@ -1,0 +1,219 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Burç Uyum Analizi{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow-lg">
+                <div class="card-header bg-gradient-primary text-white text-center">
+                    <h2 class="mb-0">💕 Burç Uyum Analizi</h2>
+                </div>
+                
+                <div class="card-body p-5">
+                    {% if compatibility %}
+                    <!-- Sonuç Gösterimi -->
+                    <div class="text-center mb-4">
+                        <div class="row align-items-center justify-content-center mb-4">
+                            <div class="col-4 text-center">
+                                <div class="display-3">{{ compatibility.sign1.symbol }}</div>
+                                <h4>{{ compatibility.sign1.name }}</h4>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="position-relative">
+                                    <svg width="120" height="120" class="mx-auto">
+                                        <circle cx="60" cy="60" r="50" fill="none" stroke="#e0e0e0" stroke-width="10"/>
+                                        <circle id="compatibilityCircle" 
+                                                cx="60" cy="60" r="50" fill="none" 
+                                                stroke="{% if compatibility.compatibility_score >= 80 %}#28a745{% elif compatibility.compatibility_score >= 60 %}#ffc107{% else %}#dc3545{% endif %}" 
+                                                stroke-width="10"
+                                                data-score="{{ compatibility.compatibility_score }}"
+                                                transform="rotate(-90 60 60)"/>
+                                        <text x="60" y="70" text-anchor="middle" font-size="24" font-weight="bold" 
+                                              fill="{% if compatibility.compatibility_score >= 80 %}#28a745{% elif compatibility.compatibility_score >= 60 %}#ffc107{% else %}#dc3545{% endif %}">
+                                            {{ compatibility.compatibility_score }}%
+                                        </text>
+                                    </svg>
+                                </div>
+                                <h5 class="mt-2">Uyum Skoru</h5>
+                            </div>
+                            <div class="col-4 text-center">
+                                <div class="display-3">{{ compatibility.sign2.symbol }}</div>
+                                <h4>{{ compatibility.sign2.name }}</h4>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Detaylı Analiz -->
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-danger">
+                                <div class="card-body">
+                                    <h5 class="card-title text-danger">❤️ Aşk Uyumu</h5>
+                                    <p class="card-text">{{ compatibility.love_compatibility }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <h5 class="card-title text-info">🤝 Arkadaşlık Uyumu</h5>
+                                    <p class="card-text">{{ compatibility.friendship_compatibility }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h5 class="card-title text-success">💼 İş Uyumu</h5>
+                                    <p class="card-text">{{ compatibility.work_compatibility }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <h5 class="card-title text-warning">⚠️ Zorluklar</h5>
+                                    <p class="card-text">{{ compatibility.challenges }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12 mb-4">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <h5 class="card-title text-primary">💡 Tavsiyeler</h5>
+                                    <p class="card-text">{{ compatibility.advice }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-4">
+                        <a href="{% url 'zodiac:compatibility' %}" class="btn btn-primary">
+                            Yeni Analiz Yap
+                        </a>
+                        <a href="{% url 'zodiac:home' %}" class="btn btn-outline-secondary">
+                            Ana Sayfa
+                        </a>
+                    </div>
+                    {% else %}
+                    <!-- Form -->
+                    <div class="text-center mb-4">
+                        <p class="lead">İki burç arasındaki uyumu öğrenmek için burçları seçin</p>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-4">
+                                <label for="sign1" class="form-label">Birinci Burç</label>
+                                <select name="sign1" id="sign1" class="form-select form-select-lg" required>
+                                    <option value="">Burç seçin...</option>
+                                    {% for sign in zodiac_signs %}
+                                    <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-4">
+                                <label for="sign2" class="form-label">İkinci Burç</label>
+                                <select name="sign2" id="sign2" class="form-select form-select-lg" required>
+                                    <option value="">Burç seçin...</option>
+                                    {% for sign in zodiac_signs %}
+                                    <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        {% if error %}
+                        <div class="alert alert-danger">
+                            {{ error }}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                💕 Uyumu Analiz Et
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="alert alert-info mt-4">
+                        <h6>ℹ️ Bilgi</h6>
+                        <p class="mb-0 small">
+                            Analiz sonuçları yapay zeka destekli olarak hazırlanır ve kişisel gelişim amaçlıdır.
+                            Uyum analizi, elementler ve gezegen pozisyonlarına göre genel bir değerlendirmedir.
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Quick Links -->
+            <div class="row mt-4">
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <h6>🔍 Burcunu Bul</h6>
+                            <a href="{% url 'zodiac:find_sign' %}" class="btn btn-sm btn-outline-primary">
+                                Git
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <h6>📅 Günlük Yorumlar</h6>
+                            <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-sm btn-outline-primary">
+                                Git
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm text-center">
+                        <div class="card-body">
+                            <h6>🌟 Tüm Burçlar</h6>
+                            <a href="{% url 'zodiac:signs_list' %}" class="btn btn-sm btn-outline-primary">
+                                Git
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+</style>
+
+<script>
+// SVG Circle Progress Animation
+document.addEventListener('DOMContentLoaded', function() {
+    const circle = document.getElementById('compatibilityCircle');
+    if (circle) {
+        const score = parseInt(circle.getAttribute('data-score'));
+        const circumference = 2 * Math.PI * 50; // radius = 50
+        const dashArray = (score / 100) * circumference;
+        circle.setAttribute('stroke-dasharray', `${dashArray} ${circumference}`);
+    }
+});
+</script>
+{% endblock %}

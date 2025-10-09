@@ -1,0 +1,375 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+.dashboard-card {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+    color: white;
+    border-radius: 15px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-card.card-warning {
+    background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+    color: #333;
+}
+
+.dashboard-card.card-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.dashboard-card.card-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #6f42c1 100%);
+}
+
+.dashboard-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.9;
+}
+
+.dashboard-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.dashboard-label {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+.admin-nav {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pills .nav-link {
+    border-radius: 10px;
+    margin: 0 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+
+.table {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.table th {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.chart-container {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white text-center mb-4">
+                <i class="fas fa-tachometer-alt me-3"></i>Admin Dashboard
+            </h1>
+            
+            <!-- Navigation -->
+            <div class="admin-nav">
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/dashboard/">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users/">
+                            <i class="fas fa-users me-2"></i>Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/readings/">
+                            <i class="fas fa-cards me-2"></i>Okumalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/statistics/">
+                            <i class="fas fa-chart-bar me-2"></i>İstatistikler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/settings/">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="dashboard-card">
+                <div class="dashboard-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="dashboard-number">{{ total_users }}</h3>
+                <p class="dashboard-label">Toplam Kullanıcı</p>
+                <small>Bu ay: +{{ monthly_users }}</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="dashboard-card card-warning">
+                <div class="dashboard-icon">
+                    <i class="fas fa-cards"></i>
+                </div>
+                <h3 class="dashboard-number">{{ total_readings }}</h3>
+                <p class="dashboard-label">Toplam Okuma</p>
+                <small>Bu ay: +{{ monthly_readings }}</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="dashboard-card card-success">
+                <div class="dashboard-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3 class="dashboard-number">{{ total_cards }}</h3>
+                <p class="dashboard-label">Tarot Kartları</p>
+                <small>Aktif kartlar</small>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="dashboard-card card-info">
+                <div class="dashboard-icon">
+                    <i class="fas fa-layer-group"></i>
+                </div>
+                <h3 class="dashboard-number">{{ total_spreads }}</h3>
+                <p class="dashboard-label">Yayılımlar</p>
+                <small>Aktif yayılımlar</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Stats -->
+    <div class="row mb-5">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-day me-2"></i>Bugünkü İstatistikler
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <h3 class="text-primary">{{ daily_readings }}</h3>
+                            <p class="text-muted">Okuma Yapıldı</p>
+                        </div>
+                        <div class="col-6">
+                            <h3 class="text-success">{{ daily_users }}</h3>
+                            <p class="text-muted">Aktif Kullanıcı</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="chart-container h-100">
+                <h5 class="mb-3">
+                    <i class="fas fa-chart-line me-2"></i>Son 7 Gün - Okuma Grafiği
+                </h5>
+                <canvas id="readingsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row">
+        <div class="col-lg-8 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-clock me-2"></i>Son Okumalar
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Yayılım</th>
+                                    <th>Soru</th>
+                                    <th>Tarih</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reading in recent_readings %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-user me-2"></i>
+                                        {{ reading.user.username }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ reading.spread.name }}</span>
+                                    </td>
+                                    <td>{{ reading.question|truncatechars:50 }}</td>
+                                    <td>
+                                        <small class="text-muted">
+                                            {{ reading.created_at|date:"d/m/Y H:i" }}
+                                        </small>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        Henüz okuma yapılmamış.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0">
+                        <i class="fas fa-fire me-2"></i>Popüler Yayılımlar
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for spread in popular_spreads %}
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <strong>{{ spread.spread__name }}</strong><br>
+                            <small class="text-muted">{{ spread.reading_count }} okuma</small>
+                        </div>
+                        <div class="progress" style="width: 100px; height: 10px;">
+                            <div class="progress-bar bg-warning" style="width: {{ spread.reading_count|default:1 }}%"></div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="text-muted text-center">Henüz okuma yok.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Users -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-trophy me-2"></i>En Aktif Kullanıcılar
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for user in active_users %}
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="d-flex align-items-center p-3 bg-light rounded">
+                                <div class="me-3">
+                                    <i class="fas fa-user-circle fa-2x text-success"></i>
+                                </div>
+                                <div>
+                                    <h6 class="mb-1">{{ user.username }}</h6>
+                                    <small class="text-muted">{{ user.reading_count }} okuma</small>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center">
+                            <p class="text-muted">Henüz aktif kullanıcı yok.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Okuma grafiği
+const ctx = document.getElementById('readingsChart').getContext('2d');
+const readingsChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [{% for stat in daily_stats %}'{{ stat.date }}'{% if not forloop.last %},{% endif %}{% endfor %}],
+        datasets: [{
+            label: 'Okumalar',
+            data: [{% for stat in daily_stats %}{{ stat.readings }}{% if not forloop.last %},{% endif %}{% endfor %}],
+            borderColor: '#667eea',
+            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true,
+                ticks: {
+                    precision: 0
+                }
+            }
+        }
+    }
+});
+
+// Auto refresh (5 dakikada bir)
+setTimeout(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

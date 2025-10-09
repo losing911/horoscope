@@ -1,0 +1,134 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Yayılım Başlığı -->
+            <div class="text-center mb-5">
+                <h1 class="display-5">{{ spread.name }}</h1>
+                <p class="lead text-muted">{{ spread.description }}</p>
+                <div>
+                    <span class="badge bg-primary fs-6 me-2">{{ spread.card_count }} Kart</span>
+                    <span class="badge bg-{% if spread.difficulty_level == 'beginner' %}success{% elif spread.difficulty_level == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
+                        {{ spread.get_difficulty_level_display }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pozisyon Açıklamaları -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="fas fa-map me-2"></i>Kart Pozisyonları</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for key, value in spread.positions.items %}
+                            <div class="col-md-6 mb-2">
+                                <div class="d-flex align-items-center">
+                                    <span class="badge bg-warning text-dark me-3 fs-6">{{ key }}</span>
+                                    <span>{{ value }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Okuma Formu -->
+            {% if user.is_authenticated %}
+                <div class="card">
+                    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);">
+                        <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Sorunuzu Sorun</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="{% url 'tarot:create_reading' %}" id="readingForm">
+                            {% csrf_token %}
+                            <input type="hidden" name="spread_id" value="{{ spread.id }}">
+                            
+                            <div class="mb-4">
+                                <label for="question" class="form-label">Kartlara sormak istediğiniz soru:</label>
+                                <textarea 
+                                    class="form-control" 
+                                    id="question"
+                                    name="question" 
+                                    rows="4" 
+                                    placeholder="Örnek: Aşk hayatımda beni neler bekliyor? Kariyerimde nasıl ilerlemeliyim? Bu durumla ilgili ne yapmalıyım?"
+                                    required
+                                ></textarea>
+                                <div class="form-text">Açık uçlu sorular daha iyi sonuçlar verir. "Evet/Hayır" soruları yerine "Nasıl" veya "Ne" ile başlayan sorular sorun.</div>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <i class="fas fa-magic me-2"></i>
+                                <strong>Mistik Kart Çekimi:</strong> Evrenin rehberliğinde rastgele {{ spread.card_count }} kart çekilecektir.
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                                    <i class="fas fa-magic me-2"></i>
+                                    Kartları Çek ve Oku
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info text-center">
+                    <h5><i class="fas fa-info-circle me-2"></i>Tarot Okuma İçin Giriş Yapın</h5>
+                    <p class="mb-3">Bu yayılımı kullanmak için hesap oluşturmanız gerekiyor.</p>
+                    <a href="#" class="btn btn-primary me-2">Giriş Yap</a>
+                    <a href="#" class="btn btn-outline-primary">Kayıt Ol</a>
+                </div>
+            {% endif %}
+            
+            <!-- Geri Dön -->
+            <div class="text-center mt-4">
+                <a href="{% url 'tarot:spreads' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Diğer Yayılımlar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Form submit
+document.getElementById('readingForm')?.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Loading state
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Kartlar yorumlanıyor...';
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Hata: ' + data.error);
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalText;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Bir hata oluştu. Lütfen tekrar deneyin.');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    });
+});
+</script>
+{% endblock %}

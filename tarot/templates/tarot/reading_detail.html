@@ -1,0 +1,132 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-6">{{ reading.spread.name }} Okuma</h1>
+                <p class="lead text-muted">{{ reading.created_at|date:"d F Y, H:i" }}</p>
+                {% if reading.ai_provider %}
+                    <span class="badge bg-info">{{ reading.ai_provider|title }} ile yorumlandı</span>
+                {% endif %}
+            </div>
+
+            <!-- Soru -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Sorulan Soru</h5>
+                </div>
+                <div class="card-body">
+                    <p class="fs-5 mb-0">"{{ reading.question }}"</p>
+                </div>
+            </div>
+
+            <!-- Çekilen Kartlar -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-cards me-2"></i>Çekilen Kartlar</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for card in reading.cards %}
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card h-100 {% if card.is_reversed %}border-danger{% else %}border-success{% endif %}">
+                                    <div class="card-header text-center {% if card.is_reversed %}bg-danger text-white{% else %}bg-success text-white{% endif %}">
+                                        <h6 class="mb-0">{{ card.position_meaning }}</h6>
+                                    </div>
+                                    <div class="card-body text-center">
+                                        <!-- Kart Görseli -->
+                                        {% if card.image_url %}
+                                            <div class="tarot-card-image mb-3 {% if card.is_reversed %}reversed{% endif %}">
+                                                <img 
+                                                    src="{{ card.image_url }}" 
+                                                    alt="{{ card.name }}" 
+                                                    class="img-fluid rounded shadow-sm"
+                                                    loading="lazy"
+                                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                                    style="max-height: 250px; object-fit: contain;"
+                                                >
+                                                <div class="card-placeholder bg-light p-3 rounded" style="display: none;">
+                                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <div class="card-placeholder bg-light p-3 rounded mb-3">
+                                                <i class="fas fa-image fa-3x text-muted"></i>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        <h5 class="card-title">
+                                            {{ card.name }}
+                                            {% if card.is_reversed %}
+                                                <small class="text-danger">(Ters)</small>
+                                            {% endif %}
+                                        </h5>
+                                        <p class="card-text small">{{ card.meaning|truncatechars:100 }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reklam -->
+            {% include 'includes/ad_inline.html' %}
+
+            <!-- AI Yorumu -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>AI Yorumu</h5>
+                </div>
+                <div class="card-body">
+                    <div class="fs-6" style="white-space: pre-line;">{{ reading.interpretation }}</div>
+                </div>
+            </div>
+
+            <!-- Reklam -->
+            {% include 'includes/ad_inline.html' %}
+
+            <!-- Aksiyon Butonları -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <a href="{% url 'tarot:spreads' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-redo me-2"></i>Yeni Okuma Yap
+                    </a>
+                </div>
+                <div class="col-md-6 mb-3">
+                    {% if reading.user == user %}
+                        <a href="{% url 'tarot:user_readings' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-history me-2"></i>Okumalarım
+                        </a>
+                    {% else %}
+                        <a href="{% url 'tarot:public_readings' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-eye me-2"></i>Diğer Okumalar
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Paylaş -->
+            {% if reading.user == user %}
+                <div class="card bg-light">
+                    <div class="card-body text-center">
+                        <h6>Bu okumayı beğendiniz mi?</h6>
+                        <p class="text-muted small">Okumayı herkese açık yaparak diğer kullanıcılarla paylaşabilirsiniz.</p>
+                        <form method="post" action="#" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm {% if reading.is_public %}btn-success{% else %}btn-outline-success{% endif %}">
+                                <i class="fas fa-{% if reading.is_public %}eye{% else %}eye-slash{% endif %} me-1"></i>
+                                {% if reading.is_public %}Herkese Açık{% else %}Herkese Açık Yap{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

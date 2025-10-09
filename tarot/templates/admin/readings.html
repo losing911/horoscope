@@ -1,0 +1,197 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="text-white text-center mb-4">
+                <i class="fas fa-cards me-3"></i>Okuma Yönetimi
+            </h1>
+            
+            <!-- Navigation -->
+            <div class="admin-nav" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);">
+                <ul class="nav nav-pills justify-content-center">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/dashboard/">
+                            <i class="fas fa-home me-2"></i>Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/users/">
+                            <i class="fas fa-users me-2"></i>Kullanıcılar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/admin/readings/">
+                            <i class="fas fa-cards me-2"></i>Okumalar
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/statistics/">
+                            <i class="fas fa-chart-bar me-2"></i>İstatistikler
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/settings/">
+                            <i class="fas fa-cog me-2"></i>Ayarlar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Arama</label>
+                            <input type="text" class="form-control" name="search" value="{{ search }}" placeholder="Kullanıcı, soru...">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Yayılım</label>
+                            <select class="form-select" name="spread">
+                                <option value="all">Tümü</option>
+                                {% for spread in spreads %}
+                                <option value="{{ spread.slug }}" {% if spread_filter == spread.slug %}selected{% endif %}>{{ spread.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label">Tarih</label>
+                            <select class="form-select" name="date">
+                                <option value="all" {% if date_filter == 'all' %}selected{% endif %}>Tümü</option>
+                                <option value="today" {% if date_filter == 'today' %}selected{% endif %}>Bugün</option>
+                                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>Son 7 Gün</option>
+                                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>Son 30 Gün</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-2"></i>Filtrele
+                            </button>
+                            <a href="/admin/readings/" class="btn btn-outline-secondary">
+                                <i class="fas fa-redo me-2"></i>Temizle
+                            </a>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end justify-content-end">
+                            <span class="badge bg-info fs-6">Toplam: {{ total_readings }}</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Readings Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Kullanıcı</th>
+                                    <th>Yayılım</th>
+                                    <th>Soru</th>
+                                    <th>AI Sağlayıcı</th>
+                                    <th>Tarih</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reading in readings %}
+                                <tr>
+                                    <td>
+                                        <i class="fas fa-user me-2"></i>
+                                        {{ reading.user.username }}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ reading.spread.name }}</span>
+                                    </td>
+                                    <td>{{ reading.question|truncatechars:60 }}</td>
+                                    <td>
+                                        {% if reading.ai_provider == 'gemini' %}
+                                        <span class="badge bg-success">Gemini</span>
+                                        {% else %}
+                                        <span class="badge bg-info">OpenAI</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ reading.created_at|date:"d/m/Y H:i" }}</td>
+                                    <td>
+                                        <a href="/reading/{{ reading.id }}/" class="btn btn-sm btn-outline-primary" title="Görüntüle" target="_blank">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/django-admin/tarot/tarotreading/{{ reading.id }}/change/" class="btn btn-sm btn-outline-warning" title="Düzenle">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted py-4">
+                                        Okuma bulunamadı.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            {% if readings.has_other_pages %}
+            <div class="d-flex justify-content-center mt-4">
+                <nav>
+                    <ul class="pagination">
+                        {% if readings.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ readings.previous_page_number }}&search={{ search }}&spread={{ spread_filter }}&date={{ date_filter }}">Önceki</a>
+                        </li>
+                        {% endif %}
+                        
+                        {% for num in readings.paginator.page_range %}
+                        <li class="page-item {% if readings.number == num %}active{% endif %}">
+                            <a class="page-link" href="?page={{ num }}&search={{ search }}&spread={{ spread_filter }}&date={{ date_filter }}">{{ num }}</a>
+                        </li>
+                        {% endfor %}
+                        
+                        {% if readings.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ readings.next_page_number }}&search={{ search }}&spread={{ spread_filter }}&date={{ date_filter }}">Sonraki</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.nav-pills .nav-link {
+    border-radius: 10px;
+    margin: 0 5px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+
+.table thead tr {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+    color: white;
+}
+</style>
+{% endblock %}

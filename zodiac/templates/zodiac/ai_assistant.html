@@ -1,0 +1,168 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AI Burç Asistanı{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12 text-center">
+            <h1 class="display-4 mb-3">🤖 AI Burç Asistanı</h1>
+            <p class="lead text-muted">AstroTarot AI ile astroloji sorularınızı sorun</p>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Burç Danışmanınız</h5>
+                </div>
+                
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="user_sign" class="form-label">
+                                <i class="fas fa-star text-warning me-2"></i>Burcunuz (Opsiyonel)
+                            </label>
+                            <select class="form-select form-select-lg" id="user_sign" name="user_sign">
+                                <option value="">-- Seçmek istemiyorum --</option>
+                                {% for sign in zodiac_signs %}
+                                <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <small class="form-text text-muted">
+                                Burcunuzu seçerseniz daha kişiselleştirilmiş cevaplar alırsınız.
+                            </small>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="question" class="form-label">
+                                <i class="fas fa-question-circle text-info me-2"></i>Sorunuz
+                            </label>
+                            <textarea 
+                                class="form-control form-control-lg" 
+                                id="question" 
+                                name="question" 
+                                rows="5" 
+                                placeholder="Örnek: Bu ay aşk hayatımda ne gibi gelişmeler olabilir?"
+                                required
+                            ></textarea>
+                            <small class="form-text text-muted">
+                                Aşk, kariyer, sağlık, finans veya genel astroloji hakkında soru sorabilirsiniz.
+                            </small>
+                        </div>
+                        
+                        {% if error %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle me-2"></i>{{ error }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>AI Yorumu Al
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            {% if response_text %}
+            <div class="card shadow-lg border-0 mt-4 animate__animated animate__fadeInUp">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>AI Cevabı</h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="ai-response">
+                        {{ response_text|linebreaks }}
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-robot me-1"></i>
+                            Bu yorum AstroTarot AI tarafından oluşturulmuştur.
+                        </small>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'zodiac:ai_assistant' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-redo me-2"></i>Yeni Soru Sor
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="card mt-4 bg-light border-0">
+                <div class="card-body">
+                    <h6 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Örnek Sorular:</h6>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2">💖 "Bu hafta aşk hayatımda neler yaşayabilirim?"</li>
+                        <li class="mb-2">💼 "Kariyer değişikliği yapmak için uygun bir dönem mi?"</li>
+                        <li class="mb-2">💰 "Mali durumum hakkında ne söyleyebilirsin?"</li>
+                        <li class="mb-2">🧘 "Enerji seviyemi nasıl artırabilirim?"</li>
+                        <li class="mb-2">🔮 "Ayın geri hareketi beni nasıl etkileyecek?"</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-5 mb-5">
+        <div class="col-12 text-center">
+            <a href="{% url 'zodiac:home' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Astroloji Ana Sayfa
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+}
+
+.ai-response {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #2d3748;
+}
+
+.ai-response p {
+    margin-bottom: 1.5rem;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate__animated {
+    animation-duration: 0.8s;
+}
+
+.animate__fadeInUp {
+    animation-name: fadeInUp;
+}
+</style>
+
+<!-- AdSense Alanları -->
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="ad-placeholder" style="background: #f0f0f0; padding: 50px; border-radius: 8px;">
+                <small class="text-muted">Reklam Alanı - 728x90</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
