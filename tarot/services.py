@@ -44,7 +44,7 @@ class AIService:
             logger.error(f"❌ {error_msg}")
             raise Exception(error_msg)
     
-    def generate_interpretation(self, question, cards, spread_name):
+    def generate_interpretation(self, question, cards, spread_name, language='tr'):
         """
         Tarot yorumu üret
         
@@ -52,6 +52,7 @@ class AIService:
             question: Kullanıcının sorusu
             cards: Seçilen kartlar listesi (dict: {position, card, is_reversed})
             spread_name: Yayılım adı
+            language: Yorum dili ('tr', 'en', 'de', 'fr')
         
         Returns:
             str: AI tarafından üretilen yorum
@@ -60,7 +61,7 @@ class AIService:
         logger.info(f"❓ Soru: {question[:100]}...")
         
         # Prompt oluştur
-        prompt = self._create_prompt(question, cards, spread_name)
+        prompt = self._create_prompt(question, cards, spread_name, language)
         logger.info(f"📄 Prompt uzunluğu: {len(prompt)} karakter")
         
         # Akıllı Fallback Sistemi: İlk provider başarısız olursa diğerini dene
@@ -116,11 +117,21 @@ class AIService:
         
         # Tüm provider'lar başarısız olursa fallback
         logger.warning("⚠️ Tüm AI provider'lar başarısız oldu, fallback yorumu kullanılıyor...")
-        return self._generate_fallback_interpretation(question, cards, spread_name)
+        return self._generate_fallback_interpretation(question, cards, spread_name, language)
     
-    def _create_prompt(self, question, cards, spread_name):
+    def _create_prompt(self, question, cards, spread_name, language='tr'):
         """AI için prompt oluştur"""
-        prompt = f"""Sen profesyonel bir tarot yorumcususun. Aşağıdaki tarot okuma için detaylı ve içgörülü bir yorum yap.
+        # Dil talimatları
+        language_instructions = {
+            'tr': 'Türkçe yanıt ver. ',
+            'en': 'Respond in English. ',
+            'de': 'Antworte auf Deutsch. ',
+            'fr': 'Répondez en français. '
+        }
+        
+        lang_instruction = language_instructions.get(language, language_instructions['tr'])
+        
+        prompt = f"""{lang_instruction}Sen profesyonel bir tarot yorumcususun. Aşağıdaki tarot okuma için detaylı ve içgörülü bir yorum yap.
 
 Yayılım Türü: {spread_name}
 Soru: {question}
@@ -251,25 +262,66 @@ Yorumun profesyonel, anlaşılır ve içgörülü olsun. Türkçe olarak yanıt 
             logger.error(f"📋 Traceback:\n{traceback.format_exc()}")
             raise
     
-    def _generate_fallback_interpretation(self, question, cards, spread_name):
+    def _generate_fallback_interpretation(self, question, cards, spread_name, language='tr'):
         """API hatası durumunda basit yorum üret"""
-        interpretation = f"## {spread_name} Yorumu\n\n"
-        interpretation += f"**Sorunuz:** {question}\n\n"
-        interpretation += "### Çekilen Kartlar:\n\n"
+        # Dile göre çeviriler
+        translations = {
+            'tr': {
+                'interpretation': 'Yorumu',
+                'your_question': 'Sorunuz',
+                'drawn_cards': 'Çekilen Kartlar',
+                'card': 'Kart',
+                'upright': 'Düz',
+                'reversed': 'Ters',
+                'note': 'Not: Bu yorum AI servisine erişilemediği için otomatik oluşturulmuştur. Daha detaylı yorum için lütfen daha sonra tekrar deneyin.'
+            },
+            'en': {
+                'interpretation': 'Reading',
+                'your_question': 'Your Question',
+                'drawn_cards': 'Drawn Cards',
+                'card': 'Card',
+                'upright': 'Upright',
+                'reversed': 'Reversed',
+                'note': 'Note: This interpretation was automatically generated because AI service is unavailable. Please try again later for a more detailed reading.'
+            },
+            'de': {
+                'interpretation': 'Deutung',
+                'your_question': 'Ihre Frage',
+                'drawn_cards': 'Gezogene Karten',
+                'card': 'Karte',
+                'upright': 'Aufrecht',
+                'reversed': 'Umgekehrt',
+                'note': 'Hinweis: Diese Deutung wurde automatisch erstellt, da der KI-Dienst nicht verfügbar ist. Bitte versuchen Sie es später erneut für eine detailliertere Deutung.'
+            },
+            'fr': {
+                'interpretation': 'Lecture',
+                'your_question': 'Votre Question',
+                'drawn_cards': 'Cartes Tirées',
+                'card': 'Carte',
+                'upright': 'Endroit',
+                'reversed': 'Renversé',
+                'note': 'Remarque : Cette interprétation a été générée automatiquement car le service IA est indisponible. Veuillez réessayer plus tard pour une lecture plus détaillée.'
+            }
+        }
+        
+        t = translations.get(language, translations['tr'])
+        
+        interpretation = f"## {spread_name} {t['interpretation']}\n\n"
+        interpretation += f"**{t['your_question']}:** {question}\n\n"
+        interpretation += f"### {t['drawn_cards']}:\n\n"
         
         for card_info in cards:
             card = card_info['card']
             position = card_info['position']
             is_reversed = card_info['is_reversed']
             
-            direction = "Ters" if is_reversed else "Düz"
+            direction = t['reversed'] if is_reversed else t['upright']
             meaning = card.reversed_meaning if is_reversed else card.upright_meaning
             
-            interpretation += f"**{position}. Kart: {card.name}** ({direction})\n"
+            interpretation += f"**{position}. {t['card']}: {card.name}** ({direction})\n"
             interpretation += f"{meaning}\n\n"
         
-        interpretation += "\n*Not: Bu yorum AI servisine erişilemediği için otomatik oluşturulmuştur. "
-        interpretation += "Daha detaylı yorum için lütfen daha sonra tekrar deneyin.*"
+        interpretation += f"\n*{t['note']}*"
         
         return interpretation
 
@@ -280,12 +332,38 @@ class DailyCardService:
     def __init__(self):
         self.ai_service = AIService()
     
-    def generate_daily_interpretation(self, card, is_reversed=False):
+    def generate_daily_interpretation(self, card, is_reversed=False, language='tr'):
         """Günlük kart için özel yorum üret"""
         meaning = card.reversed_meaning if is_reversed else card.upright_meaning
-        direction = "Ters" if is_reversed else "Düz"
         
-        prompt = f"""Sen profesyonel bir tarot yorumcususun. Günün kartı için ilham verici bir yorum yap.
+        # Dil talimatları ve çeviriler
+        language_map = {
+            'tr': {
+                'instruction': 'Türkçe yanıt ver. ',
+                'direction_upright': 'Düz',
+                'direction_reversed': 'Ters'
+            },
+            'en': {
+                'instruction': 'Respond in English. ',
+                'direction_upright': 'Upright',
+                'direction_reversed': 'Reversed'
+            },
+            'de': {
+                'instruction': 'Antworte auf Deutsch. ',
+                'direction_upright': 'Aufrecht',
+                'direction_reversed': 'Umgekehrt'
+            },
+            'fr': {
+                'instruction': 'Répondez en français. ',
+                'direction_upright': 'Endroit',
+                'direction_reversed': 'Renversé'
+            }
+        }
+        
+        lang = language_map.get(language, language_map['tr'])
+        direction = lang['direction_reversed'] if is_reversed else lang['direction_upright']
+        
+        prompt = f"""{lang['instruction']}Sen profesyonel bir tarot yorumcususun. Günün kartı için ilham verici bir yorum yap.
 
 Günün Kartı: {card.name} ({direction})
 Temel Anlam: {meaning}
@@ -296,8 +374,6 @@ Lütfen bu kart için:
 3. Dikkat edilmesi gereken noktaları belirt
 4. Pozitif ve motive edici bir dil kullan
 5. Kısa ve öz tut (3-4 paragraf)
-
-Türkçe olarak yanıt ver.
 """
         
         try:
@@ -307,12 +383,35 @@ Türkçe olarak yanıt ver.
                 return self.ai_service._generate_gemini(prompt)
         except Exception as e:
             print(f"Daily card AI error: {str(e)}")
-            # Fallback
-            interpretation = f"## Günün Kartı: {card.name}\n\n"
-            interpretation += f"**{direction} Pozisyon**\n\n"
+            # Fallback with language support
+            fallback_translations = {
+                'tr': {
+                    'title': 'Günün Kartı',
+                    'position': 'Pozisyon',
+                    'message': 'Bu kart bugün için size önemli bir mesaj taşıyor. Kartın enerjisini kullanarak gününüzü daha bilinçli yaşayabilirsiniz.'
+                },
+                'en': {
+                    'title': "Today's Card",
+                    'position': 'Position',
+                    'message': 'This card carries an important message for you today. Use the card\'s energy to live your day more consciously.'
+                },
+                'de': {
+                    'title': 'Karte des Tages',
+                    'position': 'Position',
+                    'message': 'Diese Karte trägt heute eine wichtige Botschaft für Sie. Nutzen Sie die Energie der Karte, um Ihren Tag bewusster zu leben.'
+                },
+                'fr': {
+                    'title': 'Carte du Jour',
+                    'position': 'Position',
+                    'message': 'Cette carte porte un message important pour vous aujourd\'hui. Utilisez l\'énergie de la carte pour vivre votre journée plus consciemment.'
+                }
+            }
+            
+            fb = fallback_translations.get(language, fallback_translations['tr'])
+            interpretation = f"## {fb['title']}: {card.name}\n\n"
+            interpretation += f"**{direction} {fb['position']}**\n\n"
             interpretation += f"{meaning}\n\n"
-            interpretation += "Bu kart bugün için size önemli bir mesaj taşıyor. "
-            interpretation += "Kartın enerjisini kullanarak gününüzü daha bilinçli yaşayabilirsiniz."
+            interpretation += fb['message']
             return interpretation
 
 

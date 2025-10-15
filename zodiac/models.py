@@ -353,3 +353,102 @@ class PersonalHoroscope(models.Model):
         if self.ascendant_sign:
             result += f" / Yükselen: {self.ascendant_sign.name}"
         return result
+
+
+class UserDailyHoroscope(models.Model):
+    """Kullanıcıya Özel Günlük Burç Yorumu"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Kullanıcı")
+    zodiac_sign = models.ForeignKey(ZodiacSign, on_delete=models.CASCADE, verbose_name="Burç")
+    date = models.DateField(verbose_name="Tarih")
+    general = models.TextField(verbose_name="Genel Yorum")
+    love = models.TextField(verbose_name="Aşk Hayatı")
+    career = models.TextField(verbose_name="Kariyer")
+    health = models.TextField(verbose_name="Sağlık")
+    money = models.TextField(verbose_name="Finans")
+    mood_score = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        default=5,
+        verbose_name="Ruh Hali Skoru"
+    )
+    lucky_number = models.IntegerField(verbose_name="Günün Şanslı Sayısı")
+    lucky_color = models.CharField(max_length=50, verbose_name="Günün Şanslı Rengi")
+    ai_provider = models.CharField(
+        max_length=20,
+        choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],
+        default='openai',
+        verbose_name="AI Sağlayıcı"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Kullanıcı Günlük Burç Yorumu"
+        verbose_name_plural = "Kullanıcı Günlük Burç Yorumları"
+        unique_together = ['user', 'date']
+        ordering = ['-date']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.zodiac_sign.name} - {self.date}"
+
+
+class UserWeeklyHoroscope(models.Model):
+    """Kullanıcıya Özel Haftalık Burç Yorumu"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Kullanıcı")
+    zodiac_sign = models.ForeignKey(ZodiacSign, on_delete=models.CASCADE, verbose_name="Burç")
+    week_start = models.DateField(verbose_name="Hafta Başlangıcı")
+    week_end = models.DateField(verbose_name="Hafta Bitişi")
+    general = models.TextField(verbose_name="Genel Yorum")
+    love = models.TextField(verbose_name="Aşk Hayatı")
+    career = models.TextField(verbose_name="Kariyer")
+    health = models.TextField(verbose_name="Sağlık")
+    money = models.TextField(verbose_name="Finans")
+    advice = models.TextField(verbose_name="Haftalık Tavsiye")
+    ai_provider = models.CharField(
+        max_length=20,
+        choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],
+        default='openai',
+        verbose_name="AI Sağlayıcı"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Kullanıcı Haftalık Burç Yorumu"
+        verbose_name_plural = "Kullanıcı Haftalık Burç Yorumları"
+        unique_together = ['user', 'week_start']
+        ordering = ['-week_start']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.zodiac_sign.name} - {self.week_start}"
+
+
+class UserMonthlyHoroscope(models.Model):
+    """Kullanıcıya Özel Aylık Burç Yorumu"""
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Kullanıcı")
+    zodiac_sign = models.ForeignKey(ZodiacSign, on_delete=models.CASCADE, verbose_name="Burç")
+    month = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(12)],
+        verbose_name="Ay"
+    )
+    year = models.IntegerField(verbose_name="Yıl")
+    general = models.TextField(verbose_name="Genel Yorum")
+    love = models.TextField(verbose_name="Aşk Hayatı")
+    career = models.TextField(verbose_name="Kariyer")
+    health = models.TextField(verbose_name="Sağlık")
+    money = models.TextField(verbose_name="Finans")
+    opportunities = models.TextField(verbose_name="Fırsatlar")
+    challenges = models.TextField(verbose_name="Zorluklar")
+    ai_provider = models.CharField(
+        max_length=20,
+        choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],
+        default='openai',
+        verbose_name="AI Sağlayıcı"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name = "Kullanıcı Aylık Burç Yorumu"
+        verbose_name_plural = "Kullanıcı Aylık Burç Yorumları"
+        unique_together = ['user', 'year', 'month']
+        ordering = ['-year', '-month']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.zodiac_sign.name} - {self.month}/{self.year}"

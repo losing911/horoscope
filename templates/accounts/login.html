@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Giriş Yap - Tarot Yorum{% endblock %}
+
+{% block description %}Tarot Yorum platformuna giriş yapın ve kişisel tarot okumalarınıza erişin.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 50px auto;
+    }
+    
+    .login-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .login-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+    
+    .login-header i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .login-body {
+        padding: 40px 30px;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .btn-login {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .btn-login:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .divider {
+        display: flex;
+        align-items: center;
+        text-align: center;
+        margin: 25px 0;
+    }
+    
+    .divider::before,
+    .divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .divider span {
+        padding: 0 10px;
+        color: #666;
+        font-size: 14px;
+    }
+    
+    .social-login {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .btn-social {
+        flex: 1;
+        border-radius: 10px;
+        padding: 12px;
+        border: 2px solid #e0e0e0;
+        background: white;
+        transition: all 0.3s;
+    }
+    
+    .btn-social:hover {
+        border-color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .btn-google {
+        color: #db4437;
+    }
+    
+    .btn-facebook {
+        color: #4267B2;
+    }
+    
+    .password-toggle {
+        cursor: pointer;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+    }
+    
+    .password-wrapper {
+        position: relative;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <i class="fas fa-user-circle"></i>
+            <h3 class="mb-0">Hoş Geldiniz</h3>
+            <p class="mb-0 mt-2">Hesabınıza giriş yapın</p>
+        </div>
+        
+        <div class="login-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Kullanıcı adı veya şifre hatalı. Lütfen tekrar deneyin.
+                </div>
+            {% endif %}
+            
+            <!-- Social Login Buttons (Optional) -->
+            <!--
+            <div class="social-login">
+                <button class="btn btn-social btn-google">
+                    <i class="fab fa-google me-2"></i>Google
+                </button>
+                <button class="btn btn-social btn-facebook">
+                    <i class="fab fa-facebook me-2"></i>Facebook
+                </button>
+            </div>
+            
+            <div class="divider">
+                <span>veya</span>
+            </div>
+            -->
+            
+            <form method="post" action="{% url 'accounts:login' %}">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">
+                        <i class="fas fa-user me-2"></i>Kullanıcı Adı
+                    </label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        id="id_username"
+                        class="form-control" 
+                        placeholder="Kullanıcı adınızı girin"
+                        required
+                        autofocus
+                    >
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Şifre
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="id_password"
+                            class="form-control" 
+                            placeholder="Şifrenizi girin"
+                            required
+                        >
+                        <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                    </div>
+                </div>
+                
+                <div class="mb-3 d-flex justify-content-between align-items-center">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">
+                            Beni hatırla
+                        </label>
+                    </div>
+                    <a href="{% url 'accounts:password_reset' %}" class="text-decoration-none">
+                        Şifremi unuttum
+                    </a>
+                </div>
+                
+                <input type="hidden" name="next" value="{{ next }}">
+                
+                <button type="submit" class="btn btn-login">
+                    <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Hesabınız yok mu? 
+                    <a href="{% url 'accounts:register' %}" class="text-decoration-none fw-bold">
+                        Hemen kayıt olun
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Security Info -->
+    <div class="text-center mt-4 text-muted">
+        <small>
+            <i class="fas fa-shield-alt me-1"></i>
+            Bilgileriniz SSL ile korunmaktadır
+        </small>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle
+    document.getElementById('togglePassword').addEventListener('click', function() {
+        const password = document.getElementById('id_password');
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+</script>
+{% endblock %}

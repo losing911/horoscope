@@ -1,0 +1,215 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Aylık Burç Yorumum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-calendar-alt text-primary me-2"></i>
+                    {{ month_name }} {{ year }} Aylık Burç Yorumum
+                </h1>
+            </div>
+
+            {% if user_sign %}
+            <!-- Burç Kartı -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-gradient-success text-white py-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="mb-1">
+                                {{ user_sign.symbol }} {{ user_sign.name }}
+                            </h3>
+                            <p class="mb-0 opacity-75">
+                                <small>{{ user_sign.date_range }}</small>
+                            </p>
+                        </div>
+                        <div>
+                            <span class="badge bg-light text-dark fs-6">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                Aylık
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    {% if monthly_horoscope %}
+                        <!-- Yorumlar -->
+                        <div class="horoscope-sections">
+                            <!-- Genel -->
+                            <div class="mb-4 p-4 bg-light rounded">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-star me-2"></i>Genel Değerlendirme
+                                </h5>
+                                <p class="lead text-dark mb-0">{{ monthly_horoscope.general }}</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Aşk -->
+                                    <div class="mb-4">
+                                        <h5 class="text-danger mb-3">
+                                            <i class="fas fa-heart me-2"></i>Aşk ve İlişkiler
+                                        </h5>
+                                        <p>{{ monthly_horoscope.love }}</p>
+                                    </div>
+
+                                    <!-- Sağlık -->
+                                    <div class="mb-4">
+                                        <h5 class="text-success mb-3">
+                                            <i class="fas fa-heartbeat me-2"></i>Sağlık
+                                        </h5>
+                                        <p>{{ monthly_horoscope.health }}</p>
+                                    </div>
+
+                                    <!-- Fırsatlar -->
+                                    <div class="mb-4">
+                                        <div class="alert alert-success border-0 shadow-sm">
+                                            <h6 class="alert-heading text-success">
+                                                <i class="fas fa-check-circle me-2"></i>Fırsatlar
+                                            </h6>
+                                            <p class="mb-0 small">{{ monthly_horoscope.opportunities }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <!-- Kariyer -->
+                                    <div class="mb-4">
+                                        <h5 class="text-info mb-3">
+                                            <i class="fas fa-briefcase me-2"></i>Kariyer
+                                        </h5>
+                                        <p>{{ monthly_horoscope.career }}</p>
+                                    </div>
+
+                                    <!-- Finans -->
+                                    <div class="mb-4">
+                                        <h5 class="text-warning mb-3">
+                                            <i class="fas fa-coins me-2"></i>Finans
+                                        </h5>
+                                        <p>{{ monthly_horoscope.money }}</p>
+                                    </div>
+
+                                    <!-- Zorluklar -->
+                                    <div class="mb-4">
+                                        <div class="alert alert-warning border-0 shadow-sm">
+                                            <h6 class="alert-heading text-warning">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>Dikkat Edilmesi Gerekenler
+                                            </h6>
+                                            <p class="mb-0 small">{{ monthly_horoscope.challenges }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Oluşturulma Bilgisi -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="far fa-clock me-1"></i>
+                                {{ monthly_horoscope.created_at|date:"d.m.Y H:i" }} tarihinde oluşturuldu
+                                {% if monthly_horoscope.ai_provider %}
+                                <span class="ms-2">
+                                    <i class="fas fa-robot me-1"></i>{{ monthly_horoscope.ai_provider|upper }}
+                                </span>
+                                {% endif %}
+                            </small>
+                        </div>
+
+                    {% else %}
+                        <!-- Yorum Yok - Oluşturma Butonu -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-check fa-4x text-success mb-4"></i>
+                            <h4 class="mb-3">Aylık Burç Yorumunuz Hazır Değil</h4>
+                            <p class="text-muted mb-4">
+                                {{ month_name }} {{ year }} ayı için henüz bir yorum oluşturmadınız.<br>
+                                AI ile kişiye özel aylık burç yorumunuzu şimdi oluşturun!
+                            </p>
+
+                            {% if can_generate %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-success btn-lg">
+                                    <i class="fas fa-sparkles me-2"></i>
+                                    Aylık Yorumumu Oluştur
+                                </button>
+                            </form>
+                            <p class="text-muted mt-3">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Ayda sadece 1 kere oluşturabilirsiniz
+                                </small>
+                            </p>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Bu ay zaten bir yorum oluşturdunuz. Gelecek ay tekrar deneyin!
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Hızlı Linkler -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_daily_horoscope' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-calendar-day me-2"></i>Günlük Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_weekly_horoscope' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-calendar-week me-2"></i>Haftalık Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_horoscope_history' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-history me-2"></i>Geçmiş Yorumlarım
+                    </a>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Burç Seçilmemiş -->
+            <div class="alert alert-warning text-center p-5">
+                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                <h4 class="mb-3">Burç Bilgisi Bulunamadı</h4>
+                <p class="mb-4">
+                    Aylık burç yorumunuzu görebilmek için önce burcunuzu seçmeniz gerekiyor.
+                </p>
+                <a href="{% url 'zodiac:select_my_sign' %}" class="btn btn-warning btn-lg">
+                    <i class="fas fa-hand-pointer me-2"></i>Burcumu Seç
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-success {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.horoscope-sections p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}
+

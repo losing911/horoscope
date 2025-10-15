@@ -1,0 +1,284 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Burç Yorumlarım - Geçmiş{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-history text-primary me-2"></i>
+                    Burç Yorumlarım
+                </h1>
+                <p class="lead text-muted">
+                    Geçmiş burç yorumlarınızı görüntüleyin
+                </p>
+            </div>
+
+            <!-- Günlük Yorumlar -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-day me-2"></i>
+                        Günlük Yorumlarım
+                    </h5>
+                </div>
+                <div class="card-body bg-white">
+                    {% if daily_horoscopes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Burç</th>
+                                    <th>Ruh Hali</th>
+                                    <th>Şanslı Sayı</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for horoscope in daily_horoscopes %}
+                                <tr>
+                                    <td>{{ horoscope.date|date:"d.m.Y" }}</td>
+                                    <td>{{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }}</td>
+                                    <td>
+                                        <span class="badge bg-primary">{{ horoscope.mood_score }}/10</span>
+                                    </td>
+                                    <td>{{ horoscope.lucky_number }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#dailyModal{{ horoscope.id }}">
+                                            <i class="fas fa-eye me-1"></i>Görüntüle
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="dailyModal{{ horoscope.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-primary text-white">
+                                                <h5 class="modal-title">
+                                                    {{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }} - {{ horoscope.date|date:"d F Y" }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <strong>Genel:</strong>
+                                                    <p>{{ horoscope.general }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Aşk:</strong>
+                                                    <p>{{ horoscope.love }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Kariyer:</strong>
+                                                    <p>{{ horoscope.career }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Sağlık:</strong>
+                                                    <p>{{ horoscope.health }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Finans:</strong>
+                                                    <p>{{ horoscope.money }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">
+                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                        Henüz günlük yorum oluşturmadınız
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Haftalık Yorumlar -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-week me-2"></i>
+                        Haftalık Yorumlarım
+                    </h5>
+                </div>
+                <div class="card-body bg-white">
+                    {% if weekly_horoscopes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Hafta</th>
+                                    <th>Burç</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for horoscope in weekly_horoscopes %}
+                                <tr>
+                                    <td>{{ horoscope.week_start|date:"d.m.Y" }} - {{ horoscope.week_end|date:"d.m.Y" }}</td>
+                                    <td>{{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#weeklyModal{{ horoscope.id }}">
+                                            <i class="fas fa-eye me-1"></i>Görüntüle
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="weeklyModal{{ horoscope.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-info text-white">
+                                                <h5 class="modal-title">
+                                                    {{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }} - Haftalık
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="text-muted mb-3">{{ horoscope.week_start|date:"d F" }} - {{ horoscope.week_end|date:"d F Y" }}</p>
+                                                <div class="mb-3">
+                                                    <strong>Genel:</strong>
+                                                    <p>{{ horoscope.general }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Aşk:</strong>
+                                                    <p>{{ horoscope.love }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Kariyer:</strong>
+                                                    <p>{{ horoscope.career }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Tavsiye:</strong>
+                                                    <p>{{ horoscope.advice }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">
+                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                        Henüz haftalık yorum oluşturmadınız
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Aylık Yorumlar -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Aylık Yorumlarım
+                    </h5>
+                </div>
+                <div class="card-body bg-white">
+                    {% if monthly_horoscopes %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Dönem</th>
+                                    <th>Burç</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for horoscope in monthly_horoscopes %}
+                                <tr>
+                                    <td>{{ horoscope.month }}/{{ horoscope.year }}</td>
+                                    <td>{{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }}</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#monthlyModal{{ horoscope.id }}">
+                                            <i class="fas fa-eye me-1"></i>Görüntüle
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="monthlyModal{{ horoscope.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">
+                                                    {{ horoscope.zodiac_sign.symbol }} {{ horoscope.zodiac_sign.name }} - Aylık
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <strong>Genel:</strong>
+                                                    <p>{{ horoscope.general }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Aşk:</strong>
+                                                    <p>{{ horoscope.love }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Kariyer:</strong>
+                                                    <p>{{ horoscope.career }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Fırsatlar:</strong>
+                                                    <p>{{ horoscope.opportunities }}</p>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <strong>Zorluklar:</strong>
+                                                    <p>{{ horoscope.challenges }}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <p class="text-muted text-center py-4">
+                        <i class="fas fa-inbox fa-3x mb-3 d-block"></i>
+                        Henüz aylık yorum oluşturmadınız
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Hızlı Linkler -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_daily_horoscope' %}" class="btn btn-primary w-100">
+                        <i class="fas fa-calendar-day me-2"></i>Günlük Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_weekly_horoscope' %}" class="btn btn-info w-100 text-white">
+                        <i class="fas fa-calendar-week me-2"></i>Haftalık Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_monthly_horoscope' %}" class="btn btn-success w-100">
+                        <i class="fas fa-calendar-alt me-2"></i>Aylık Yorumum
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -149,6 +149,10 @@ def create_reading(request):
         
         # AI yorumu oluştur
         try:
+            # Kullanıcının seçili dilini al
+            from django.utils.translation import get_language
+            current_language = get_language()
+            
             ai_service = AIService()
             # Kartları AI servisi için hazırla
             ai_cards = []
@@ -163,7 +167,8 @@ def create_reading(request):
             interpretation = ai_service.generate_interpretation(
                 question=question,
                 cards=ai_cards,
-                spread_name=spread.name
+                spread_name=spread.name,
+                language=current_language
             )
         except Exception as e:
             print(f"AI Service Error: {e}")
@@ -246,8 +251,16 @@ def daily_card(request):
             
             # AI yorumu oluştur
             try:
+                # Kullanıcının seçili dilini al
+                from django.utils.translation import get_language
+                current_language = get_language()
+                
                 daily_service = DailyCardService()
-                interpretation = daily_service.generate_daily_interpretation(random_card, is_reversed)
+                interpretation = daily_service.generate_daily_interpretation(
+                    random_card, 
+                    is_reversed,
+                    language=current_language
+                )
             except Exception as e:
                 print(f"Daily card interpretation error: {e}")
                 meaning = random_card.reversed_meaning if is_reversed else random_card.upright_meaning

@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - Günlük Burç Yorumum{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-calendar-day text-primary me-2"></i>
+                    Günlük Burç Yorumum
+                </h1>
+                <p class="lead text-muted">
+                    <i class="far fa-calendar-alt me-2"></i>{{ date|date:"d F Y, l" }}
+                </p>
+            </div>
+
+            {% if user_sign %}
+            <!-- Burç Kartı -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-gradient-primary text-white py-4">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            <h3 class="mb-1">
+                                {{ user_sign.symbol }} {{ user_sign.name }}
+                            </h3>
+                            <p class="mb-0 opacity-75">
+                                <small>{{ user_sign.date_range }}</small>
+                            </p>
+                        </div>
+                        {% if daily_horoscope %}
+                        <div class="text-end">
+                            <div class="badge bg-light text-dark fs-6">
+                                <i class="fas fa-sparkles me-1"></i>
+                                Ruh Hali: {{ daily_horoscope.mood_score }}/10
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    {% if daily_horoscope %}
+                        <!-- Şanslı Bilgiler -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                    <i class="fas fa-dice text-success fa-2x me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Şanslı Sayı</small>
+                                        <strong class="fs-5">{{ daily_horoscope.lucky_number }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center p-3 bg-light rounded">
+                                    <i class="fas fa-palette text-danger fa-2x me-3"></i>
+                                    <div>
+                                        <small class="text-muted d-block">Şanslı Renk</small>
+                                        <strong class="fs-5">{{ daily_horoscope.lucky_color }}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Yorumlar -->
+                        <div class="horoscope-sections">
+                            <!-- Genel -->
+                            <div class="mb-4">
+                                <h5 class="text-primary mb-3">
+                                    <i class="fas fa-star me-2"></i>Genel Yorum
+                                </h5>
+                                <p class="lead text-dark">{{ daily_horoscope.general }}</p>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Aşk -->
+                            <div class="mb-4">
+                                <h5 class="text-danger mb-3">
+                                    <i class="fas fa-heart me-2"></i>Aşk Hayatı
+                                </h5>
+                                <p>{{ daily_horoscope.love }}</p>
+                            </div>
+
+                            <!-- Kariyer -->
+                            <div class="mb-4">
+                                <h5 class="text-info mb-3">
+                                    <i class="fas fa-briefcase me-2"></i>Kariyer
+                                </h5>
+                                <p>{{ daily_horoscope.career }}</p>
+                            </div>
+
+                            <!-- Sağlık -->
+                            <div class="mb-4">
+                                <h5 class="text-success mb-3">
+                                    <i class="fas fa-heartbeat me-2"></i>Sağlık
+                                </h5>
+                                <p>{{ daily_horoscope.health }}</p>
+                            </div>
+
+                            <!-- Finans -->
+                            <div class="mb-4">
+                                <h5 class="text-warning mb-3">
+                                    <i class="fas fa-coins me-2"></i>Finans
+                                </h5>
+                                <p>{{ daily_horoscope.money }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Oluşturulma Bilgisi -->
+                        <div class="text-center mt-4 pt-3 border-top">
+                            <small class="text-muted">
+                                <i class="far fa-clock me-1"></i>
+                                {{ daily_horoscope.created_at|date:"d.m.Y H:i" }} tarihinde oluşturuldu
+                                {% if daily_horoscope.ai_provider %}
+                                <span class="ms-2">
+                                    <i class="fas fa-robot me-1"></i>{{ daily_horoscope.ai_provider|upper }}
+                                </span>
+                                {% endif %}
+                            </small>
+                        </div>
+
+                    {% else %}
+                        <!-- Yorum Yok - Oluşturma Butonu -->
+                        <div class="text-center py-5">
+                            <i class="fas fa-magic fa-4x text-primary mb-4"></i>
+                            <h4 class="mb-3">Günlük Burç Yorumunuz Hazır Değil</h4>
+                            <p class="text-muted mb-4">
+                                Bugün için henüz bir yorum oluşturmadınız.<br>
+                                AI ile kişiye özel günlük burç yorumunuzu şimdi oluşturun!
+                            </p>
+
+                            {% if can_generate %}
+                            <form method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sparkles me-2"></i>
+                                    Günlük Yorumumu Oluştur
+                                </button>
+                            </form>
+                            <p class="text-muted mt-3">
+                                <small>
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Günde sadece 1 kere oluşturabilirsiniz
+                                </small>
+                            </p>
+                            {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Bugün zaten bir yorum oluşturdunuz. Yarın tekrar deneyin!
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Hızlı Linkler -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_weekly_horoscope' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-calendar-week me-2"></i>Haftalık Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_monthly_horoscope' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-calendar-alt me-2"></i>Aylık Yorumum
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <a href="{% url 'zodiac:my_horoscope_history' %}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-history me-2"></i>Geçmiş Yorumlarım
+                    </a>
+                </div>
+            </div>
+
+            {% else %}
+            <!-- Burç Seçilmemiş -->
+            <div class="alert alert-warning text-center p-5">
+                <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
+                <h4 class="mb-3">Burç Bilgisi Bulunamadı</h4>
+                <p class="mb-4">
+                    Günlük burç yorumunuzu görebilmek için önce burcunuzu seçmeniz gerekiyor.
+                </p>
+                <a href="{% url 'zodiac:select_my_sign' %}" class="btn btn-warning btn-lg">
+                    <i class="fas fa-hand-pointer me-2"></i>Burcumu Seç
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.horoscope-sections p {
+    font-size: 1.05rem;
+    line-height: 1.8;
+}
+
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}
+

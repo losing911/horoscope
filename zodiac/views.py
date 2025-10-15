@@ -13,6 +13,7 @@ from .models import (
     MonthlyHoroscope, CompatibilityReading, BirthChart
 )
 from tarot.services import AIService, ImageGenerationService
+from .services import ZodiacAIService
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,10 @@ def zodiac_signs_list(request):
 
 def zodiac_sign_detail(request, sign_slug):
     """Burç detayı"""
+    from django.utils.translation import get_language
+    
     zodiac_sign = get_object_or_404(ZodiacSign, slug=sign_slug)
+    current_language = get_language()
     
     # Bugünün burç yorumu
     today = timezone.now().date()
@@ -60,9 +64,9 @@ def zodiac_sign_detail(request, sign_slug):
         date=today
     ).first()
     
-    # Yoksa oluştur
-    if not daily_horoscope:
-        daily_horoscope = generate_daily_horoscope(zodiac_sign, today)
+    # Yoksa oluştur (dil-aware)
+    if not daily_horoscope or (daily_horoscope and current_language != 'tr'):
+        daily_horoscope = generate_daily_horoscope(zodiac_sign, today, current_language)
     
     # AI ile burç görseli oluştur (isteğe bağlı)
     zodiac_image = None
@@ -92,7 +96,10 @@ def zodiac_sign_detail(request, sign_slug):
 
 def daily_horoscopes(request):
     """Tüm burçların günlük yorumları"""
+    from django.utils.translation import get_language
+    
     today = timezone.now().date()
+    current_language = get_language()
     zodiac_signs = ZodiacSign.objects.all().order_by('order')
     
     horoscopes = []
@@ -102,9 +109,9 @@ def daily_horoscopes(request):
             date=today
         ).first()
         
-        # Yoksa oluştur
-        if not horoscope:
-            horoscope = generate_daily_horoscope(sign, today)
+        # Yoksa oluştur (dil-aware)
+        if not horoscope or (horoscope and current_language != 'tr'):
+            horoscope = generate_daily_horoscope(sign, today, current_language)
         
         horoscopes.append({
             'sign': sign,
@@ -139,6 +146,14 @@ def find_my_sign(request):
         'error': error,
     }
     return render(request, 'zodiac/find_sign.html', context)
+
+
+def technology(request):
+    """Teknoloji ve bilimsel hesaplamalar sayfası"""
+    context = {
+        'title': 'Teknolojimiz - Bilimsel Astroloji'
+    }
+    return render(request, 'zodiac/technology.html', context)
 
 
 @login_required
@@ -250,98 +265,145 @@ def compatibility_check(request):
     return render(request, 'zodiac/compatibility.html', context)
 
 
+def weekly_horoscopes(request):
+    """Tüm burçların haftalık yorumları"""
+    today = timezone.now().date()
+    # Haftanın başlangıcını bul (Pazartesi)
+    week_start = today - timedelta(days=today.weekday())
+    week_end = week_start + timedelta(days=6)
+    
+    zodiac_signs = ZodiacSign.objects.all().order_by('order')
+    
+    horoscopes = []
+    for sign in zodiac_signs:
+        horoscope = WeeklyHoroscope.objects.filter(
+            zodiac_sign=sign,
+            week_start=week_start
+        ).first()
+        
+        # Yoksa oluştur
+        if not horoscope:
+            horoscope = generate_weekly_horoscope(sign, week_start)
+        
+        horoscopes.append({
+            'sign': sign,
+            'horoscope': horoscope
+        })
+    
+    context = {
+        'title': 'Haftalık Burç Yorumları',
+        'week_start': week_start,
+        'week_end': week_end,
+        'horoscopes': horoscopes,
+    }
+    return render(request, 'zodiac/weekly_horoscopes.html', context)
+
+
+def monthly_horoscopes(request):
+    """Tüm burçların aylık yorumları"""
+    today = timezone.now().date()
+    
+    # URL'den ay ve yıl parametresi al, yoksa bu ay
+    year = int(request.GET.get('year', today.year))
+    month = int(request.GET.get('month', today.month))
+    
+    # Ay isimleri
+    month_names = [
+        '', 'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    ]
+    
+    zodiac_signs = ZodiacSign.objects.all().order_by('order')
+    
+    horoscopes = []
+    for sign in zodiac_signs:
+        horoscope = MonthlyHoroscope.objects.filter(
+            zodiac_sign=sign,
+            year=year,
+            month=month
+        ).first()
+        
+        # Yoksa oluştur
+        if not horoscope:
+            horoscope = generate_monthly_horoscope(sign, year, month)
+        
+        horoscopes.append({
+            'sign': sign,
+            'horoscope': horoscope
+        })
+    
+    # Önceki ve sonraki ay hesapla
+    prev_month = month - 1 if month > 1 else 12
+    prev_year = year if month > 1 else year - 1
+    next_month = month + 1 if month < 12 else 1
+    next_year = year if month < 12 else year + 1
+    
+    context = {
+        'title': f'{month_names[month]} {year} Burç Yorumları',
+        'month_name': month_names[month],
+        'year': year,
+        'month': month,
+        'horoscopes': horoscopes,
+        'prev_year': prev_year,
+        'prev_month': prev_month,
+        'next_year': next_year,
+        'next_month': next_month,
+    }
+    return render(request, 'zodiac/monthly_horoscopes.html', context)
+
+
 # Helper Functions
 
-def generate_daily_horoscope(zodiac_sign, date):
+def generate_daily_horoscope(zodiac_sign, date, language='tr'):
     """
-    AI ile günlük burç yorumu oluştur
-    
-    Özellikler:
-    - İlk olarak database'de mevcut yorum var mı kontrol eder
-    - Akıllı fallback: Gemini -> OpenAI -> Template
-    - Kota sınırlarını otomatik yönetir
+    AI ile günlük burç yorumu oluştur - ZodiacAIService kullanır
     """
     try:
         # Önce database'de var mı kontrol et (cache gibi çalışır)
+        # NOT: Cache language-aware olmalı
         existing = DailyHoroscope.objects.filter(
             zodiac_sign=zodiac_sign,
             date=date
         ).first()
         
-        if existing:
+        if existing and language == 'tr':  # Sadece Türkçe için cache kullan
             logger.info(f"📦 Cache'den alındı: {zodiac_sign.name} - {date}")
             return existing
         
         # Yeni yorum oluştur
-        ai_service = AIService()
+        ai_service = ZodiacAIService()
+        result = ai_service.generate_daily_horoscope(zodiac_sign, date, language)
         
-        prompt = f"""Sen profesyonel bir astrolog ve burç yorumcususun. 
-        
-{zodiac_sign.name} burcu için {date} tarihli günlük burç yorumu yap.
-
-Burç Özellikleri:
-- Element: {zodiac_sign.get_element_display()}
-- Yöneten Gezegen: {zodiac_sign.ruling_planet}
-- Güçlü Yönler: {zodiac_sign.strengths[:100]}
-
-Aşağıdaki başlıklar altında yorumla:
-
-1. GENEL: Günün genel enerjisi ve öneriler (2-3 cümle)
-2. AŞK: Aşk hayatı ve ilişkiler (2-3 cümle)
-3. KARİYER: İş hayatı ve fırsatlar (2-3 cümle)
-4. SAĞLIK: Fiziksel ve mental sağlık (2-3 cümle)
-5. FİNANS: Ekonomik durum ve harcamalar (2-3 cümle)
-
-Her başlığı büyük harfle yaz ve altına yorumu ekle. Pozitif, motive edici ve yapıcı ol."""
-
-        response = ai_service.generate_interpretation(
-            question=prompt,
-            cards=[],
-            spread_name="Günlük Burç"
-        )
-        
-        # Yanıtı parse et
-        sections = parse_horoscope_response(response)
-        
-        # Şanslı sayı ve renk
-        lucky_numbers = [int(n) for n in zodiac_sign.lucky_numbers.split(',') if n.strip().isdigit()]
-        lucky_colors = [c.strip() for c in zodiac_sign.lucky_colors.split(',')]
-        
+        # Database'e kaydet
         horoscope = DailyHoroscope.objects.create(
             zodiac_sign=zodiac_sign,
             date=date,
-            general=sections.get('GENEL', 'Bugün sizin için güzel bir gün olacak.'),
-            love=sections.get('AŞK', 'Aşk hayatınızda huzur var.'),
-            career=sections.get('KARİYER', 'İşleriniz yolunda gidiyor.'),
-            health=sections.get('SAĞLIK', 'Sağlığınıza dikkat edin.'),
-            money=sections.get('FİNANS', 'Finansal durumunuz dengeli.'),
-            mood_score=random.randint(6, 10),
-            lucky_number=random.choice(lucky_numbers) if lucky_numbers else random.randint(1, 99),
-            lucky_color=random.choice(lucky_colors) if lucky_colors else 'Mavi',
-            ai_provider='gemini'
+            **result
         )
         
         return horoscope
         
     except Exception as e:
-        import traceback
-        error_details = traceback.format_exc()
-        print(f"\n❌ Horoscope generation error for {zodiac_sign.name}: {e}")
-        print(f"Error details: {error_details}")
-        # Fallback - AI başarısız olursa
+        logger.error(f"❌ Horoscope generation error for {zodiac_sign.name}: {e}")
+        # Fallback
         return DailyHoroscope.objects.create(
             zodiac_sign=zodiac_sign,
             date=date,
-            general=f"[FALLBACK] Bugün {zodiac_sign.name} burcu için enerjik bir gün olacak.",
-            love="[FALLBACK] Aşk hayatınızda olumlu gelişmeler sizi bekliyor.",
-            career="[FALLBACK] Kariyerinizde yeni fırsatlar doğabilir.",
-            health="[FALLBACK] Sağlığınıza özen gösterin.",
-            money="[FALLBACK] Finansal konularda dikkatli olun.",
+            general=f"Bugün {zodiac_sign.name} burcu için enerjik bir gün olacak.",
+            love="Aşk hayatınızda olumlu gelişmeler sizi bekliyor.",
+            career="Kariyerinizde yeni fırsatlar doğabilir.",
+            health="Sağlığınıza özen gösterin.",
+            money="Finansal konularda dikkatli olun.",
             mood_score=7,
             lucky_number=random.randint(1, 99),
             lucky_color='Mavi',
             ai_provider='fallback'
         )
+
+
+def generate_weekly_horoscope_old(zodiac_sign, week_start):
+    """Haftalık burç yorumu oluştur (ESKİ VERSİYON - KULLANILMIYOR)"""
+    pass
 
 
 def generate_compatibility(user, sign1, sign2):

@@ -4,7 +4,8 @@ from django.utils import timezone
 from .models import (
     ZodiacSign, DailyHoroscope, WeeklyHoroscope, 
     MonthlyHoroscope, CompatibilityReading, BirthChart,
-    MoonSign, Ascendant, PersonalHoroscope
+    MoonSign, Ascendant, PersonalHoroscope,
+    UserDailyHoroscope, UserWeeklyHoroscope, UserMonthlyHoroscope
 )
 from .views import generate_daily_horoscope
 
@@ -239,3 +240,29 @@ class PersonalHoroscopeAdmin(admin.ModelAdmin):
             'fields': ('interpretation',)
         }),
     )
+
+
+@admin.register(UserDailyHoroscope)
+class UserDailyHoroscopeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'zodiac_sign', 'date', 'mood_score', 'lucky_number', 'ai_provider', 'created_at']
+    list_filter = ['date', 'zodiac_sign', 'ai_provider']
+    search_fields = ['user__username', 'zodiac_sign__name']
+    date_hierarchy = 'date'
+    ordering = ['-date']
+
+
+@admin.register(UserWeeklyHoroscope)
+class UserWeeklyHoroscopeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'zodiac_sign', 'week_start', 'week_end', 'ai_provider', 'created_at']
+    list_filter = ['week_start', 'zodiac_sign', 'ai_provider']
+    search_fields = ['user__username', 'zodiac_sign__name']
+    date_hierarchy = 'week_start'
+    ordering = ['-week_start']
+
+
+@admin.register(UserMonthlyHoroscope)
+class UserMonthlyHoroscopeAdmin(admin.ModelAdmin):
+    list_display = ['user', 'zodiac_sign', 'month', 'year', 'ai_provider', 'created_at']
+    list_filter = ['year', 'month', 'zodiac_sign', 'ai_provider']
+    search_fields = ['user__username', 'zodiac_sign__name']
+    ordering = ['-year', '-month']

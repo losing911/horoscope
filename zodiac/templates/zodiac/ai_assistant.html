@@ -1,14 +1,14 @@
-ï»¿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}AI BurÃ§ AsistanÄ±{% endblock %}
+{% block title %}AI Burç Asistanı{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1 class="display-4 mb-3">ğŸ¤– AI BurÃ§ AsistanÄ±</h1>
-            <p class="lead text-muted">AstroTarot AI ile astroloji sorularÄ±nÄ±zÄ± sorun</p>
+            <h1 class="display-4 mb-3">?? AI Burç Asistanı</h1>
+            <p class="lead text-muted">AstroTarot AI ile astroloji sorularınızı sorun</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
         <div class="col-lg-8">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-gradient-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>BurÃ§ DanÄ±ÅŸmanÄ±nÄ±z</h5>
+                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Burç Danışmanınız</h5>
                 </div>
                 
                 <div class="card-body p-4">
@@ -28,13 +28,13 @@
                                 <i class="fas fa-star text-warning me-2"></i>Burcunuz (Opsiyonel)
                             </label>
                             <select class="form-select form-select-lg" id="user_sign" name="user_sign">
-                                <option value="">-- SeÃ§mek istemiyorum --</option>
+                                <option value="">-- Seçmek istemiyorum --</option>
                                 {% for sign in zodiac_signs %}
                                 <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
                                 {% endfor %}
                             </select>
                             <small class="form-text text-muted">
-                                Burcunuzu seÃ§erseniz daha kiÅŸiselleÅŸtirilmiÅŸ cevaplar alÄ±rsÄ±nÄ±z.
+                                Burcunuzu seçerseniz daha kişiselleştirilmiş cevaplar alırsınız.
                             </small>
                         </div>
                         
@@ -47,11 +47,11 @@
                                 id="question" 
                                 name="question" 
                                 rows="5" 
-                                placeholder="Ã–rnek: Bu ay aÅŸk hayatÄ±mda ne gibi geliÅŸmeler olabilir?"
+                                placeholder="Örnek: Bu ay aşk hayatımda ne gibi gelişmeler olabilir?"
                                 required
                             ></textarea>
                             <small class="form-text text-muted">
-                                AÅŸk, kariyer, saÄŸlÄ±k, finans veya genel astroloji hakkÄ±nda soru sorabilirsiniz.
+                                Aşk, kariyer, sağlık, finans veya genel astroloji hakkında soru sorabilirsiniz.
                             </small>
                         </div>
                         
@@ -74,7 +74,7 @@
             {% if response_text %}
             <div class="card shadow-lg border-0 mt-4 animate__animated animate__fadeInUp">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>AI CevabÄ±</h5>
+                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>AI Cevabı</h5>
                 </div>
                 <div class="card-body p-4">
                     <div class="ai-response">
@@ -84,7 +84,7 @@
                     <div class="mt-4 text-center">
                         <small class="text-muted">
                             <i class="fas fa-robot me-1"></i>
-                            Bu yorum AstroTarot AI tarafÄ±ndan oluÅŸturulmuÅŸtur.
+                            Bu yorum AstroTarot AI tarafından oluşturulmuştur.
                         </small>
                     </div>
                 </div>
@@ -97,14 +97,14 @@
             {% endif %}
             
             <div class="card mt-4 bg-light border-0">
-                <div class="card-body">
-                    <h6 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Ã–rnek Sorular:</h6>
+                <div class="card-body bg-white">
+                    <h6 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Örnek Sorular:</h6>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2">ğŸ’– "Bu hafta aÅŸk hayatÄ±mda neler yaÅŸayabilirim?"</li>
-                        <li class="mb-2">ğŸ’¼ "Kariyer deÄŸiÅŸikliÄŸi yapmak iÃ§in uygun bir dÃ¶nem mi?"</li>
-                        <li class="mb-2">ğŸ’° "Mali durumum hakkÄ±nda ne sÃ¶yleyebilirsin?"</li>
-                        <li class="mb-2">ğŸ§˜ "Enerji seviyemi nasÄ±l artÄ±rabilirim?"</li>
-                        <li class="mb-2">ğŸ”® "AyÄ±n geri hareketi beni nasÄ±l etkileyecek?"</li>
+                        <li class="mb-2">?? "Bu hafta aşk hayatımda neler yaşayabilirim?"</li>
+                        <li class="mb-2">?? "Kariyer değişikliği yapmak için uygun bir dönem mi?"</li>
+                        <li class="mb-2">?? "Mali durumum hakkında ne söyleyebilirsin?"</li>
+                        <li class="mb-2">?? "Enerji seviyemi nasıl artırabilirim?"</li>
+                        <li class="mb-2">?? "Ayın geri hareketi beni nasıl etkileyecek?"</li>
                     </ul>
                 </div>
             </div>
@@ -155,14 +155,15 @@
 }
 </style>
 
-<!-- AdSense AlanlarÄ± -->
+<!-- AdSense Alanları -->
 <div class="container mt-4">
     <div class="row">
         <div class="col-12 text-center">
             <div class="ad-placeholder" style="background: #f0f0f0; padding: 50px; border-radius: 8px;">
-                <small class="text-muted">Reklam AlanÄ± - 728x90</small>
+                <small class="text-muted">Reklam Alanı - 728x90</small>
             </div>
         </div>
     </div>
 </div>
 {% endblock %}
+

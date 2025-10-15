@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sepetim - Mistik Mağaza{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4"><i class="fas fa-shopping-cart me-2"></i>Alışveriş Sepetim</h1>
+
+    {% if cart.items.all %}
+    <div class="row">
+        <!-- Sepet Ürünleri -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 20px;">
+                <div class="card-body bg-white p-4" style="border-radius: 20px;">
+                    {% for item in cart.items.all %}
+                    <div class="row align-items-center border-bottom pb-3 mb-3">
+                        <div class="col-md-2 col-3">
+                            {% if item.product.image %}
+                            <img src="{{ item.product.image }}" class="img-fluid rounded" alt="{{ item.product.name }}" style="height: 80px; width: 80px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px; width: 80px;">
+                                <i class="fas fa-image text-muted"></i>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-4 col-9">
+                            <h6 class="mb-1">{{ item.product.name }}</h6>
+                            <small class="text-muted">{{ item.product.category.name }}</small>
+                        </div>
+                        <div class="col-md-2 col-4 mt-2 mt-md-0">
+                            <strong>{{ item.product.price }} ₺</strong>
+                        </div>
+                        <div class="col-md-3 col-4 mt-2 mt-md-0">
+                            <form method="post" action="{% url 'shop:update_cart_item' item.id %}" class="d-flex align-items-center gap-2">
+                                {% csrf_token %}
+                                <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.product.stock }}" class="form-control form-control-sm" style="width: 70px;">
+                                <button type="submit" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-check"></i>
+                                </button>
+                            </form>
+                            {% if item.product.stock < item.quantity %}
+                            <small class="text-danger">Stok: {{ item.product.stock }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-1 col-4 mt-2 mt-md-0 text-end">
+                            <form method="post" action="{% url 'shop:remove_from_cart' item.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sepet Özeti -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 sticky-top" style="border-radius: 20px; top: 20px;">
+                <div class="card-body bg-white p-4" style="border-radius: 20px;">
+                    <h5 class="mb-4"><i class="fas fa-receipt me-2"></i>Sipariş Özeti</h5>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Ara Toplam:</span>
+                        <strong>{{ cart.subtotal }} ₺</strong>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Kargo:</span>
+                        <strong>
+                            {% if cart.shipping_cost == 0 %}
+                            <span class="text-success">Ücretsiz</span>
+                            {% else %}
+                            {{ cart.shipping_cost }} ₺
+                            {% endif %}
+                        </strong>
+                    </div>
+
+                    {% if cart.subtotal < 500 and cart.subtotal > 0 %}
+                    <div class="alert alert-info small mt-3">
+                        <i class="fas fa-info-circle me-1"></i>
+                        {{ 500|floatformat:0|add:"-"|add:cart.subtotal|floatformat:0 }} ₺ daha alışveriş yapın, kargo bedava!
+                    </div>
+                    {% endif %}
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between mb-4">
+                        <h5>Toplam:</h5>
+                        <h5 class="text-primary">{{ cart.total }} ₺</h5>
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        {% if user.is_authenticated %}
+                        <a href="{% url 'shop:checkout' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-credit-card me-2"></i>Siparişi Tamamla
+                        </a>
+                        {% else %}
+                        <a href="/admin/login/?next={% url 'shop:checkout' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap ve Devam Et
+                        </a>
+                        {% endif %}
+                        <a href="{% url 'shop:product_list' %}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Alışverişe Devam
+                        </a>
+                    </div>
+
+                    <div class="text-center mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt me-1"></i>Güvenli Ödeme
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- Boş Sepet -->
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0" style="border-radius: 20px;">
+                <div class="card-body bg-white text-center p-5" style="border-radius: 20px;">
+                    <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+                    <h3 class="mb-3">Sepetiniz Boş</h3>
+                    <p class="text-muted mb-4">Alışverişe başlamak için ürünlerimize göz atın!</p>
+                    <a href="{% url 'shop:product_list' %}" class="btn btn-primary btn-lg">
+                        <i class="fas fa-shopping-bag me-2"></i>Ürünleri Keşfet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

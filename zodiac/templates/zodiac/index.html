@@ -1,24 +1,24 @@
-ï»¿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Astroloji - BurÃ§ YorumlarÄ±{% endblock %}
+{% block title %}Astroloji - Burç Yorumları{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Hero Section -->
     <div class="row mb-5">
         <div class="col-12 text-center">
-            <h1 class="display-4 mb-3">ğŸŒŸ Astroloji & BurÃ§ YorumlarÄ±</h1>
+            <h1 class="display-4 mb-3">?? Astroloji & Burç Yorumları</h1>
             <p class="lead text-muted">
-                12 burÃ§un gizli sÄ±rlarÄ±nÄ± keÅŸfedin. GÃ¼nlÃ¼k, haftalÄ±k ve aylÄ±k burÃ§ yorumlarÄ±nÄ±zÄ± Ã¶ÄŸrenin.
+                12 burçun gizli sırlarını keşfedin. Günlük, haftalık ve aylık burç yorumlarınızı öğrenin.
             </p>
             
             {% if user.is_authenticated and user_sign %}
             <div class="alert alert-info mt-4">
-                <h5>Merhaba {{ user.first_name|default:user.username }}! âœ¨</h5>
+                <h5>Merhaba {{ user.first_name|default:user.username }}! ?</h5>
                 <p class="mb-2">Burcunuz: <strong>{{ user_sign.name }} {{ user_sign.symbol }}</strong></p>
                 <a href="{% url 'zodiac:sign_detail' user_sign.slug %}" class="btn btn-primary">
-                    BurÃ§ DetayÄ±na Git
+                    Burç Detayına Git
                 </a>
             </div>
             {% endif %}
@@ -30,11 +30,11 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">ğŸ“…</div>
-                    <h5 class="card-title">GÃ¼nlÃ¼k BurÃ§ YorumlarÄ±</h5>
-                    <p class="card-text">BugÃ¼n iÃ§in tÃ¼m burÃ§larÄ±n yorumlarÄ±nÄ± gÃ¶rÃ¼n</p>
+                    <div class="display-4 mb-3">??</div>
+                    <h5 class="card-title">Günlük Burç Yorumları</h5>
+                    <p class="card-text">Bugün için tüm burçların yorumlarını görün</p>
                     <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-outline-primary">
-                        GÃ¼nlÃ¼k Yorumlar
+                        Günlük Yorumlar
                     </a>
                 </div>
             </div>
@@ -43,9 +43,9 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">ğŸ”</div>
-                    <h5 class="card-title">Burcunu Ã–ÄŸren</h5>
-                    <p class="card-text">DoÄŸum tarihinizden burcunuzu bulun</p>
+                    <div class="display-4 mb-3">??</div>
+                    <h5 class="card-title">Burcunu Öğren</h5>
+                    <p class="card-text">Doğum tarihinizden burcunuzu bulun</p>
                     <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-primary">
                         Burcumu Bul
                     </a>
@@ -56,16 +56,16 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">ğŸ’•</div>
+                    <div class="display-4 mb-3">??</div>
                     <h5 class="card-title">Uyum Analizi</h5>
-                    <p class="card-text">Ä°ki burÃ§ arasÄ±ndaki uyumu Ã¶ÄŸrenin</p>
+                    <p class="card-text">İki burç arasındaki uyumu öğrenin</p>
                     {% if user.is_authenticated %}
                     <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-primary">
                         Uyumu Kontrol Et
                     </a>
                     {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-secondary">
-                        GiriÅŸ YapÄ±n
+                        Giriş Yapın
                     </a>
                     {% endif %}
                 </div>
@@ -76,7 +76,7 @@
     <!-- Zodiac Signs Grid -->
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="text-center mb-4">12 BurÃ§</h2>
+            <h2 class="text-center mb-4">12 Burç</h2>
         </div>
     </div>
     
@@ -107,7 +107,7 @@
         {% empty %}
         <div class="col-12">
             <div class="alert alert-warning text-center">
-                HenÃ¼z burÃ§ bilgisi eklenmemiÅŸ. LÃ¼tfen admin panelinden burÃ§larÄ± ekleyin.
+                Henüz burç bilgisi eklenmemiş. Lütfen admin panelinden burçları ekleyin.
             </div>
         </div>
         {% endfor %}
@@ -130,3 +130,4 @@
 }
 </style>
 {% endblock %}
+

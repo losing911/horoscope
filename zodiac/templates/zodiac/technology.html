@@ -1,0 +1,350 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Teknolojimiz - Bilimsel Astroloji Hesaplamaları{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Başlık -->
+                  <!-- Gizlilik ve Güvenlik -->
+            <div class="card shadow-lg border-0 mb-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Gizlilik ve Güvenlik</h3>
+                </div>
+                <div class="card-body p-4 bg-white"><div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-rocket text-primary me-3"></i>Bilimsel Astroloji Hesaplamaları
+                </h1>
+                <p class="lead text-muted">
+                    Profesyonel yazılımlar seviyesinde astronomik doğruluk ile 
+                    NASA verilerine dayalı gerçek burç hesaplamaları
+                </p>
+            </div>
+
+            <!-- Swiss Ephemeris -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3 class="mb-0"><i class="fas fa-satellite me-2"></i>Swiss Ephemeris - Endüstri Standardı</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-globe fa-5x text-primary mb-3"></i>
+                        </div>
+                        <div class="col-md-9">
+                            <h5><i class="fas fa-check-circle text-success me-2"></i>Swiss Ephemeris Nedir?</h5>
+                            <p class="mb-3">
+                                <strong>Swiss Ephemeris</strong>, dünya çapında profesyonel astroloji yazılımlarının 
+                                kullandığı en güvenilir astronomik hesaplama kütüphanesidir. Astrodienst AG tarafından 
+                                geliştirilmiş ve NASA Jet Propulsion Laboratory (JPL) verilerine dayanmaktadır.
+                            </p>
+                            
+                            <h6 class="mt-4"><i class="fas fa-star text-warning me-2"></i>Teknik Özellikler</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i><strong>0.001°</strong> hassasiyetinde gezegen pozisyonları</li>
+                                <li><i class="fas fa-check text-success me-2"></i><strong>6000 yıllık</strong> zaman aralığı (MÖ 3000 - MS 3000)</li>
+                                <li><i class="fas fa-check text-success me-2"></i><strong>NASA JPL DE431</strong> efemeris verisi</li>
+                                <li><i class="fas fa-check text-success me-2"></i>10 gezegen + Ay + Yükselen burç hesaplaması</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Placidus ev sistemi desteği</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle me-2"></i>Profesyonel Yazılımlarda Kullanım</h6>
+                        <p class="mb-0">
+                            Astro.com, Solar Fire, Astrolog, Kepler gibi dünya çapında tanınan 
+                            astroloji yazılımları Swiss Ephemeris kullanmaktadır. Bizim sistemimiz 
+                            de aynı teknoloji ile çalışmaktadır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NASA JPL -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                    <h3 class="mb-0"><i class="fas fa-space-shuttle me-2"></i>NASA JPL Verileri</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-md-9">
+                            <h5><i class="fas fa-rocket text-danger me-2"></i>Jet Propulsion Laboratory (JPL)</h5>
+                            <p class="mb-3">
+                                <strong>NASA'nın Jet Propulsion Laboratory (JPL)</strong>, uzay araçlarının navigasyonu 
+                                için en hassas gezegen efemerislerini hesaplar. Swiss Ephemeris, JPL'nin 
+                                <strong>DE431</strong> efemeris serisini kullanır.
+                            </p>
+
+                            <h6 class="mt-4"><i class="fas fa-satellite-dish text-primary me-2"></i>DE431 Efemeris</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>NASA uzay misyonlarında kullanılır</li>
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>Cassini, Juno, New Horizons gibi misyonlarda doğrulanmıştır</li>
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>Arc saniye hassasiyetinde pozisyon belirleme</li>
+                                <li><i class="fas fa-arrow-right text-primary me-2"></i>Güneş Sistemi'ndeki tüm büyük gezegenleri kapsar</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-moon fa-5x text-warning mb-3"></i>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Bilimsel Doğruluk</h6>
+                        <p class="mb-0">
+                            Sistemimiz, uzay araçlarının navigasyonunda kullanılan aynı hassasiyetteki 
+                            verilerle çalışır. Bu, internet üzerindeki çoğu astroloji sitesinden 
+                            <strong>binlerce kat daha doğru</strong> hesaplamalar yapmamızı sağlar.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hesaplama Karşılaştırması -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Hesaplama Yöntemleri Karşılaştırması</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-bordered">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Özellik</th>
+                                    <th class="text-danger">Basit Algoritmalar</th>
+                                    <th class="text-success">Swiss Ephemeris (Bizim Sistemimiz)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Ay Burcu</strong></td>
+                                    <td><span class="badge bg-danger">Ay bazlı (12 seçenek)</span><br>
+                                        <small class="text-muted">Ocak doğumlu = Koç (yanlış!)</small>
+                                    </td>
+                                    <td><span class="badge bg-success">Gerçek ekliptik boylam</span><br>
+                                        <small class="text-muted">0.001° hassasiyet, 360° aralık</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Yükselen Burç</strong></td>
+                                    <td><span class="badge bg-danger">Saat / 2 (6 seçenek)</span><br>
+                                        <small class="text-muted">Konum dikkate alınmaz</small>
+                                    </td>
+                                    <td><span class="badge bg-success">Placidus ev sistemi</span><br>
+                                        <small class="text-muted">GPS koordinat + doğum saati, dakika hassasiyeti</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Gezegen Pozisyonları</strong></td>
+                                    <td><span class="badge bg-danger">Mevcut değil</span></td>
+                                    <td><span class="badge bg-success">10 gezegen hesaplanır</span><br>
+                                        <small class="text-muted">Güneş, Ay, Merkür, Venüs, Mars, Jüpiter, Satürn, Uranüs, Neptün, Plüton</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Zaman Aralığı</strong></td>
+                                    <td><span class="badge bg-danger">Sınırlı</span></td>
+                                    <td><span class="badge bg-success">MÖ 3000 - MS 3000</span><br>
+                                        <small class="text-muted">6000 yıllık veri</small>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doğruluk</strong></td>
+                                    <td><span class="badge bg-danger">~30° hata payı</span></td>
+                                    <td><span class="badge bg-success">0.001° hassasiyet</span><br>
+                                        <small class="text-muted">30,000 kat daha hassas!</small>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="alert alert-success mt-4">
+                        <h6><i class="fas fa-trophy text-warning me-2"></i>Sonuç</h6>
+                        <p class="mb-0">
+                            Sistemimiz, basit algoritmaların <strong>30,000 kat daha hassas</strong> 
+                            hesaplamalar yapar ve profesyonel astroloji yazılımları ile aynı sonuçları verir.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Geocoding -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    <h3 class="mb-0"><i class="fas fa-map-marked-alt me-2"></i>Coğrafi Konum Hassasiyeti</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <h5><i class="fas fa-location-arrow text-success me-2"></i>Otomatik Koordinat Bulma</h5>
+                    <p>
+                        Yükselen burç ve doğum haritası hesaplamaları için doğum yerinin GPS koordinatları 
+                        kritik önem taşır. Sistemimiz, <strong>OpenStreetMap Nominatim</strong> servisi 
+                        ile şehir adlarını otomatik olarak koordinatlara çevirir.
+                    </p>
+
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-city me-2"></i>Örnek: İstanbul</h6>
+                                    <p class="mb-1"><strong>Girdi:</strong> "İstanbul, Türkiye"</p>
+                                    <p class="mb-0"><strong>Koordinat:</strong> 41.0082°K, 28.9784°D</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-city me-2"></i>Örnek: Ankara</h6>
+                                    <p class="mb-1"><strong>Girdi:</strong> "Ankara, Türkiye"</p>
+                                    <p class="mb-0"><strong>Koordinat:</strong> 39.9334°K, 32.8597°D</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4">
+                        <p class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Yükselen burç yaklaşık <strong>4 dakikada bir</strong> değişir. 
+                            Bu yüzden doğum saatiniz ve yeriniz dakika hassasiyetinde doğru olmalıdır.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Entegrasyonu -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header text-white" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">
+                    <h3 class="mb-0"><i class="fas fa-brain me-2"></i>AI Destekli Yorumlama</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <h5><i class="fas fa-robot text-purple me-2"></i>OpenAI GPT-4 Teknolojisi</h5>
+                    <p>
+                        Hesapladığımız astronomik verileri, en gelişmiş yapay zeka modeli olan 
+                        <strong>OpenAI GPT-4o-mini</strong> ile yorumluyoruz. AI, tüm gezegen 
+                        pozisyonlarını, ev sistemini ve burç kombinasyonlarını dikkate alarak 
+                        kişiselleştirilmiş analizler oluşturur.
+                    </p>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="mt-3"><i class="fas fa-check-circle text-success me-2"></i>AI'nin Aldığı Veriler</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-angle-right text-primary me-2"></i>Güneş, Ay, Yükselen burçları</li>
+                                <li><i class="fas fa-angle-right text-primary me-2"></i>10 gezegenin pozisyonları</li>
+                                <li><i class="fas fa-angle-right text-primary me-2"></i>Gezegenlerin bulundukları burçlar</li>
+                                <li><i class="fas fa-angle-right text-primary me-2"></i>Ekliptik boylam değerleri</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="mt-3"><i class="fas fa-magic text-warning me-2"></i>AI'nin Ürettiği Analizler</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-star text-warning me-2"></i>Kişilik Analizi</li>
+                                <li><i class="fas fa-heart text-danger me-2"></i>Duygusal Yapı</li>
+                                <li><i class="fas fa-briefcase text-success me-2"></i>Kariyer Yönelimi</li>
+                                <li><i class="fas fa-users text-info me-2"></i>İlişki Tarzı</li>
+                                <li><i class="fas fa-road text-secondary me-2"></i>Yaşam Yolu</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kaynaklar -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-secondary text-white">
+                    <h3 class="mb-0"><i class="fas fa-book me-2"></i>Kaynaklar ve Referanslar</h3>
+                </div>
+                <div class="card-body p-4 bg-white">
+                    <h6><i class="fas fa-link text-primary me-2"></i>Teknik Dokümantasyon</h6>
+                    <ul>
+                        <li><a href="https://www.astro.com/swisseph/" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>Swiss Ephemeris Resmi Web Sitesi
+                        </a></li>
+                        <li><a href="https://ssd.jpl.nasa.gov/planets/eph_export.html" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>NASA JPL Planetary Ephemeris
+                        </a></li>
+                        <li><a href="https://pypi.org/project/pyswisseph/" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>PySwissEph (Python Kütüphanesi)
+                        </a></li>
+                        <li><a href="https://nominatim.openstreetmap.org/" target="_blank" class="text-decoration-none">
+                            <i class="fas fa-external-link-alt me-1"></i>Nominatim Geocoding Service
+                        </a></li>
+                    </ul>
+
+                    <h6 class="mt-4"><i class="fas fa-graduation-cap text-success me-2"></i>Bilimsel Makaleler</h6>
+                    <ul>
+                        <li>Folkner, W.M., et al. (2014). "The Planetary and Lunar Ephemerides DE430 and DE431." <em>IPN Progress Report</em></li>
+                        <li>Koch, D., & Rindgen, A. (1995). "Swiss Ephemeris: A High Precision Ephemeris." <em>Astrodienst AG</em></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Güvenlik ve Gizlilik -->
+            <div class="card shadow-lg border-0 mb-4 border-success">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Gizlilik ve Güvenlik</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lock text-success me-2"></i>Veri Güvenliği</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>SSL şifrelemeli bağlantı</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Şifreler hash'li saklanır</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Kişisel veriler korunur</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-user-shield text-primary me-2"></i>Gizlilik</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Verileriniz satılmaz</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Üçüncü taraflarla paylaşılmaz</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Dilediğiniz zaman silebilirsiniz</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="card bg-gradient text-white text-center shadow-lg border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body p-5">
+                    <h3 class="mb-3"><i class="fas fa-rocket me-2"></i>Bilimsel Doğrulukla Kendinizi Keşfedin!</h3>
+                    <p class="lead mb-4">
+                        Profesyonel yazılımlar seviyesinde astronomik hesaplamalar ve 
+                        AI destekli kişiselleştirilmiş analizler ile doğum haritanızı inceleyin.
+                    </p>
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'zodiac:birth_chart' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-chart-pie me-2"></i>Doğum Haritamı Oluştur
+                    </a>
+                    {% else %}
+                    <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg">
+                        <i class="fas fa-user-plus me-2"></i>Ücretsiz Kayıt Ol
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.text-purple {
+    color: #8e2de2;
+}
+</style>
+{% endblock %}

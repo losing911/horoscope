@@ -29,6 +29,12 @@ uuid==1.30
 # Date/Time
 python-dateutil==2.8.2
 
+# Astronomy & Astrology
+pyswisseph==2.10.3.2
+
+# Geocoding
+geopy==2.4.1
+
 # Production Server
 gunicorn==21.2.0
 

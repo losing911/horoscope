@@ -6,6 +6,13 @@ import datetime
 class User(AbstractUser):
     """Genişletilmiş kullanıcı modeli"""
     birth_date = models.DateField(null=True, blank=True, verbose_name="Doğum Tarihi")
+    zodiac_sign = models.ForeignKey(
+        'zodiac.ZodiacSign',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="Burç"
+    )
     preferred_ai_provider = models.CharField(
         max_length=20, 
         choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],

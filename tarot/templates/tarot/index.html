@@ -313,6 +313,129 @@
 </section>
 {% endif %}
 
+<!-- Technology Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="text-center mb-5">
+            <span class="badge px-4 py-2 mb-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 30px; font-size: 0.9rem;">
+                <i class="fas fa-rocket me-2"></i>Bilimsel Astroloji
+            </span>
+            <h2 class="display-5 fw-bold mb-3" style="color: #1a1a1a;">Profesyonel Astronomik Hesaplamalar</h2>
+            <p class="lead text-muted">NASA verileri ile Swiss Ephemeris - Endüstri standardında doğruluk</p>
+        </div>
+        
+        <div class="row g-4 mb-5">
+            <!-- Swiss Ephemeris -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="tech-icon mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);">
+                            <i class="fas fa-satellite text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">Swiss Ephemeris</h5>
+                        <p class="text-muted mb-3" style="font-size: 0.95rem;">Dünya standardı astronomik hesaplama kütüphanesi</p>
+                        <div class="badge bg-light text-dark mb-2">0.001° Hassasiyet</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NASA JPL -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="tech-icon mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(240, 147, 251, 0.3);">
+                            <i class="fas fa-space-shuttle text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">NASA JPL DE431</h5>
+                        <p class="text-muted mb-3" style="font-size: 0.95rem;">Uzay araçları için kullanılan gerçek veriler</p>
+                        <div class="badge bg-light text-dark mb-2">6000 Yıl Kapsama</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Geocoding -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="tech-icon mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(17, 153, 142, 0.3);">
+                            <i class="fas fa-map-marked-alt text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">GPS Koordinat</h5>
+                        <p class="text-muted mb-3" style="font-size: 0.95rem;">Otomatik konum tespiti ile hassas hesaplama</p>
+                        <div class="badge bg-light text-dark mb-2">Nominatim API</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Integration -->
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 border-0" style="border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: all 0.3s ease;">
+                    <div class="card-body text-center p-4">
+                        <div class="tech-icon mb-4 mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%); border-radius: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 20px rgba(142, 45, 226, 0.3);">
+                            <i class="fas fa-brain text-white fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold mb-3" style="color: #1a1a1a;">AI Yorumlama</h5>
+                        <p class="text-muted mb-3" style="font-size: 0.95rem;">GPT-4 ile 10 gezegen analizi</p>
+                        <div class="badge bg-light text-dark mb-2">OpenAI GPT-4</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison -->
+        <div class="row mb-4">
+            <div class="col-lg-10 mx-auto">
+                <div class="card border-0" style="border-radius: 20px; box-shadow: 0 5px 30px rgba(0,0,0,0.1); overflow: hidden;">
+                    <div class="card-header text-white text-center py-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <h4 class="mb-0"><i class="fas fa-balance-scale me-2"></i>Basit Algoritmalar vs Swiss Ephemeris</h4>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="py-3 ps-4">Özellik</th>
+                                        <th class="py-3 text-center"><span class="badge bg-danger">Basit Yöntem</span></th>
+                                        <th class="py-3 text-center"><span class="badge bg-success">Bizim Sistemimiz</span></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="ps-4"><i class="fas fa-crosshairs me-2 text-primary"></i><strong>Hassasiyet</strong></td>
+                                        <td class="text-center"><span class="text-danger">~30° hata</span></td>
+                                        <td class="text-center"><span class="text-success fw-bold">0.001° hassasiyet</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4"><i class="fas fa-moon me-2 text-primary"></i><strong>Ay Burcu</strong></td>
+                                        <td class="text-center"><span class="text-muted">Ay bazlı tahmin</span></td>
+                                        <td class="text-center"><span class="text-success">Gerçek ekliptik boylam</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4"><i class="fas fa-arrow-up me-2 text-primary"></i><strong>Yükselen Burç</strong></td>
+                                        <td class="text-center"><span class="text-muted">Saat/2 formülü</span></td>
+                                        <td class="text-center"><span class="text-success">Placidus ev sistemi</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="ps-4"><i class="fas fa-globe me-2 text-primary"></i><strong>Konum</strong></td>
+                                        <td class="text-center"><span class="text-muted">Yok / Manuel</span></td>
+                                        <td class="text-center"><span class="text-success">Otomatik GPS</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center">
+            <a href="{% url 'zodiac:technology' %}" class="btn btn-lg px-5 py-3" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50px; font-weight: 700; box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);">
+                <i class="fas fa-microscope me-2"></i>Detaylı Teknik Bilgiler
+            </a>
+        </div>
+    </div>
+</section>
+
 <!-- Stats Section -->
 <section class="py-5" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%); position: relative; overflow: hidden;">
     <!-- Decorative circles -->
@@ -529,6 +652,20 @@
 .testimonial-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 15px 40px rgba(0,0,0,0.12) !important;
+}
+
+/* Technology Cards Hover */
+.tech-icon {
+    transition: all 0.3s ease;
+}
+
+.card:has(.tech-icon):hover .tech-icon {
+    transform: rotate(5deg) scale(1.1);
+}
+
+.card:has(.tech-icon):hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
 }
 
 .horoscope-card {

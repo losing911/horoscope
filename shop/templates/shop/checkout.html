@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ödeme - Mistik Mağaza{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="mb-4"><i class="fas fa-credit-card me-2"></i>Sipariş Tamamlama</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row">
+            <!-- Teslimat Bilgileri -->
+            <div class="col-lg-8 mb-4">
+                <div class="card shadow-sm border-0 mb-4" style="border-radius: 20px;">
+                    <div class="card-body bg-white p-4" style="border-radius: 20px;">
+                        <h5 class="mb-4"><i class="fas fa-shipping-fast me-2"></i>Teslimat Bilgileri</h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="full_name" class="form-label">Ad Soyad *</label>
+                                <input type="text" class="form-control" id="full_name" name="full_name" required value="{{ user.get_full_name }}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">E-posta *</label>
+                                <input type="email" class="form-control" id="email" name="email" required value="{{ user.email }}">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label">Telefon *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required placeholder="0532 123 45 67">
+                            </div>
+                            
+                            <div class="col-md-12">
+                                <label for="address" class="form-label">Adres *</label>
+                                <textarea class="form-control" id="address" name="address" rows="3" required placeholder="Mahalle, sokak, bina no, daire no"></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="city" class="form-label">Şehir *</label>
+                                <input type="text" class="form-control" id="city" name="city" required placeholder="İstanbul">
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="postal_code" class="form-label">Posta Kodu *</label>
+                                <input type="text" class="form-control" id="postal_code" name="postal_code" required placeholder="34000">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0" style="border-radius: 20px;">
+                    <div class="card-body bg-white p-4" style="border-radius: 20px;">
+                        <h5 class="mb-4"><i class="fas fa-wallet me-2"></i>Ödeme Yöntemi</h5>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="cash_on_delivery" value="cash_on_delivery" checked>
+                            <label class="form-check-label" for="cash_on_delivery">
+                                <i class="fas fa-hand-holding-usd me-2"></i>Kapıda Ödeme
+                                <small class="d-block text-muted">Siparişinizi teslim alırken nakit veya kredi kartıyla ödeyin</small>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="payment_method" id="credit_card" value="credit_card">
+                            <label class="form-check-label" for="credit_card">
+                                <i class="fas fa-credit-card me-2"></i>Kredi Kartı
+                                <small class="d-block text-muted">Güvenli ödeme (yakında aktif olacak)</small>
+                            </label>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="payment_method" id="bank_transfer" value="bank_transfer">
+                            <label class="form-check-label" for="bank_transfer">
+                                <i class="fas fa-university me-2"></i>Havale / EFT
+                                <small class="d-block text-muted">Sipariş onayı sonrası banka bilgilerimize havale yapın</small>
+                            </label>
+                        </div>
+
+                        <div class="mt-4">
+                            <label for="notes" class="form-label">Sipariş Notu (Opsiyonel)</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="3" placeholder="Siparişiniz hakkında özel notlarınızı buraya yazabilirsiniz..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sipariş Özeti -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 sticky-top" style="border-radius: 20px; top: 20px;">
+                    <div class="card-body bg-white p-4" style="border-radius: 20px;">
+                        <h5 class="mb-4"><i class="fas fa-receipt me-2"></i>Sipariş Özeti</h5>
+                        
+                        <!-- Ürünler -->
+                        <div class="mb-3" style="max-height: 300px; overflow-y: auto;">
+                            {% for item in cart.items.all %}
+                            <div class="d-flex gap-2 mb-3 pb-2 border-bottom">
+                                <div>
+                                    {% if item.product.image %}
+                                    <img src="{{ item.product.image }}" alt="{{ item.product.name }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 8px;">
+                                    {% else %}
+                                    <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="flex-grow-1">
+                                    <small class="d-block fw-bold">{{ item.product.name }}</small>
+                                    <small class="text-muted">{{ item.quantity }} x {{ item.product.price }} ₺</small>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+
+                        <hr>
+                        
+                        <!-- Fiyat Detayları -->
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Ara Toplam:</span>
+                            <strong>{{ cart.subtotal }} ₺</strong>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Kargo:</span>
+                            <strong>
+                                {% if cart.shipping_cost == 0 %}
+                                <span class="text-success">Ücretsiz</span>
+                                {% else %}
+                                {{ cart.shipping_cost }} ₺
+                                {% endif %}
+                            </strong>
+                        </div>
+
+                        {% if cart.shipping_cost == 0 and cart.subtotal >= 500 %}
+                        <div class="alert alert-success small">
+                            <i class="fas fa-check-circle me-1"></i>
+                            500 ₺ üzeri ücretsiz kargo!
+                        </div>
+                        {% endif %}
+                        
+                        <hr>
+                        
+                        <div class="d-flex justify-content-between mb-4">
+                            <h5>Toplam:</h5>
+                            <h5 class="text-primary">{{ cart.total }} ₺</h5>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>Siparişi Onayla
+                            </button>
+                            <a href="{% url 'shop:cart' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Sepete Dön
+                            </a>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-shield-alt me-1"></i>Güvenli ve Hızlı Teslimat
+                            </small>
+                        </div>
+
+                        <div class="alert alert-info small mt-3 mb-0">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Siparişiniz 2-5 iş günü içinde kargoya verilecektir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

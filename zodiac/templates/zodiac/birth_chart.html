@@ -1,0 +1,400 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Doğum Haritası - Tarot Yorum{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-chart-pie text-purple me-3"></i>Doğum Haritanız
+                </h1>
+                <p class="lead text-muted">
+                    Doğum haritanız, doğduğunuz andaki gökyüzünün fotoğrafıdır. 
+                    Güneş, Ay ve Yükselen burcunuzun yanı sıra <strong>5 farklı AI analizi</strong> ile 
+                    kendinizi derinlemesine tanıyın!
+                </p>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <!-- Hesaplama Formu -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">
+                    <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Tam Doğum Bilgileriniz</h5>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="birth_date" class="form-label">
+                                    <i class="fas fa-birthday-cake me-2 text-primary"></i>Doğum Tarihi <span class="text-danger">*</span>
+                                </label>
+                                <input type="date" class="form-control form-control-lg" id="birth_date" 
+                                       name="birth_date" required max="{{ today }}">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="birth_time" class="form-label">
+                                    <i class="fas fa-clock me-2 text-danger"></i>Doğum Saati <span class="text-danger">*</span>
+                                </label>
+                                <input type="time" class="form-control form-control-lg" id="birth_time" 
+                                       name="birth_time" required>
+                                <small class="form-text text-danger">Zorunlu alan</small>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="birth_place" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-2 text-primary"></i>Doğum Yeri
+                                </label>
+                                <input type="text" class="form-control form-control-lg" id="birth_place" 
+                                       name="birth_place" placeholder="Örn: İzmir, Türkiye">
+                                <small class="form-text text-muted">Opsiyonel</small>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-purple btn-lg">
+                                <i class="fas fa-magic me-2"></i>Doğum Haritamı Oluştur (5 AI Analizi)
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if chart %}
+            <!-- Ana Burçlar Özeti -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-star me-2"></i>Ana Üçlünüz (Big Three)</h5>
+                </div>
+                <div class="card-body bg-white">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border rounded">
+                                <h6 class="text-muted mb-2">☀️ GÜNEŞ BURCU</h6>
+                                <img src="{% static 'images/zodiac/' %}{{ chart.sun_sign.slug }}.svg" 
+                                     alt="{{ chart.sun_sign.name }}" 
+                                     style="width: 80px; height: 80px;"
+                                     onerror="this.style.display='none'">
+                                <h4 class="mt-2 mb-0">{{ chart.sun_sign.name }}</h4>
+                                <small class="text-muted">Temel Kişiliğiniz</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border rounded">
+                                <h6 class="text-muted mb-2">🌙 AY BURCU</h6>
+                                <img src="{% static 'images/zodiac/' %}{{ chart.moon_sign.slug }}.svg" 
+                                     alt="{{ chart.moon_sign.name }}" 
+                                     style="width: 80px; height: 80px;"
+                                     onerror="this.style.display='none'">
+                                <h4 class="mt-2 mb-0">{{ chart.moon_sign.name }}</h4>
+                                <small class="text-muted">Duygusal Dünyanız</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="p-3 border rounded">
+                                <h6 class="text-muted mb-2">⬆️ YÜKSELEN BURÇ</h6>
+                                <img src="{% static 'images/zodiac/' %}{{ chart.rising_sign.slug }}.svg" 
+                                     alt="{{ chart.rising_sign.name }}" 
+                                     style="width: 80px; height: 80px;"
+                                     onerror="this.style.display='none'">
+                                <h4 class="mt-2 mb-0">{{ chart.rising_sign.name }}</h4>
+                                <small class="text-muted">Dış Yansımanız</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info mt-3 mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Hesaplama Tarihi:</strong> {{ chart.created_at|date:"d F Y H:i" }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5 AI Analizi -->
+            <div class="row">
+                <!-- 1. Kişilik Analizi -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                            <h5 class="mb-0"><i class="fas fa-user me-2"></i>1. Kişilik Analizi</h5>
+                        </div>
+                        <div class="card-body bg-white">
+                            {{ chart.personality_analysis|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Duygusal Analiz -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                            <h5 class="mb-0"><i class="fas fa-heart me-2"></i>2. Duygusal Analiz</h5>
+                        </div>
+                        <div class="card-body bg-white">
+                            {{ chart.emotional_analysis|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Kariyer Analizi -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                            <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>3. Kariyer & İş Hayatı</h5>
+                        </div>
+                        <div class="card-body bg-white">
+                            {{ chart.career_analysis|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. İlişki Analizi -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                            <h5 class="mb-0"><i class="fas fa-heart-broken me-2"></i>4. İlişkiler & Aşk</h5>
+                        </div>
+                        <div class="card-body bg-white">
+                            {{ chart.relationship_analysis|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. Yaşam Yolu -->
+                <div class="col-lg-12 mb-4">
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">
+                            <h5 class="mb-0"><i class="fas fa-road me-2"></i>5. Yaşam Yolu & Ruhsal Gelişim</h5>
+                        </div>
+                        <div class="card-body bg-white">
+                            {{ chart.life_path_analysis|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- İpucu Kartı -->
+            <div class="card border-warning">
+                <div class="card-body bg-white">
+                    <h5 class="card-title"><i class="fas fa-lightbulb me-2 text-warning"></i>Bu Analizi Nasıl Kullanmalısınız?</h5>
+                    <ul class="mb-0">
+                        <li><strong>Kişilik Analizi:</strong> Temel karakterinizi anlamak için</li>
+                        <li><strong>Duygusal Analiz:</strong> İç dünyanızı ve tepkilerinizi anlamak için</li>
+                        <li><strong>Kariyer:</strong> Profesyonel yönelimlerinizi keşfetmek için</li>
+                        <li><strong>İlişkiler:</strong> Partnerinizle uyumunuzu değerlendirmek için</li>
+                        <li><strong>Yaşam Yolu:</strong> Uzun vadeli hedeflerinizi belirlemek için</li>
+                    </ul>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Geçmiş Haritalar -->
+            {% if past_charts %}
+            <div class="card shadow-lg border-0 mt-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Geçmiş Doğum Haritalarınız</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th><i class="fas fa-calendar me-2"></i>Tarih</th>
+                                    <th><i class="fas fa-sun me-2"></i>Güneş</th>
+                                    <th><i class="fas fa-moon me-2"></i>Ay</th>
+                                    <th><i class="fas fa-arrow-up me-2"></i>Yükselen</th>
+                                    <th><i class="fas fa-eye me-2"></i>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for old_chart in past_charts %}
+                                <tr>
+                                    <td>{{ old_chart.created_at|date:"d F Y" }}</td>
+                                    <td><span class="badge bg-warning">{{ old_chart.sun_sign.name }}</span></td>
+                                    <td><span class="badge bg-info">{{ old_chart.moon_sign.name }}</span></td>
+                                    <td><span class="badge bg-success">{{ old_chart.rising_sign.name }}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-primary" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#chartModal{{ old_chart.id }}">
+                                            <i class="fas fa-eye me-1"></i>Göster
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <!-- Modal -->
+                                <div class="modal fade" id="chartModal{{ old_chart.id }}" tabindex="-1">
+                                    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-gradient text-white" 
+                                                 style="background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-chart-pie me-2"></i>Doğum Haritası - {{ old_chart.created_at|date:"d F Y" }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <!-- Ana Burçlar -->
+                                                <div class="row text-center mb-4">
+                                                    <div class="col-4">
+                                                        <h6>☀️ {{ old_chart.sun_sign.name }}</h6>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <h6>🌙 {{ old_chart.moon_sign.name }}</h6>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        <h6>⬆️ {{ old_chart.rising_sign.name }}</h6>
+                                                    </div>
+                                                </div>
+
+                                                <!-- 5 Analiz -->
+                                                <div class="accordion" id="accordion{{ old_chart.id }}">
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button" type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#collapse1_{{ old_chart.id }}">
+                                                                <i class="fas fa-user me-2"></i>Kişilik Analizi
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse1_{{ old_chart.id }}" class="accordion-collapse collapse show" 
+                                                             data-bs-parent="#accordion{{ old_chart.id }}">
+                                                            <div class="accordion-body">
+                                                                {{ old_chart.personality_analysis|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed" type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#collapse2_{{ old_chart.id }}">
+                                                                <i class="fas fa-heart me-2"></i>Duygusal Analiz
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse2_{{ old_chart.id }}" class="accordion-collapse collapse" 
+                                                             data-bs-parent="#accordion{{ old_chart.id }}">
+                                                            <div class="accordion-body">
+                                                                {{ old_chart.emotional_analysis|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed" type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#collapse3_{{ old_chart.id }}">
+                                                                <i class="fas fa-briefcase me-2"></i>Kariyer
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse3_{{ old_chart.id }}" class="accordion-collapse collapse" 
+                                                             data-bs-parent="#accordion{{ old_chart.id }}">
+                                                            <div class="accordion-body">
+                                                                {{ old_chart.career_analysis|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed" type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#collapse4_{{ old_chart.id }}">
+                                                                <i class="fas fa-heart-broken me-2"></i>İlişkiler
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse4_{{ old_chart.id }}" class="accordion-collapse collapse" 
+                                                             data-bs-parent="#accordion{{ old_chart.id }}">
+                                                            <div class="accordion-body">
+                                                                {{ old_chart.relationship_analysis|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="accordion-item">
+                                                        <h2 class="accordion-header">
+                                                            <button class="accordion-button collapsed" type="button" 
+                                                                    data-bs-toggle="collapse" 
+                                                                    data-bs-target="#collapse5_{{ old_chart.id }}">
+                                                                <i class="fas fa-road me-2"></i>Yaşam Yolu
+                                                            </button>
+                                                        </h2>
+                                                        <div id="collapse5_{{ old_chart.id }}" class="accordion-collapse collapse" 
+                                                             data-bs-parent="#accordion{{ old_chart.id }}">
+                                                            <div class="accordion-body">
+                                                                {{ old_chart.life_path_analysis|linebreaks }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Kapat</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Bilgilendirme -->
+            <div class="card border-info mt-4">
+                <div class="card-body bg-white">
+                    <h5 class="card-title"><i class="fas fa-info-circle me-2 text-info"></i>Doğum Haritası Nedir?</h5>
+                    <p class="card-text">
+                        Doğum haritanız (Natal Chart), doğduğunuz an ve yerdeki gökyüzünün haritasıdır. 
+                        Güneş, Ay ve gezegenlerin o andaki pozisyonları, sizin benzersiz karakterinizi oluşturur.
+                    </p>
+                    <div class="alert alert-warning mt-3">
+                        <strong><i class="fas fa-robot me-2"></i>AI Teknolojisi:</strong><br>
+                        Bu analizler, en gelişmiş AI modelleri kullanılarak oluşturulmuştur. 
+                        Her analiz, burçlarınızın kombinasyonunu dikkate alarak kişiselleştirilmiştir.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+}
+.btn-purple {
+    background: linear-gradient(135deg, #8e2de2 0%, #4a00e0 100%);
+    color: white;
+    border: none;
+}
+.btn-purple:hover {
+    opacity: 0.9;
+    color: white;
+}
+.card {
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.text-purple {
+    color: #8e2de2;
+}
+</style>
+
+<script>
+// Bugünün tarihini max olarak ayarla
+document.getElementById('birth_date').max = new Date().toISOString().split('T')[0];
+</script>
+{% endblock %}
+

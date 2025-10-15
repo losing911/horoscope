@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Profilim - Tarot Yorum{% endblock %}
+
+{% block extra_css %}
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0 40px;
+        margin-top: -100px;
+        margin-bottom: 30px;
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        color: #667eea;
+        margin: 0 auto 20px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stat-card {
+        border-radius: 15px;
+        border: none;
+        transition: all 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="profile-header">
+    <div class="container text-center">
+        <div class="profile-avatar">
+            <i class="fas fa-user"></i>
+        </div>
+        <h2 class="mb-2">{{ user.username }}</h2>
+        <p class="mb-0">
+            <i class="fas fa-calendar-alt me-2"></i>
+            Üye olma tarihi: {{ user.date_joined|date:"d F Y" }}
+        </p>
+    </div>
+</div>
+
+<div class="container mb-5">
+    <div class="row g-4 mb-4">
+        <!-- İstatistikler -->
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-primary bg-opacity-10 mx-auto">
+                        <i class="fas fa-cards text-primary"></i>
+                    </div>
+                    <h3 class="mb-0">{{ user.tarotreading_set.count }}</h3>
+                    <p class="text-muted mb-0">Tarot Okuma</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 mx-auto">
+                        <i class="fas fa-calendar-day text-warning"></i>
+                    </div>
+                    <h3 class="mb-0">{{ user.dailycard_set.count }}</h3>
+                    <p class="text-muted mb-0">Günlük Kart</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-success bg-opacity-10 mx-auto">
+                        <i class="fas fa-star text-success"></i>
+                    </div>
+                    <h3 class="mb-0">{{ user.tarotreading_set.filter.count }}</h3>
+                    <p class="text-muted mb-0">Herkese Açık</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <!-- Profil Bilgileri -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-circle me-2"></i>Profil Bilgileri
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Kullanıcı Adı</label>
+                        <p class="mb-0 fw-bold">{{ user.username }}</p>
+                    </div>
+                    
+                    {% if user.email %}
+                    <div class="mb-3">
+                        <label class="text-muted small">E-posta</label>
+                        <p class="mb-0">{{ user.email }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label class="text-muted small">Üyelik Durumu</label>
+                        <p class="mb-0">
+                            <span class="badge bg-success">Aktif</span>
+                        </p>
+                    </div>
+                    
+                    <div class="mb-0">
+                        <label class="text-muted small">Son Giriş</label>
+                        <p class="mb-0">{{ user.last_login|date:"d F Y, H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Hızlı İşlemler -->
+            <div class="card mt-4">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bolt me-2"></i>Hızlı İşlemler
+                    </h5>
+                </div>
+                <div class="list-group list-group-flush">
+                    <a href="{% url 'accounts:password_change' %}" class="list-group-item list-group-item-action">
+                        <i class="fas fa-key me-2"></i>Şifre Değiştir
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-bell me-2"></i>Bildirim Ayarları
+                    </a>
+                    <a href="#" class="list-group-item list-group-item-action">
+                        <i class="fas fa-shield-alt me-2"></i>Gizlilik Ayarları
+                    </a>
+                    <a href="{% url 'accounts:logout' %}" class="list-group-item list-group-item-action text-danger">
+                        <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <!-- Son Okumalar -->
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-history me-2"></i>Son Okumalar
+                        </h5>
+                        <a href="{% url 'tarot:user_readings' %}" class="btn btn-sm btn-primary">
+                            Tümünü Gör
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if user.tarotreading_set.all %}
+                        <div class="list-group">
+                            {% for reading in user.tarotreading_set.all|slice:":5" %}
+                                <a href="{% url 'tarot:reading_detail' reading.id %}" class="list-group-item list-group-item-action">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ reading.spread.name }}</h6>
+                                            <p class="mb-0 text-muted small">
+                                                {{ reading.question|truncatewords:10 }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <small class="text-muted">
+                                                {{ reading.created_at|date:"d M Y" }}
+                                            </small>
+                                            <br>
+                                            <span class="badge bg-primary">
+                                                {{ reading.cards|length }} Kart
+                                            </span>
+                                        </div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-cards text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3">Henüz tarot okuma yapmadınız</p>
+                            <a href="{% url 'tarot:spreads' %}" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>İlk Okumayı Yap
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Günlük Kartlar -->
+            <div class="card">
+                <div class="card-header bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-calendar-alt me-2"></i>Son Günlük Kartlar
+                        </h5>
+                        <a href="{% url 'tarot:daily_card' %}" class="btn btn-sm btn-warning">
+                            Bugünkü Kartı Çek
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if user.dailycard_set.all %}
+                        <div class="row g-3">
+                            {% for daily in user.dailycard_set.all|slice:":3" %}
+                                <div class="col-md-4">
+                                    <div class="card h-100">
+                                        {% if daily.card.image_url %}
+                                            <img src="{{ daily.card.image_url }}" class="card-img-top" alt="{{ daily.card.name }}">
+                                        {% endif %}
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ daily.card.name }}</h6>
+                                            <p class="text-muted small mb-0">
+                                                {{ daily.date|date:"d F Y" }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <i class="fas fa-calendar-day text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3">Henüz günlük kart çekmediniz</p>
+                            <a href="{% url 'tarot:daily_card' %}" class="btn btn-warning">
+                                <i class="fas fa-magic me-2"></i>Günlük Kartını Çek
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,17 +1,17 @@
-ï»¿{% extends 'base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block title %}12 BurÃ§ - TÃ¼m BurÃ§lar{% endblock %}
+{% block title %}12 Burç - Tüm Burçlar{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-12">
             <div class="card shadow-lg">
-                <div class="card-body text-center py-5">
-                    <h1 class="display-4 mb-3">ğŸŒŸ 12 BurÃ§</h1>
+                <div class="card-body bg-white text-center py-5">
+                    <h1 class="display-4 mb-3">?? 12 Burç</h1>
                     <p class="lead text-muted mb-0">
-                        Zodyak kuÅŸaÄŸÄ±ndaki 12 burcun Ã¶zelliklerini keÅŸfedin
+                        Zodyak kuşağındaki 12 burcun özelliklerini keşfedin
                     </p>
                 </div>
             </div>
@@ -23,19 +23,19 @@
         <div class="col-12">
             <div class="btn-group d-flex flex-wrap justify-content-center" role="group">
                 <button type="button" class="btn btn-outline-primary filter-btn active" data-element="all">
-                    TÃ¼mÃ¼
+                    Tümü
                 </button>
                 <button type="button" class="btn btn-outline-danger filter-btn" data-element="fire">
-                    ğŸ”¥ AteÅŸ
+                    ?? Ateş
                 </button>
                 <button type="button" class="btn btn-outline-success filter-btn" data-element="earth">
-                    ğŸŒ Toprak
+                    ?? Toprak
                 </button>
                 <button type="button" class="btn btn-outline-info filter-btn" data-element="air">
-                    ğŸ’¨ Hava
+                    ?? Hava
                 </button>
                 <button type="button" class="btn btn-outline-primary filter-btn" data-element="water">
-                    ğŸ’§ Su
+                    ?? Su
                 </button>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 </div>
                 {% endif %}
                 
-                <div class="card-body">
+                <div class="card-body bg-white">
                     <h5 class="card-title">{{ sign.symbol }} {{ sign.name }}</h5>
                     <p class="card-text text-muted small mb-2">{{ sign.date_range }}</p>
                     <p class="card-text">{{ sign.description|truncatewords:15 }}</p>
@@ -65,14 +65,14 @@
                     </div>
                     
                     <div class="mt-2 small text-muted">
-                        <div><strong>YÃ¶neten:</strong> {{ sign.ruling_planet }}</div>
-                        <div><strong>ÅanslÄ± GÃ¼n:</strong> {{ sign.lucky_day }}</div>
+                        <div><strong>Yöneten:</strong> {{ sign.ruling_planet }}</div>
+                        <div><strong>Şanslı Gün:</strong> {{ sign.lucky_day }}</div>
                     </div>
                 </div>
                 
                 <div class="card-footer bg-transparent">
                     <a href="{% url 'zodiac:sign_detail' sign.slug %}" class="btn btn-sm btn-outline-primary w-100">
-                        DetaylarÄ± GÃ¶r
+                        Detayları Gör
                     </a>
                 </div>
             </div>
@@ -80,7 +80,7 @@
         {% empty %}
         <div class="col-12">
             <div class="alert alert-warning text-center">
-                HenÃ¼z burÃ§ bilgisi eklenmemiÅŸ. LÃ¼tfen admin panelinden burÃ§larÄ± ekleyin.
+                Henüz burç bilgisi eklenmemiş. Lütfen admin panelinden burçları ekleyin.
             </div>
         </div>
         {% endfor %}
@@ -90,43 +90,43 @@
     <div class="row mt-5 mb-5">
         <div class="col-md-3 mb-3">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <div class="display-4 mb-2">ğŸ”¥</div>
-                    <h5>AteÅŸ</h5>
-                    <p class="small text-muted">KoÃ§, Aslan, Yay</p>
-                    <p class="small">Tutkulu, enerjik, giriÅŸken</p>
+                <div class="card-body bg-white">
+                    <div class="display-4 mb-2">??</div>
+                    <h5>Ateş</h5>
+                    <p class="small text-muted">Koç, Aslan, Yay</p>
+                    <p class="small">Tutkulu, enerjik, girişken</p>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-3">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <div class="display-4 mb-2">ğŸŒ</div>
+                <div class="card-body bg-white">
+                    <div class="display-4 mb-2">??</div>
                     <h5>Toprak</h5>
-                    <p class="small text-muted">BoÄŸa, BaÅŸak, OÄŸlak</p>
-                    <p class="small">Pratik, kararlÄ±, gÃ¼venilir</p>
+                    <p class="small text-muted">Boğa, Başak, Oğlak</p>
+                    <p class="small">Pratik, kararlı, güvenilir</p>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-3">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <div class="display-4 mb-2">ğŸ’¨</div>
+                <div class="card-body bg-white">
+                    <div class="display-4 mb-2">??</div>
                     <h5>Hava</h5>
-                    <p class="small text-muted">Ä°kizler, Terazi, Kova</p>
-                    <p class="small">Zeki, sosyal, iletiÅŸimci</p>
+                    <p class="small text-muted">İkizler, Terazi, Kova</p>
+                    <p class="small">Zeki, sosyal, iletişimci</p>
                 </div>
             </div>
         </div>
         
         <div class="col-md-3 mb-3">
             <div class="card shadow-sm text-center">
-                <div class="card-body">
-                    <div class="display-4 mb-2">ğŸ’§</div>
+                <div class="card-body bg-white">
+                    <div class="display-4 mb-2">??</div>
                     <h5>Su</h5>
-                    <p class="small text-muted">YengeÃ§, Akrep, BalÄ±k</p>
+                    <p class="small text-muted">Yengeç, Akrep, Balık</p>
                     <p class="small">Duygusal, sezgisel, empatik</p>
                 </div>
             </div>
@@ -137,14 +137,14 @@
     <div class="row mb-5">
         <div class="col-12 text-center">
             <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-primary me-2">
-                ğŸ“… GÃ¼nlÃ¼k Yorumlar
+                ?? Günlük Yorumlar
             </a>
             <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-primary me-2">
-                ğŸ” Burcunu Bul
+                ?? Burcunu Bul
             </a>
             {% if user.is_authenticated %}
             <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-success">
-                ğŸ’• Uyum Analizi
+                ?? Uyum Analizi
             </a>
             {% endif %}
         </div>
@@ -225,3 +225,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

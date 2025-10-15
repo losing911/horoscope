@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mistik Mağaza - Burç Bilezikleri, Kristaller ve Tarot Kartları{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card shadow-lg border-0" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px;">
+                <div class="card-body bg-white text-center py-5" style="border-radius: 20px;">
+                    <h1 class="display-4 mb-3">
+                        <i class="fas fa-gem text-primary me-3"></i>Mistik Mağaza
+                    </h1>
+                    <p class="lead text-muted mb-0">
+                        Burç bilezikleri, şifa kristalleri, tarot kartları ve daha fazlası
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sidebar - Kategoriler -->
+        <div class="col-lg-3 mb-4">
+            <div class="card shadow-sm border-0" style="border-radius: 15px;">
+                <div class="card-header bg-white" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Kategoriler</h5>
+                </div>
+                <div class="card-body bg-white" style="border-radius: 0 0 15px 15px;">
+                    <div class="list-group list-group-flush">
+                        <a href="{% url 'shop:product_list' %}" class="list-group-item list-group-item-action border-0">
+                            <i class="fas fa-th me-2"></i>Tüm Ürünler
+                        </a>
+                        {% for category in categories %}
+                        <a href="{% url 'shop:product_list' %}?category={{ category.slug }}" class="list-group-item list-group-item-action border-0">
+                            <i class="fas {{ category.icon }} me-2"></i>{{ category.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Öne Çıkan Ürünler -->
+            {% if featured_products %}
+            <div class="card shadow-sm border-0 mt-4" style="border-radius: 15px;">
+                <div class="card-header bg-white" style="border-radius: 15px 15px 0 0;">
+                    <h5 class="mb-0"><i class="fas fa-star me-2 text-warning"></i>Öne Çıkanlar</h5>
+                </div>
+                <div class="card-body bg-white" style="border-radius: 0 0 15px 15px;">
+                    {% for product in featured_products %}
+                    <div class="mb-3 pb-3 {% if not forloop.last %}border-bottom{% endif %}">
+                        <a href="{% url 'shop:product_detail' product.slug %}" class="text-decoration-none">
+                            <div class="d-flex align-items-center">
+                                {% if product.image %}
+                                <img src="{{ product.image }}" alt="{{ product.name }}" class="rounded me-2" style="width: 50px; height: 50px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-image text-muted"></i>
+                                </div>
+                                {% endif %}
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-0 small">{{ product.name|truncatewords:3 }}</h6>
+                                    <span class="text-primary fw-bold">{{ product.price }} ₺</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Ürün Listesi -->
+        <div class="col-lg-9">
+            <!-- Arama ve Sıralama -->
+            <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+                <div class="card-body bg-white" style="border-radius: 15px;">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-8">
+                            <input type="text" name="search" class="form-control" placeholder="Ürün ara..." value="{{ request.GET.search }}">
+                        </div>
+                        <div class="col-md-2">
+                            <select name="sort" class="form-select">
+                                <option value="-created_at">Yeniler</option>
+                                <option value="-sales_count" {% if request.GET.sort == '-sales_count' %}selected{% endif %}>Çok Satanlar</option>
+                                <option value="price" {% if request.GET.sort == 'price' %}selected{% endif %}>Ucuzdan Pahalıya</option>
+                                <option value="-price" {% if request.GET.sort == '-price' %}selected{% endif %}>Pahalıdan Ucuza</option>
+                                <option value="name" {% if request.GET.sort == 'name' %}selected{% endif %}>A-Z</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Ürün Grid -->
+            <div class="row g-4">
+                {% for product in products %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 border-0 shadow-sm product-card" style="border-radius: 15px; overflow: hidden; transition: all 0.3s ease;">
+                        <a href="{% url 'shop:product_detail' product.slug %}" class="text-decoration-none">
+                            {% if product.image %}
+                            <img src="{{ product.image }}" class="card-img-top" alt="{{ product.name }}" style="height: 250px; object-fit: cover;">
+                            {% else %}
+                            <div class="bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
+                                <i class="fas fa-image fa-3x text-muted"></i>
+                            </div>
+                            {% endif %}
+                            
+                            {% if product.has_discount %}
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-3">
+                                -%{{ product.discount_percentage }}
+                            </span>
+                            {% endif %}
+                            
+                            {% if product.stock_status == 'low_stock' %}
+                            <span class="badge bg-warning position-absolute top-0 end-0 m-3">
+                                Son {{ product.stock }} adet
+                            </span>
+                            {% elif product.stock_status == 'out_of_stock' %}
+                            <span class="badge bg-secondary position-absolute top-0 end-0 m-3">
+                                Stokta Yok
+                            </span>
+                            {% endif %}
+                        </a>
+                        
+                        <div class="card-body bg-white">
+                            <a href="{% url 'shop:product_detail' product.slug %}" class="text-decoration-none">
+                                <h5 class="card-title text-dark">{{ product.name }}</h5>
+                                <p class="card-text text-muted small">{{ product.short_description|truncatewords:10 }}</p>
+                            </a>
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    {% if product.has_discount %}
+                                    <span class="text-muted text-decoration-line-through small">{{ product.original_price }} ₺</span><br>
+                                    <span class="text-primary fw-bold fs-5">{{ product.price }} ₺</span>
+                                    {% else %}
+                                    <span class="text-primary fw-bold fs-5">{{ product.price }} ₺</span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-muted small">
+                                    <i class="fas fa-star text-warning"></i> {{ product.views }} görüntülenme
+                                </div>
+                            </div>
+                            
+                            {% if product.is_in_stock %}
+                            <form method="post" action="{% url 'shop:add_to_cart' product.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-shopping-cart me-2"></i>Sepete Ekle
+                                </button>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-secondary w-100" disabled>
+                                <i class="fas fa-times me-2"></i>Stokta Yok
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle me-2"></i>Henüz ürün bulunmamaktadır.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.product-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15) !important;
+}
+</style>
+{% endblock %}

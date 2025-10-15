@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Kayıt Ol - Tarot Yorum{% endblock %}
+
+{% block description %}Tarot Yorum platformuna ücretsiz kayıt olun ve AI destekli tarot okumalarından faydalanın.{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 50px auto;
+    }
+    
+    .register-card {
+        background: rgba(255, 255, 255, 0.98);
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .register-header {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 40px 30px;
+        text-align: center;
+    }
+    
+    .register-header i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+    
+    .register-body {
+        padding: 40px 30px;
+    }
+    
+    .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e0e0e0;
+        transition: all 0.3s;
+    }
+    
+    .form-control:focus {
+        border-color: #f5576c;
+        box-shadow: 0 0 0 0.2rem rgba(245, 87, 108, 0.25);
+    }
+    
+    .btn-register {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 12px;
+        font-weight: 600;
+        transition: all 0.3s;
+        width: 100%;
+    }
+    
+    .btn-register:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(245, 87, 108, 0.4);
+        color: white;
+    }
+    
+    .password-strength {
+        height: 5px;
+        border-radius: 5px;
+        background: #e0e0e0;
+        margin-top: 5px;
+        overflow: hidden;
+    }
+    
+    .password-strength-bar {
+        height: 100%;
+        transition: all 0.3s;
+        width: 0;
+    }
+    
+    .strength-weak { background: #dc3545; width: 33%; }
+    .strength-medium { background: #ffc107; width: 66%; }
+    .strength-strong { background: #28a745; width: 100%; }
+    
+    .password-wrapper {
+        position: relative;
+    }
+    
+    .password-toggle {
+        cursor: pointer;
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #666;
+    }
+    
+    .requirements-list {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .requirements-list li {
+        padding: 3px 0;
+    }
+    
+    .requirements-list .valid {
+        color: #28a745;
+    }
+    
+    .requirements-list .valid i {
+        color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <i class="fas fa-user-plus"></i>
+            <h3 class="mb-0">Hesap Oluştur</h3>
+            <p class="mb-0 mt-2">Tarot Yorum ailesine katılın</p>
+        </div>
+        
+        <div class="register-body">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            <form method="post" action="{% url 'accounts:register' %}" id="registerForm">
+                {% csrf_token %}
+                
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">
+                        <i class="fas fa-user me-2"></i>Kullanıcı Adı
+                    </label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        id="id_username"
+                        class="form-control {% if form.username.errors %}is-invalid{% endif %}" 
+                        placeholder="Kullanıcı adınızı seçin"
+                        value="{{ form.username.value|default:'' }}"
+                        required
+                        autofocus
+                    >
+                    {% if form.username.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.username.errors.0 }}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">3-30 karakter arası, harfler, rakamlar ve @ . + - _ kullanabilirsiniz</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_email" class="form-label">
+                        <i class="fas fa-envelope me-2"></i>E-posta Adresi
+                    </label>
+                    <input 
+                        type="email" 
+                        name="email" 
+                        id="id_email"
+                        class="form-control {% if form.email.errors %}is-invalid{% endif %}" 
+                        placeholder="ornek@email.com"
+                        value="{{ form.email.value|default:'' }}"
+                    >
+                    {% if form.email.errors %}
+                        <div class="invalid-feedback">
+                            {{ form.email.errors.0 }}
+                        </div>
+                    {% else %}
+                        <small class="text-muted">Şifre sıfırlama için gereklidir (opsiyonel)</small>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_password1" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Şifre
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password1" 
+                            id="id_password1"
+                            class="form-control {% if form.password1.errors %}is-invalid{% endif %}" 
+                            placeholder="Güçlü bir şifre oluşturun"
+                            required
+                        >
+                        <i class="fas fa-eye password-toggle" id="togglePassword1"></i>
+                    </div>
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="strengthBar"></div>
+                    </div>
+                    {% if form.password1.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password1.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <label for="id_password2" class="form-label">
+                        <i class="fas fa-lock me-2"></i>Şifre (Tekrar)
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password2" 
+                            id="id_password2"
+                            class="form-control {% if form.password2.errors %}is-invalid{% endif %}" 
+                            placeholder="Şifrenizi tekrar girin"
+                            required
+                        >
+                        <i class="fas fa-eye password-toggle" id="togglePassword2"></i>
+                    </div>
+                    {% if form.password2.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.password2.errors.0 }}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Requirements -->
+                <div class="card bg-light mb-3">
+                    <div class="card-body p-3">
+                        <small class="fw-bold text-muted">Şifre Gereksinimleri:</small>
+                        <ul class="requirements-list mb-0 mt-1">
+                            <li id="req-length">
+                                <i class="fas fa-circle"></i> En az 8 karakter
+                            </li>
+                            <li id="req-letter">
+                                <i class="fas fa-circle"></i> En az bir harf
+                            </li>
+                            <li id="req-number">
+                                <i class="fas fa-circle"></i> En az bir rakam
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input class="form-check-input" type="checkbox" id="acceptTerms" required>
+                    <label class="form-check-label" for="acceptTerms">
+                        <a href="#" class="text-decoration-none">Kullanım Koşulları</a> ve 
+                        <a href="#" class="text-decoration-none">Gizlilik Politikası</a>'nı kabul ediyorum
+                    </label>
+                </div>
+                
+                <button type="submit" class="btn btn-register">
+                    <i class="fas fa-user-plus me-2"></i>Kayıt Ol
+                </button>
+            </form>
+            
+            <div class="text-center mt-4">
+                <p class="mb-0">
+                    Zaten hesabınız var mı? 
+                    <a href="{% url 'accounts:login' %}" class="text-decoration-none fw-bold">
+                        Giriş yapın
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Benefits -->
+    <div class="card mt-4 bg-gradient">
+        <div class="card-body">
+            <h6 class="card-title"><i class="fas fa-star text-warning me-2"></i>Üye Avantajları</h6>
+            <ul class="mb-0">
+                <li>🎴 Sınırsız tarot okuma</li>
+                <li>🤖 AI destekli kişisel yorumlar</li>
+                <li>📊 Okuma geçmişinizi kaydedin</li>
+                <li>🌟 Günlük kart bildirimleri</li>
+                <li>♈ Burç yorumları ve uyumluluk analizi</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Password toggle
+    document.getElementById('togglePassword1').addEventListener('click', function() {
+        const password = document.getElementById('id_password1');
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+    
+    document.getElementById('togglePassword2').addEventListener('click', function() {
+        const password = document.getElementById('id_password2');
+        const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+        password.setAttribute('type', type);
+        this.classList.toggle('fa-eye');
+        this.classList.toggle('fa-eye-slash');
+    });
+    
+    // Password strength meter
+    const password1 = document.getElementById('id_password1');
+    const strengthBar = document.getElementById('strengthBar');
+    const reqLength = document.getElementById('req-length');
+    const reqLetter = document.getElementById('req-letter');
+    const reqNumber = document.getElementById('req-number');
+    
+    password1.addEventListener('input', function() {
+        const value = this.value;
+        let strength = 0;
+        
+        // Check requirements
+        const hasLength = value.length >= 8;
+        const hasLetter = /[a-zA-Z]/.test(value);
+        const hasNumber = /\d/.test(value);
+        
+        // Update UI
+        updateRequirement(reqLength, hasLength);
+        updateRequirement(reqLetter, hasLetter);
+        updateRequirement(reqNumber, hasNumber);
+        
+        // Calculate strength
+        if (hasLength) strength++;
+        if (hasLetter) strength++;
+        if (hasNumber) strength++;
+        if (value.length >= 12) strength++;
+        if (/[!@#$%^&*]/.test(value)) strength++;
+        
+        // Update strength bar
+        strengthBar.className = 'password-strength-bar';
+        if (strength <= 2) {
+            strengthBar.classList.add('strength-weak');
+        } else if (strength <= 4) {
+            strengthBar.classList.add('strength-medium');
+        } else {
+            strengthBar.classList.add('strength-strong');
+        }
+    });
+    
+    function updateRequirement(element, valid) {
+        if (valid) {
+            element.classList.add('valid');
+            element.querySelector('i').className = 'fas fa-check-circle';
+        } else {
+            element.classList.remove('valid');
+            element.querySelector('i').className = 'fas fa-circle';
+        }
+    }
+</script>
+{% endblock %}

@@ -21,7 +21,7 @@
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
     
     <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXX"
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5141522562233432"
          crossorigin="anonymous"></script>
     
     <!-- Google Analytics (optional) -->
@@ -74,55 +74,95 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-shopping-bag me-1"></i>Mağaza
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'shop:product_list' %}">
+                                <i class="fas fa-th me-2"></i>Tüm Ürünler
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:cart' %}">
+                                <i class="fas fa-shopping-cart me-2"></i>Sepetim
+                            </a></li>
+                            {% if user.is_authenticated %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:order_list' %}">
+                                <i class="fas fa-box me-2"></i>Siparişlerim
+                            </a></li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-star me-1"></i>Astroloji
                         </a>
                         <ul class="dropdown-menu">
-                            <li><h6 class="dropdown-header"><i class="fas fa-sun text-warning me-2"></i>Burçlar</h6></li>
-                            <li><a class="dropdown-item" href="{% url 'zodiac:home' %}">
-                                <i class="fas fa-home me-2"></i>Ana Sayfa
-                            </a></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-sun text-warning me-2"></i>Genel Bilgiler</h6></li>
                             <li><a class="dropdown-item" href="{% url 'zodiac:signs_list' %}">
-                                <i class="fas fa-star-of-life me-2"></i>12 Burç
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'zodiac:daily_horoscopes' %}">
-                                <i class="fas fa-calendar-day me-2"></i>Günlük Yorumlar
+                                <i class="fas fa-star-of-life me-2"></i>12 Burç Bilgileri
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'zodiac:find_sign' %}">
                                 <i class="fas fa-search me-2"></i>Burcunu Bul
                             </a></li>
                             
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header"><i class="fas fa-robot text-success me-2"></i>AI Asistan</h6></li>
                             {% if user.is_authenticated %}
-                            <li><a class="dropdown-item" href="{% url 'zodiac:ai_assistant' %}">
-                                <i class="fas fa-robot me-2"></i>AI Burç Danışmanı
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-user-astronaut text-primary me-2"></i>Kişisel Yorumlarım</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:select_my_sign' %}">
+                                <i class="fas fa-hand-pointer me-2"></i>Burcumu Seç
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:my_daily_horoscope' %}">
+                                <i class="fas fa-calendar-day me-2"></i>Günlük Yorumum
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:my_weekly_horoscope' %}">
+                                <i class="fas fa-calendar-week me-2"></i>Haftalık Yorumum
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:my_monthly_horoscope' %}">
+                                <i class="fas fa-calendar-alt me-2"></i>Aylık Yorumum
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:my_horoscope_history' %}">
+                                <i class="fas fa-history me-2"></i>Geçmiş Yorumlarım
                             </a></li>
                             {% else %}
-                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}?next={% url 'zodiac:ai_assistant' %}">
-                                <i class="fas fa-robot me-2"></i>AI Burç Danışmanı <span class="badge bg-warning text-dark">Giriş</span>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-user-astronaut text-muted me-2"></i>Kişisel Yorumlar</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-2"></i>Kişisel yorumlar için giriş yapın
                             </a></li>
                             {% endif %}
                             
                             <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header"><i class="fas fa-moon text-info me-2"></i>İleri Seviye</h6></li>
-                            <li><a class="dropdown-item" href="#" onclick="alert('Ay Burcu hesaplama özelliği yakında!')">
-                                <i class="fas fa-moon me-2"></i>Ay Burcu
+                            <li><h6 class="dropdown-header"><i class="fas fa-moon text-info me-2"></i>İleri Seviye Hesaplamalar</h6></li>
+                            {% if user.is_authenticated %}
+                            <li><a class="dropdown-item" href="{% url 'zodiac:moon_sign' %}">
+                                <i class="fas fa-moon me-2"></i>Ay Burcu Hesapla
                             </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="alert('Yükselen burç hesaplama özelliği yakında!')">
+                            <li><a class="dropdown-item" href="{% url 'zodiac:ascendant' %}">
                                 <i class="fas fa-arrow-up me-2"></i>Yükselen Burç
                             </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="alert('Kişisel profil özelliği yakında!')">
-                                <i class="fas fa-user-astronaut me-2"></i>Kişisel Profil
+                            <li><a class="dropdown-item" href="{% url 'zodiac:birth_chart' %}">
+                                <i class="fas fa-chart-pie me-2"></i>Doğum Haritası (5 AI Analizi)
                             </a></li>
-                            <li><a class="dropdown-item" href="#" onclick="alert('Doğum haritası özelliği yakında!')">
-                                <i class="fas fa-chart-pie me-2"></i>Doğum Haritası
-                            </a></li>
-                            
-                            {% if user.is_authenticated %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header"><i class="fas fa-heart text-danger me-2"></i>İlişkiler</h6></li>
                             <li><a class="dropdown-item" href="{% url 'zodiac:compatibility' %}">
-                                <i class="fas fa-heart me-2"></i>Uyum Analizi
+                                <i class="fas fa-heart me-2"></i>Burç Uyumu
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:ai_assistant' %}">
+                                <i class="fas fa-robot me-2"></i>AI Burç Danışmanı
+                            </a></li>
+                            {% else %}
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-moon me-2 text-muted"></i>Ay Burcu <span class="badge bg-warning text-dark">Giriş</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-arrow-up me-2 text-muted"></i>Yükselen Burç <span class="badge bg-warning text-dark">Giriş</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-chart-pie me-2 text-muted"></i>Doğum Haritası <span class="badge bg-warning text-dark">Giriş</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-heart me-2 text-muted"></i>Burç Uyumu <span class="badge bg-warning text-dark">Giriş</span>
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-robot me-2 text-muted"></i>AI Danışman <span class="badge bg-warning text-dark">Giriş</span>
                             </a></li>
                             {% endif %}
                         </ul>
@@ -158,27 +198,84 @@
                     {% if user.is_authenticated %}
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-user me-1"></i>{{ user.username }}
+                                <i class="fas fa-user-circle me-1"></i>{{ user.username }}
                             </a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#">Profil</a></li>
-                                <li><a class="dropdown-item" href="{% url 'tarot:user_readings' %}">Okumalarım</a></li>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:profile' %}">
+                                        <i class="fas fa-user me-2"></i>Profilim
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'tarot:user_readings' %}">
+                                        <i class="fas fa-cards me-2"></i>Okumalarım
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'tarot:daily_card' %}">
+                                        <i class="fas fa-calendar-day me-2"></i>Günlük Kartım
+                                    </a>
+                                </li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Çıkış Yap</a></li>
+                                <li>
+                                    <a class="dropdown-item" href="{% url 'accounts:password_change' %}">
+                                        <i class="fas fa-key me-2"></i>Şifre Değiştir
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Çıkış Yap
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-sign-in-alt me-1"></i>Giriş
+                            <a class="nav-link btn btn-outline-light me-2" href="{% url 'accounts:login' %}">
+                                <i class="fas fa-sign-in-alt me-1"></i>Giriş Yap
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
-                                <i class="fas fa-user-plus me-1"></i>Kayıt
+                            <a class="nav-link btn btn-warning text-dark" href="{% url 'accounts:register' %}">
+                                <i class="fas fa-user-plus me-1"></i>Üye Ol
                             </a>
                         </li>
                     {% endif %}
+                    
+                    <!-- Dil Seçici -->
+                    {% load i18n %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-globe me-1"></i>
+                            {% get_current_language as LANGUAGE_CODE %}
+                            {% if LANGUAGE_CODE == 'tr' %}🇹🇷 TR
+                            {% elif LANGUAGE_CODE == 'en' %}🇬🇧 EN
+                            {% elif LANGUAGE_CODE == 'de' %}🇩🇪 DE
+                            {% elif LANGUAGE_CODE == 'fr' %}🇫🇷 FR
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="px-3">
+                                    {% csrf_token %}
+                                    <input name="next" type="hidden" value="{{ request.path }}">
+                                    <button type="submit" name="language" value="tr" class="dropdown-item {% if LANGUAGE_CODE == 'tr' %}active{% endif %}">
+                                        🇹🇷 Türkçe
+                                    </button>
+                                    <button type="submit" name="language" value="en" class="dropdown-item {% if LANGUAGE_CODE == 'en' %}active{% endif %}">
+                                        🇬🇧 English
+                                    </button>
+                                    <button type="submit" name="language" value="de" class="dropdown-item {% if LANGUAGE_CODE == 'de' %}active{% endif %}">
+                                        🇩🇪 Deutsch
+                                    </button>
+                                    <button type="submit" name="language" value="fr" class="dropdown-item {% if LANGUAGE_CODE == 'fr' %}active{% endif %}">
+                                        🇫🇷 Français
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -197,10 +294,8 @@
     {% endif %}
 
     <!-- Content -->
-    <main style="padding-top: 100px;">
-        <div class="container">
-            {% block content %}{% endblock %}
-        </div>
+    <main style="padding-top: 100px; min-height: 60vh;">
+        {% block content %}{% endblock %}
     </main>
 
     <!-- Footer -->
@@ -223,8 +318,8 @@
                     <ul class="list-unstyled">
                         <li><a href="{% url 'tarot:spreads' %}" class="text-muted text-decoration-none">Tarot Yayılımları</a></li>
                         <li><a href="{% url 'tarot:daily_card' %}" class="text-muted text-decoration-none">Günün Kartı</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Burç Yorumları</a></li>
-                        <li><a href="#" class="text-muted text-decoration-none">Hakkımızda</a></li>
+                        <li><a href="{% url 'zodiac:signs_list' %}" class="text-muted text-decoration-none">Burç Yorumları</a></li>
+                        <li><a href="{% url 'zodiac:technology' %}" class="text-muted text-decoration-none"><i class="fas fa-rocket me-1"></i>Teknolojimiz</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4 mb-4">

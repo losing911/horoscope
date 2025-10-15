@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Burcumu Seç{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Başlık -->
+            <div class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="fas fa-star text-warning me-2"></i>
+                    Burcumu Seç
+                </h1>
+                <p class="lead text-muted">
+                    Kişiye özel burç yorumları almak için burcunuzu seçin
+                </p>
+            </div>
+
+            {% if selected_sign %}
+            <!-- Mevcut Burç -->
+            <div class="alert alert-success text-center mb-5">
+                <h4>
+                    <i class="fas fa-check-circle me-2"></i>
+                    Mevcut Burcunuz: {{ selected_sign.symbol }} {{ selected_sign.name }}
+                </h4>
+                <p class="mb-0">{{ selected_sign.date_range }}</p>
+            </div>
+            {% endif %}
+
+            <!-- Seçim Yöntemleri -->
+            <div class="row g-4 mb-5">
+                <!-- Doğum Tarihi ile Seçim -->
+                <div class="col-md-6">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4">
+                                <i class="fas fa-calendar-alt text-primary me-2"></i>
+                                Doğum Tarihimle Belirle
+                            </h4>
+                            <p class="text-muted mb-4">Doğum tarihinizi girerek burcunuzu otomatik olarak belirleyin</p>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-6 mb-3">
+                                        <label for="birth_month" class="form-label">Ay</label>
+                                        <select name="birth_month" id="birth_month" class="form-select" required>
+                                            <option value="">Ay Seçin</option>
+                                            <option value="1">Ocak</option>
+                                            <option value="2">Şubat</option>
+                                            <option value="3">Mart</option>
+                                            <option value="4">Nisan</option>
+                                            <option value="5">Mayıs</option>
+                                            <option value="6">Haziran</option>
+                                            <option value="7">Temmuz</option>
+                                            <option value="8">Ağustos</option>
+                                            <option value="9">Eylül</option>
+                                            <option value="10">Ekim</option>
+                                            <option value="11">Kasım</option>
+                                            <option value="12">Aralık</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-6 mb-3">
+                                        <label for="birth_day" class="form-label">Gün</label>
+                                        <select name="birth_day" id="birth_day" class="form-select" required>
+                                            <option value="">Gün Seçin</option>
+                                            {% for day in "12345678901234567890123456789012"|make_list %}
+                                                {% if forloop.counter <= 31 %}
+                                                <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search me-2"></i>Burcumu Bul
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direkt Burç Seçimi -->
+                <div class="col-md-6">
+                    <div class="card shadow border-0 h-100">
+                        <div class="card-body p-4">
+                            <h4 class="card-title mb-4">
+                                <i class="fas fa-hand-pointer text-success me-2"></i>
+                                Direkt Burç Seç
+                            </h4>
+                            <p class="text-muted mb-4">Burcunuzu biliyorsanız direkt seçebilirsiniz</p>
+
+                            <form method="post">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="sign_id" class="form-label">Burç</label>
+                                    <select name="sign_id" id="sign_id" class="form-select" required>
+                                        <option value="">Burç Seçin</option>
+                                        {% for sign in zodiac_signs %}
+                                        <option value="{{ sign.id }}" {% if selected_sign and selected_sign.id == sign.id %}selected{% endif %}>
+                                            {{ sign.symbol }} {{ sign.name }} ({{ sign.date_range }})
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">
+                                    <i class="fas fa-check me-2"></i>Bu Burcu Seç
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Burç Listesi -->
+            <div class="card shadow border-0 mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Tüm Burçlar
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        {% for sign in zodiac_signs %}
+                        <div class="col-md-4 col-sm-6">
+                            <div class="zodiac-sign-item p-3 border-bottom border-end">
+                                <form method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="sign_id" value="{{ sign.id }}">
+                                    <button type="submit" class="btn btn-link text-decoration-none p-0 w-100 text-start">
+                                        <div class="d-flex align-items-center">
+                                            <span class="fs-2 me-3">{{ sign.symbol }}</span>
+                                            <div>
+                                                <strong class="d-block">{{ sign.name }}</strong>
+                                                <small class="text-muted">{{ sign.date_range }}</small>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Devam Et -->
+            {% if selected_sign %}
+            <div class="text-center">
+                <a href="{% url 'zodiac:my_daily_horoscope' %}" class="btn btn-lg btn-primary">
+                    <i class="fas fa-arrow-right me-2"></i>
+                    Yorumlarıma Git
+                </a>
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+
+<style>
+.zodiac-sign-item {
+    transition: background-color 0.2s ease;
+}
+
+.zodiac-sign-item:hover {
+    background-color: #f8f9fa;
+}
+
+.zodiac-sign-item button:hover {
+    color: #667eea !important;
+}
+
+.card {
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+</style>
+{% endblock %}
+
