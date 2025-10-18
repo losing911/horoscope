@@ -1,12 +1,12 @@
 """
 Zodiac AI Service - Burç yorumları için AI entegrasyonu
-OpenAI GPT-4o-mini ile günlük, haftalık, aylık burç yorumları oluşturur
+OpenRouter AI ile günlük, haftalık, aylık burç yorumları oluşturur
 """
 import logging
 import random
 from datetime import timedelta
 from django.utils import timezone
-from tarot.services import AIService
+from tarot.openrouter_service import OpenRouterService
 
 logger = logging.getLogger(__name__)
 
@@ -14,11 +14,15 @@ logger = logging.getLogger(__name__)
 class ZodiacAIService:
     """
     Burç yorumları için AI servisi
-    Tarot AI servisini kullanarak burç yorumları oluşturur
+    OpenRouter AI servisini kullanarak burç yorumları oluşturur
     """
     
-    def __init__(self):
-        self.ai_service = AIService()
+    def __init__(self, model=None):
+        """
+        AI servisi başlat
+        model: Kullanılacak AI model (None ise varsayılan: anthropic/claude-3.5-sonnet)
+        """
+        self.openrouter = OpenRouterService(model)
     
     def generate_daily_horoscope(self, zodiac_sign, date, language='tr'):
         """
@@ -33,7 +37,7 @@ class ZodiacAIService:
             dict: Yorumların bulunduğu dictionary
         """
         try:
-            logger.info(f"🌟 Günlük yorum oluşturuluyor: {zodiac_sign.name} - {date} ({language})")
+            logger.info(f"🌟 Günlük yorum oluşturuluyor: {zodiac_sign.name} - {date} ({language}) - Model: {self.openrouter.model}")
             
             # Dil talimatı
             language_instructions = {
@@ -46,9 +50,9 @@ class ZodiacAIService:
             
             element_display = self._get_element_display(zodiac_sign.element)
             
-            prompt = f"""{lang_instruction}Sen profesyonel bir astrolog ve burç yorumcususun. 
-
-{zodiac_sign.name} burcu için {date} tarihli günlük burç yorumu yap.
+            system_prompt = f"""{lang_instruction}Sen uzman bir astrolog ve burç yorumcususun. Pozitif, motive edici ve yapıcı yorumlar yaparsın."""
+            
+            prompt = f"""{zodiac_sign.name} burcu için {date} tarihli günlük burç yorumu yap.
 
 Burç Özellikleri:
 - Element: {element_display}
@@ -64,16 +68,19 @@ Aşağıdaki başlıklar altında yorumla:
 4. SAĞLIK: Fiziksel ve mental sağlık (2-3 cümle)
 5. FİNANS: Ekonomik durum ve harcamalar (2-3 cümle)
 
-Her başlığı büyük harfle yaz ve altına yorumu ekle. Pozitif, motive edici ve yapıcı ol."""
+Her başlığı büyük harfle yaz ve altına yorumu ekle."""
 
-            response = self.ai_service.generate_interpretation(
-                question=prompt,
-                cards=[],
-                spread_name="Günlük Burç Yorumu",
-                language=language
+            response = self.openrouter.generate_response(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                max_tokens=800,
+                temperature=0.7
             )
             
+            logger.info(f"🤖 AI Yanıtı alındı ({len(response)} karakter)")
+            
             sections = self._parse_horoscope_response(response)
+            logger.info(f"📊 Parse edilen sections: {list(sections.keys())}")
             
             # Şanslı sayı ve renk
             lucky_numbers = self._parse_lucky_numbers(zodiac_sign.lucky_numbers)
@@ -88,10 +95,10 @@ Her başlığı büyük harfle yaz ve altına yorumu ekle. Pozitif, motive edici
                 'mood_score': random.randint(6, 10),
                 'lucky_number': random.choice(lucky_numbers) if lucky_numbers else random.randint(1, 99),
                 'lucky_color': random.choice(lucky_colors) if lucky_colors else 'Mavi',
-                'ai_provider': 'openai'
+                'ai_provider': 'openrouter'
             }
             
-            logger.info(f"✅ Günlük yorum oluşturuldu: {zodiac_sign.name}")
+            logger.info(f"✅ Günlük yorum oluşturuldu: {zodiac_sign.name} - Model: {self.openrouter.model}")
             return result
             
         except Exception as e:
@@ -146,11 +153,13 @@ Aşağıdaki başlıklar altında detaylı yorumla:
 
 Her başlığı büyük harfle yaz ve altına yorumu ekle. Pozitif, motive edici ve detaylı ol."""
 
-            response = self.ai_service.generate_interpretation(
-                question=prompt,
-                cards=[],
-                spread_name="Haftalık Burç Yorumu",
-                language=language
+            system_prompt = f"""{lang_instruction}Sen profesyonel bir astrolog ve burç yorumcususun. Detaylı, içgörü dolu ve motive edici haftalık burç yorumları yazıyorsun."""
+
+            response = self.openrouter.generate_response(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                max_tokens=1000,
+                temperature=0.7
             )
             
             sections = self._parse_horoscope_response(response)
@@ -162,10 +171,10 @@ Her başlığı büyük harfle yaz ve altına yorumu ekle. Pozitif, motive edici
                 'health': sections.get('SAĞLIK', 'Sağlığınıza özen gösterin.'),
                 'money': sections.get('FİNANS', 'Finansal konularda dengeli olun.'),
                 'advice': sections.get('ÖNEMLİ GÜNLER', 'Hafta ortası önemli olabilir.'),
-                'ai_provider': 'openai'
+                'ai_provider': 'openrouter'
             }
             
-            logger.info(f"✅ Haftalık yorum oluşturuldu: {zodiac_sign.name}")
+            logger.info(f"✅ Haftalık yorum oluşturuldu: {zodiac_sign.name} - Provider: openrouter")
             return result
             
         except Exception as e:
@@ -227,11 +236,13 @@ Aşağıdaki başlıklar altında kapsamlı yorumla:
 
 Her başlığı büyük harfle yaz. Detaylı, içgörü dolu ve faydalı ol."""
 
-            response = self.ai_service.generate_interpretation(
-                question=prompt,
-                cards=[],
-                spread_name="Aylık Burç Yorumu",
-                language=language
+            system_prompt = f"""{lang_instruction}Sen profesyonel bir astrolog ve burç yorumcususun. Kapsamlı, içgörü dolu ve faydalı aylık burç yorumları yazıyorsun."""
+
+            response = self.openrouter.generate_response(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                max_tokens=1200,
+                temperature=0.7
             )
             
             sections = self._parse_horoscope_response(response)
@@ -244,11 +255,10 @@ Her başlığı büyük harfle yaz. Detaylı, içgörü dolu ve faydalı ol."""
                 'money': sections.get('FİNANS', 'Finansal durumunuz dengeli seyredecek.'),
                 'opportunities': sections.get('FIRSATLAR', 'Yeni fırsatlar kapınızı çalabilir.'),
                 'challenges': sections.get('ZORLUKLAR', 'Bazı zorluklarla karşılaşabilirsiniz.'),
-                'advice': sections.get('TAVSİYELER', 'Sabırlı ve planlı olun.'),
-                'ai_provider': 'openai'
+                'ai_provider': 'openrouter'
             }
             
-            logger.info(f"✅ Aylık yorum oluşturuldu: {zodiac_sign.name}")
+            logger.info(f"✅ Aylık yorum oluşturuldu: {zodiac_sign.name} - Provider: openrouter")
             return result
             
         except Exception as e:
@@ -300,11 +310,13 @@ Aşağıdaki başlıklar altında analiz yap:
 
 Her başlığı büyük harfle yaz. Dürüst, yapıcı ve faydalı ol."""
 
-            response = self.ai_service.generate_interpretation(
-                question=prompt,
-                cards=[],
-                spread_name="Burç Uyumu Analizi",
-                language=language
+            system_prompt = f"""{lang_instruction}Sen profesyonel bir astrolog ve ilişki danışmanısın. Burç uyumları hakkında detaylı, yapıcı ve faydalı analizler yapıyorsun."""
+
+            response = self.openrouter.generate_response(
+                prompt=prompt,
+                system_prompt=system_prompt,
+                max_tokens=1000,
+                temperature=0.7
             )
             
             sections = self._parse_horoscope_response(response)
@@ -319,10 +331,10 @@ Her başlığı büyük harfle yaz. Dürüst, yapıcı ve faydalı ol."""
                 'work_compatibility': sections.get('İŞ UYUMU', 'İş birliğiniz verimli olabilir.'),
                 'challenges': sections.get('ZORLUKLAR', 'Bazı zorluklarla karşılaşabilirsiniz.'),
                 'advice': sections.get('TAVSİYELER', 'İletişime önem verin.'),
-                'ai_provider': 'openai'
+                'ai_provider': 'openrouter'
             }
             
-            logger.info(f"✅ Uyumluluk analizi oluşturuldu: {sign1.name} & {sign2.name}")
+            logger.info(f"✅ Uyumluluk analizi oluşturuldu: {sign1.name} & {sign2.name} - Provider: openrouter")
             return result
             
         except Exception as e:
@@ -343,14 +355,19 @@ Her başlığı büyük harfle yaz. Dürüst, yapıcı ve faydalı ol."""
             if not line:
                 continue
             
-            # Başlık kontrolü
-            if line.isupper() or (line and ':' in line and line.split(':')[0].isupper()):
+            # Başlık kontrolü - "1. GENEL" veya "GENEL" gibi başlıkları yakala
+            # Sayı ile başlayan başlıklar için
+            if line and (line.isupper() or (':' in line and line.split(':')[0].isupper())):
                 # Önceki bölümü kaydet
                 if current_section and current_content:
                     sections[current_section] = ' '.join(current_content).strip()
                 
-                # Yeni bölüm başlat
-                current_section = line.replace(':', '').strip().upper()
+                # Yeni bölüm başlat - sayıları ve noktalama işaretlerini kaldır
+                section_name = line.replace(':', '').strip().upper()
+                # "1. GENEL" -> "GENEL", "2. AŞK" -> "AŞK"
+                section_name = section_name.split('. ', 1)[-1] if '. ' in section_name else section_name
+                section_name = section_name.split(')', 1)[-1].strip() if ')' in section_name else section_name
+                current_section = section_name
                 current_content = []
             elif current_section:
                 current_content.append(line)
@@ -441,7 +458,6 @@ Her başlığı büyük harfle yaz. Dürüst, yapıcı ve faydalı ol."""
             'money': "Finansal durumunuz dengeli seyredecek.",
             'opportunities': "Yeni fırsatlar kapınızı çalabilir.",
             'challenges': "Bazı zorluklarla karşılaşabilirsiniz ama üstesinden gelirsiniz.",
-            'advice': "Sabırlı ve planlı olun. Hedefinize odaklanın.",
             'ai_provider': 'fallback'
         }
     

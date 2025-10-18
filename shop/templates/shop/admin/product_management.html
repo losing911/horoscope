@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}Ürün Yönetimi{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1><i class="fas fa-box me-2"></i>Ürün Yönetimi</h1>
+    
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>
+        Ürün ekleme, kategori düzenleme ve detaylı ürün yönetimi için 
+        <a href="/admin/shop/product/" class="alert-link">Django Admin Panel</a>'i kullanabilirsiniz.
+        Burada stok kontrolü ve hızlı düzenleme yapabilirsiniz.
+    </div>
+
+    <!-- Ürün tablosu basit hali - detaylı template sonra eklenecek -->
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Ürün Listesi</h5>
+            <a href="/admin/shop/product/add/" class="btn btn-success btn-sm">
+                <i class="fas fa-plus me-1"></i> Yeni Ürün Ekle
+            </a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Ürün</th>
+                            <th>Kategori</th>
+                            <th>Fiyat</th>
+                            <th>Stok</th>
+                            <th>Durum</th>
+                            <th>İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for product in products %}
+                        <tr>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.category.name }}</td>
+                            <td>₺{{ product.price }}</td>
+                            <td>
+                                <form method="post" action="{% url 'shop:update_product_stock' product.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="number" name="stock" value="{{ product.stock }}" class="form-control form-control-sm d-inline" style="width:80px">
+                                    <button type="submit" class="btn btn-sm btn-primary">Güncelle</button>
+                                </form>
+                            </td>
+                            <td>
+                                {% if product.is_active %}
+                                    <span class="badge bg-success">Aktif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Pasif</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="/admin/shop/product/{{ product.id}}/change/" class="btn btn-sm btn-outline-primary">Düzenle</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="text-center">Henüz ürün yok</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

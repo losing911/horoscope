@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Burç Uyum Analizi{% endblock %}
+{% block title %}BurÃ§ Uyum Analizi{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -9,12 +9,12 @@
         <div class="col-md-10">
             <div class="card shadow-lg">
                 <div class="card-header bg-gradient-primary text-white text-center">
-                    <h2 class="mb-0">?? Burç Uyum Analizi</h2>
+                    <h2 class="mb-0">ğŸ’• BurÃ§ Uyum Analizi</h2>
                 </div>
                 
                 <div class="card-body p-5">
                     {% if compatibility %}
-                    <!-- Sonuç Gösterimi -->
+                    <!-- SonuÃ§ GÃ¶sterimi -->
                     <div class="text-center mb-4">
                         <div class="row align-items-center justify-content-center mb-4">
                             <div class="col-4 text-center">
@@ -48,12 +48,12 @@
                     
                     <hr class="my-4">
                     
-                    <!-- Detaylı Analiz -->
+                    <!-- DetaylÄ± Analiz -->
                     <div class="row">
                         <div class="col-md-6 mb-4">
                             <div class="card border-danger">
                                 <div class="card-body bg-white">
-                                    <h5 class="card-title text-danger">?? Aşk Uyumu</h5>
+                                    <h5 class="card-title text-danger">â¤ï¸ AÅŸk Uyumu</h5>
                                     <p class="card-text">{{ compatibility.love_compatibility }}</p>
                                 </div>
                             </div>
@@ -62,7 +62,7 @@
                         <div class="col-md-6 mb-4">
                             <div class="card border-info">
                                 <div class="card-body bg-white">
-                                    <h5 class="card-title text-info">?? Arkadaşlık Uyumu</h5>
+                                    <h5 class="card-title text-info">ğŸ¤ ArkadaÅŸlÄ±k Uyumu</h5>
                                     <p class="card-text">{{ compatibility.friendship_compatibility }}</p>
                                 </div>
                             </div>
@@ -71,7 +71,7 @@
                         <div class="col-md-6 mb-4">
                             <div class="card border-success">
                                 <div class="card-body bg-white">
-                                    <h5 class="card-title text-success">?? İş Uyumu</h5>
+                                    <h5 class="card-title text-success">ğŸ’¼ Ä°ÅŸ Uyumu</h5>
                                     <p class="card-text">{{ compatibility.work_compatibility }}</p>
                                 </div>
                             </div>
@@ -80,7 +80,7 @@
                         <div class="col-md-6 mb-4">
                             <div class="card border-warning">
                                 <div class="card-body bg-white">
-                                    <h5 class="card-title text-warning">?? Zorluklar</h5>
+                                    <h5 class="card-title text-warning">âš ï¸ Zorluklar</h5>
                                     <p class="card-text">{{ compatibility.challenges }}</p>
                                 </div>
                             </div>
@@ -89,7 +89,7 @@
                         <div class="col-12 mb-4">
                             <div class="card border-primary">
                                 <div class="card-body bg-white">
-                                    <h5 class="card-title text-primary">?? Tavsiyeler</h5>
+                                    <h5 class="card-title text-primary">ğŸ’¡ Tavsiyeler</h5>
                                     <p class="card-text">{{ compatibility.advice }}</p>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@
                     {% else %}
                     <!-- Form -->
                     <div class="text-center mb-4">
-                        <p class="lead">İki burç arasındaki uyumu öğrenmek için burçları seçin</p>
+                        <p class="lead">Ä°ki burÃ§ arasÄ±ndaki uyumu Ã¶ÄŸrenmek iÃ§in burÃ§larÄ± seÃ§in</p>
                     </div>
                     
                     <form method="post">
@@ -115,9 +115,9 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-4">
-                                <label for="sign1" class="form-label">Birinci Burç</label>
+                                <label for="sign1" class="form-label">Birinci BurÃ§</label>
                                 <select name="sign1" id="sign1" class="form-select form-select-lg" required>
-                                    <option value="">Burç seçin...</option>
+                                    <option value="">BurÃ§ seÃ§in...</option>
                                     {% for sign in zodiac_signs %}
                                     <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
                                     {% endfor %}
@@ -125,9 +125,9 @@
                             </div>
                             
                             <div class="col-md-6 mb-4">
-                                <label for="sign2" class="form-label">İkinci Burç</label>
+                                <label for="sign2" class="form-label">Ä°kinci BurÃ§</label>
                                 <select name="sign2" id="sign2" class="form-select form-select-lg" required>
-                                    <option value="">Burç seçin...</option>
+                                    <option value="">BurÃ§ seÃ§in...</option>
                                     {% for sign in zodiac_signs %}
                                     <option value="{{ sign.id }}">{{ sign.symbol }} {{ sign.name }}</option>
                                     {% endfor %}
@@ -149,10 +149,10 @@
                     </form>
                     
                     <div class="alert alert-info mt-4">
-                        <h6>?? Bilgi</h6>
+                        <h6>â„¹ï¸ Bilgi</h6>
                         <p class="mb-0 small">
-                            Analiz sonuçları yapay zeka destekli olarak hazırlanır ve kişisel gelişim amaçlıdır.
-                            Uyum analizi, elementler ve gezegen pozisyonlarına göre genel bir değerlendirmedir.
+                            Analiz sonuÃ§larÄ± yapay zeka destekli olarak hazÄ±rlanÄ±r ve kiÅŸisel geliÅŸim amaÃ§lÄ±dÄ±r.
+                            Uyum analizi, elementler ve gezegen pozisyonlarÄ±na gÃ¶re genel bir deÄŸerlendirmedir.
                         </p>
                     </div>
                     {% endif %}
@@ -164,7 +164,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="card shadow-sm text-center">
                         <div class="card-body bg-white">
-                            <h6>?? Burcunu Bul</h6>
+                            <h6>ğŸ” Burcunu Bul</h6>
                             <a href="{% url 'zodiac:find_sign' %}" class="btn btn-sm btn-outline-primary">
                                 Git
                             </a>
@@ -175,7 +175,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="card shadow-sm text-center">
                         <div class="card-body bg-white">
-                            <h6>?? Günlük Yorumlar</h6>
+                            <h6>ğŸŒŸ GÃ¼nlÃ¼k Yorumlar</h6>
                             <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-sm btn-outline-primary">
                                 Git
                             </a>
@@ -186,7 +186,7 @@
                 <div class="col-md-4 mb-3">
                     <div class="card shadow-sm text-center">
                         <div class="card-body bg-white">
-                            <h6>?? Tüm Burçlar</h6>
+                            <h6>â™ˆ TÃ¼m BurÃ§lar</h6>
                             <a href="{% url 'zodiac:signs_list' %}" class="btn btn-sm btn-outline-primary">
                                 Git
                             </a>

@@ -45,15 +45,21 @@ def my_daily_horoscope(request):
             ai_service = ZodiacAIService()
             horoscope_data = ai_service.generate_daily_horoscope(user_sign, today)
             
-            daily_horoscope = UserDailyHoroscope.objects.create(
+            # get_or_create kullan - race condition'ı önle
+            daily_horoscope, created = UserDailyHoroscope.objects.get_or_create(
                 user=request.user,
-                zodiac_sign=user_sign,
                 date=today,
-                **horoscope_data
+                defaults={
+                    'zodiac_sign': user_sign,
+                    **horoscope_data
+                }
             )
             
-            messages.success(request, f'🌟 {user_sign.name} burcunuz için günlük yorum oluşturuldu!')
-            logger.info(f"Günlük yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            if created:
+                messages.success(request, f'🌟 {user_sign.name} burcunuz için günlük yorum oluşturuldu!')
+                logger.info(f"Günlük yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            else:
+                messages.info(request, f'Bu tarih için zaten bir yorum var.')
             
         except Exception as e:
             messages.error(request, f'Yorum oluşturulurken hata: {str(e)}')
@@ -96,16 +102,22 @@ def my_weekly_horoscope(request):
             ai_service = ZodiacAIService()
             horoscope_data = ai_service.generate_weekly_horoscope(user_sign, week_start)
             
-            weekly_horoscope = UserWeeklyHoroscope.objects.create(
+            # get_or_create kullan - race condition'ı önle
+            weekly_horoscope, created = UserWeeklyHoroscope.objects.get_or_create(
                 user=request.user,
-                zodiac_sign=user_sign,
                 week_start=week_start,
-                week_end=week_end,
-                **horoscope_data
+                defaults={
+                    'zodiac_sign': user_sign,
+                    'week_end': week_end,
+                    **horoscope_data
+                }
             )
             
-            messages.success(request, f'🌟 {user_sign.name} burcunuz için haftalık yorum oluşturuldu!')
-            logger.info(f"Haftalık yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            if created:
+                messages.success(request, f'🌟 {user_sign.name} burcunuz için haftalık yorum oluşturuldu!')
+                logger.info(f"Haftalık yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            else:
+                messages.info(request, f'Bu hafta için zaten bir yorum var.')
             
         except Exception as e:
             messages.error(request, f'Yorum oluşturulurken hata: {str(e)}')
@@ -150,16 +162,22 @@ def my_monthly_horoscope(request):
             ai_service = ZodiacAIService()
             horoscope_data = ai_service.generate_monthly_horoscope(user_sign, year, month)
             
-            monthly_horoscope = UserMonthlyHoroscope.objects.create(
+            # get_or_create kullan - race condition'ı önle
+            monthly_horoscope, created = UserMonthlyHoroscope.objects.get_or_create(
                 user=request.user,
-                zodiac_sign=user_sign,
                 year=year,
                 month=month,
-                **horoscope_data
+                defaults={
+                    'zodiac_sign': user_sign,
+                    **horoscope_data
+                }
             )
             
-            messages.success(request, f'🌟 {user_sign.name} burcunuz için aylık yorum oluşturuldu!')
-            logger.info(f"Aylık yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            if created:
+                messages.success(request, f'🌟 {user_sign.name} burcunuz için aylık yorum oluşturuldu!')
+                logger.info(f"Aylık yorum oluşturuldu: {request.user.username} - {user_sign.name}")
+            else:
+                messages.info(request, f'Bu ay için zaten bir yorum var.')
             
         except Exception as e:
             messages.error(request, f'Yorum oluşturulurken hata: {str(e)}')

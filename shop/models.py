@@ -47,9 +47,11 @@ class Product(models.Model):
     short_description = models.CharField('Kısa Açıklama', max_length=250, blank=True)
     
     # Fiyat
-    price = models.DecimalField('Fiyat', max_digits=10, decimal_places=2)
-    original_price = models.DecimalField('İndirimli Fiyat', max_digits=10, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField('Fiyat (TL)', max_digits=10, decimal_places=2, help_text='USD fiyat girerseniz otomatik TL\'ye çevrilir')
+    price_usd = models.DecimalField('Fiyat (USD)', max_digits=10, decimal_places=2, blank=True, null=True, help_text='Opsiyonel: USD fiyat')
+    original_price = models.DecimalField('İndirimli Fiyat (TL)', max_digits=10, decimal_places=2, blank=True, null=True)
     discount_percentage = models.IntegerField('İndirim %', default=0, blank=True)
+    usd_to_try_rate = models.DecimalField('USD/TL Kuru', max_digits=6, decimal_places=2, default=Decimal('34.00'), help_text='Kayıt sırasındaki kur')
     
     # Stok
     stock = models.IntegerField('Stok Miktarı', default=0)
@@ -90,6 +92,10 @@ class Product(models.Model):
         if not self.slug:
             self.slug = slugify(self.name, allow_unicode=True)
         
+        # USD/TL dönüşümü - eğer price_usd varsa TL'ye çevir
+        if self.price_usd and self.price_usd > 0:
+            self.price = self.price_usd * self.usd_to_try_rate
+        
         # İndirim hesaplama
         if self.original_price and self.original_price > self.price:
             self.discount_percentage = int(((self.original_price - self.price) / self.original_price) * 100)
@@ -111,6 +117,28 @@ class Product(models.Model):
     @property
     def is_in_stock(self):
         return self.stock > 0
+    
+    @property
+    def total_revenue(self):
+        """Bu üründen elde edilen toplam gelir (sadece ödenmişler)"""
+        from django.db.models import Sum
+        revenue = self.orderitem_set.filter(
+            order__is_paid=True
+        ).aggregate(
+            total=Sum('product_price')
+        )['total']
+        return revenue or Decimal('0.00')
+    
+    @property
+    def total_sales_quantity(self):
+        """Bu üründen satılan toplam adet (sadece ödenmişler)"""
+        from django.db.models import Sum
+        quantity = self.orderitem_set.filter(
+            order__is_paid=True
+        ).aggregate(
+            total=Sum('quantity')
+        )['total']
+        return quantity or 0
 
 
 class Cart(models.Model):
@@ -229,6 +257,17 @@ class Order(models.Model):
             import random
             import string
             self.order_number = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+        
+        # Ödeme durumu değişimi kontrolü
+        if self.pk:  # Eğer güncelleme ise
+            old_order = Order.objects.filter(pk=self.pk).first()
+            if old_order and not old_order.is_paid and self.is_paid:
+                # Ödeme yapıldı, satış sayılarını güncelle
+                for item in self.items.all():
+                    if item.product:
+                        item.product.sales_count += item.quantity
+                        item.product.save(update_fields=['sales_count'])
+        
         super().save(*args, **kwargs)
 
 

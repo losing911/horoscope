@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Müşteri Listesi{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1><i class="fas fa-users me-2"></i>Müşteri Listesi</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Kayıtlı Müşteriler ({{ customers.count }})</h5>
+            <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-light btn-sm">
+                <i class="fas fa-arrow-left me-1"></i> Dashboard
+            </a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Müşteri</th>
+                            <th>Email</th>
+                            <th class="text-center">Sipariş Sayısı</th>
+                            <th class="text-end">Toplam Harcama</th>
+                            <th class="text-center">Kayıt Tarihi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>
+                                <strong>{{ customer.username }}</strong>
+                                {% if customer.is_staff %}
+                                    <span class="badge bg-danger ms-1">Admin</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ customer.email }}</td>
+                            <td class="text-center">
+                                <span class="badge bg-info">{{ customer.order_count }} sipariş</span>
+                            </td>
+                            <td class="text-end">
+                                <strong>₺{{ customer.total_spent|default:0|floatformat:2 }}</strong>
+                            </td>
+                            <td class="text-center">{{ customer.date_joined|date:"d M Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-5">
+                                <i class="fas fa-user-slash fa-3x mb-3 d-block"></i>
+                                Henüz müşteri yok
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="alert alert-info mt-4">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Not:</strong> Bu liste sadece en az 1 sipariş vermiş müşterileri gösterir.
+    </div>
+</div>
+{% endblock %}

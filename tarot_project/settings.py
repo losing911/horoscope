@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     # Third party apps
     'crispy_forms',
     'crispy_bootstrap5',
+    'rosetta',  # Translation management
     
     # Local apps
     'accounts',
@@ -64,6 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'tarot_project.middleware.UTF8Middleware',  # UTF-8 encoding zorlaması
 ]
 
 ROOT_URLCONF = 'tarot_project.urls'
@@ -127,6 +129,10 @@ USE_I18N = True  # Uluslararasılaştırma aktif
 USE_L10N = True  # Lokalizasyon aktif
 USE_TZ = True
 
+# Charset Ayarları - Türkçe karakter desteği
+DEFAULT_CHARSET = 'utf-8'
+FILE_CHARSET = 'utf-8'
+
 # Desteklenen Diller
 LANGUAGES = [
     ('tr', 'Türkçe'),
@@ -151,10 +157,13 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# AI Settings
-OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
-GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
-DEFAULT_AI_PROVIDER = config('DEFAULT_AI_PROVIDER', default='gemini')
+# AI Settings - OpenRouter (Primary AI Provider)
+OPENROUTER_API_KEY = config('OPENROUTER_API_KEY', default='')
+OPENROUTER_MODEL = config('OPENROUTER_MODEL', default='moonshotai/kimi-k2:free')
+
+# Instagram API Settings
+INSTAGRAM_ACCESS_TOKEN = config('INSTAGRAM_ACCESS_TOKEN', default='')
+INSTAGRAM_BUSINESS_ACCOUNT_ID = config('INSTAGRAM_BUSINESS_ACCOUNT_ID', default='')
 
 # Login/Logout URLs
 LOGIN_URL = 'accounts:login'
@@ -231,6 +240,7 @@ SESSION_COOKIE_AGE = 86400  # 24 saat
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_USE_SESSIONS = False
+CSRF_TRUSTED_ORIGINS = config('CSRF_TRUSTED_ORIGINS', default='http://localhost:8000,http://127.0.0.1:8000', cast=lambda v: [s.strip() for s in v.split(',')])
 
 # Login/Logout URLs
 LOGIN_URL = '/accounts/login/'

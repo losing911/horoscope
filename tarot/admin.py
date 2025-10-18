@@ -1,6 +1,60 @@
 from django.contrib import admin
 from django import forms
-from .models import TarotCard, TarotSpread, TarotReading, DailyCard, SiteSettings, AIProvider
+from .models import TarotCard, TarotSpread, TarotReading, DailyCard, SiteSettings, HeroSection
+
+
+@admin.register(HeroSection)
+class HeroSectionAdmin(admin.ModelAdmin):
+    """Hero bölümü admin paneli"""
+    list_display = ('title_line1', 'is_active', 'show_announcement', 'show_video', 'updated_at')
+    list_filter = ('is_active', 'show_announcement', 'show_video')
+    search_fields = ('title_line1', 'title_line2', 'subtitle', 'video_title')
+    
+    fieldsets = (
+        ('📋 Ana Başlık', {
+            'fields': ('title_line1', 'title_line2'),
+            'description': 'Hero bölümünün ana başlık satırları'
+        }),
+        ('📝 Alt Başlık', {
+            'fields': ('subtitle',),
+        }),
+        ('🎬 YouTube Video', {
+            'fields': ('show_video', 'video_url', 'video_title'),
+            'description': '<div style="background:#e3f2fd;padding:12px;border-radius:8px;margin:10px 0;">'
+                          '<strong>🎥 Video Ekleme:</strong><br>'
+                          '1. YouTube video URL\'sini yapıştırın (watch?v= veya youtu.be/ formatında)<br>'
+                          '2. Video başlığı opsiyoneldir (boş bırakılırsa YouTube\'dan alınır)<br>'
+                          '3. Video kartların yerine sağ tarafta gösterilir<br>'
+                          '<strong>Örnek:</strong> https://www.youtube.com/watch?v=dQw4w9WgXcQ</div>',
+            'classes': ('collapse',)
+        }),
+        ('📢 Duyuru/Bildirim', {
+            'fields': ('show_announcement', 'announcement_text', 'announcement_icon', 'announcement_link', 'announcement_color'),
+            'description': '<div style="background:#fff3cd;padding:12px;border-radius:8px;margin:10px 0;">'
+                          '<strong>💡 İpucu:</strong> Yeni video veya önemli güncellemeleri duyurmak için kullanın.<br>'
+                          '<strong>Font Awesome İkonlar:</strong> fas fa-video, fas fa-star, fas fa-gift, vb.</div>',
+            'classes': ('collapse',)
+        }),
+        ('🔘 Butonlar', {
+            'fields': ('primary_button_text', 'primary_button_url', 'secondary_button_text', 'secondary_button_url'),
+            'classes': ('collapse',)
+        }),
+        ('🎨 Görsel Ayarlar', {
+            'fields': ('background_gradient_start', 'background_gradient_end'),
+            'description': 'Hex renk kodları kullanın (örn: #6B1B3D)',
+            'classes': ('collapse',)
+        }),
+        ('⚙️ Durum', {
+            'fields': ('is_active',),
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        # Yeni kayıt aktif olarak kaydedildiğinde diğerlerini pasif yap
+        if obj.is_active:
+            HeroSection.objects.exclude(pk=obj.pk).update(is_active=False)
+        super().save_model(request, obj, form, change)
+
 
 class SiteSettingsAdminForm(forms.ModelForm):
     """Site ayarları için özel form"""
@@ -8,35 +62,6 @@ class SiteSettingsAdminForm(forms.ModelForm):
     class Meta:
         model = SiteSettings
         fields = '__all__'
-        widgets = {
-            'default_ai_provider': forms.Select(attrs={
-                'class': 'admin-select',
-                'style': 'width: 100%; max-width: 400px; padding: 8px; font-size: 14px;'
-            }),
-            'openai_model': forms.Select(attrs={
-                'class': 'admin-select model-select',
-                'style': 'width: 100%; max-width: 500px; padding: 10px; font-size: 14px; background: #f8f9fa;'
-            }),
-            'gemini_model': forms.Select(attrs={
-                'class': 'admin-select model-select',
-                'style': 'width: 100%; max-width: 500px; padding: 10px; font-size: 14px; background: #f8f9fa;'
-            }),
-            'ai_response_max_length': forms.NumberInput(attrs={
-                'style': 'width: 150px; padding: 8px;'
-            }),
-        }
-        help_texts = {
-            'default_ai_provider': '🤖 <strong>Ana AI Motor:</strong> Tarot ve burç yorumları için kullanılacak AI motoru',
-            'openai_model': '<div style="background:#e3f2fd;padding:10px;border-radius:5px;margin-top:5px;">'
-                           '🎯 <strong>Standard (gpt-4o-mini):</strong> Hızlı, ekonomik (~$0.001/istek) - Önerilen ✅<br>'
-                           '💎 <strong>Advanced (gpt-4o):</strong> Güçlü, detaylı (~$0.01/istek)<br>'
-                           '🧠 <strong>Expert (o1-preview/o1-mini):</strong> En akıllı (~$0.10/istek)</div>',
-            'gemini_model': '<div style="background:#fff3cd;padding:10px;border-radius:5px;margin-top:5px;">'
-                           '🆓 <strong>Ücretsiz alternatif:</strong> Günlük 50 istek limiti vardır<br>'
-                           '⚠️ Kota dolduğunda otomatik olarak AstroTarot AI aktif olur</div>',
-            'openai_api_key': '🔑 OpenAI API anahtarınız (sk-... ile başlar)',
-            'gemini_api_key': '🔑 Google Gemini API anahtarınız',
-        }
 
 @admin.register(SiteSettings)
 class SiteSettingsAdmin(admin.ModelAdmin):
@@ -58,23 +83,11 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Genel Ayarlar', {
-            'fields': ('site_title', 'site_description', 'site_keywords')
-        }),
-        ('🤖 AI Servis Ayarları', {
-            'fields': (
-                'default_ai_provider',
-                'openai_api_key',
-                'openai_model',
-                'gemini_api_key', 
-                'gemini_model',
-                'ai_response_max_length'
-            ),
+            'fields': ('site_title', 'site_description', 'site_keywords'),
             'description': '<div style="background:#e8f5e9;padding:15px;border-radius:8px;margin:10px 0;">'
-                          '<strong>🤖 AstroTarot AI Model Rehberi:</strong><br>'
-                          '<b>Standard (gpt-4o-mini):</b> Hızlı, ekonomik, günlük kullanım (~$0.001/yorum) ✅<br>'
-                          '<b>Advanced (gpt-4o):</b> Daha güçlü, karmaşık yorumlar (~$0.01/yorum)<br>'
-                          '<b>Expert (o1/o1-mini):</b> En akıllı, çok detaylı analiz (~$0.10/yorum)<br>'
-                          '<b>Alternative Engine:</b> Ücretsiz, günde 50 istek limiti</div>'
+                          '<strong>🤖 AI Ayarları:</strong><br>'
+                          'OpenRouter.ai üzerinden tek bir API ile tüm AI modellerine erişim sağlanıyor.<br>'
+                          'AI yapılandırması artık .env dosyası üzerinden yapılmaktadır.</div>'
         }),
         ('Kullanıcı Limitleri', {
             'fields': ('daily_reading_limit', 'max_question_length'),
@@ -94,26 +107,6 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         }),
         ('Cache Ayarları', {
             'fields': ('cache_timeout',),
-            'classes': ('collapse',)
-        }),
-    )
-
-@admin.register(AIProvider)
-class AIProviderAdmin(admin.ModelAdmin):
-    """AI Sağlayıcı admin paneli"""
-    list_display = ('display_name', 'name', 'is_active', 'max_tokens', 'temperature')
-    list_filter = ('is_active',)
-    search_fields = ('name', 'display_name')
-    
-    fieldsets = (
-        ('Temel Bilgiler', {
-            'fields': ('name', 'display_name', 'is_active')
-        }),
-        ('API Ayarları', {
-            'fields': ('api_key', 'max_tokens', 'temperature')
-        }),
-        ('Sistem Mesajı', {
-            'fields': ('system_prompt',),
             'classes': ('collapse',)
         }),
     )

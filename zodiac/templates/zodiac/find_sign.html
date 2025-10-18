@@ -2,20 +2,22 @@
 {% load static %}
 {% load crispy_forms_tags %}
 
-{% block title %}Burcunu Öğren{% endblock %}
+{% block title %}Burcunu Ã–ÄŸren{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow-lg">
-                <div class="card-header bg-gradient-primary text-white text-center">
-                    <h2 class="mb-0">?? Burcunu Öğren</h2>
+                <div class="card-header text-center">
+                    <div class="header-title-bg p-3 rounded">
+                        <h2 class="mb-0">â­ Burcunu Ã–ÄŸren</h2>
+                    </div>
                 </div>
                 
                 <div class="card-body p-5">
                     {% if found_sign %}
-                    <!-- Sonuç Gösterimi -->
+                    <!-- SonuÃ§ GÃ¶sterimi -->
                     <div class="text-center mb-4">
                         <div class="display-1 text-primary mb-3">{{ found_sign.symbol }}</div>
                         <h3 class="mb-3">Burcunuz: {{ found_sign.name }}</h3>
@@ -27,7 +29,7 @@
                                 <span class="badge bg-info">{{ found_sign.get_element_display }}</span>
                             </div>
                             <div class="col-6">
-                                <strong>Yöneten Gezegen:</strong><br>
+                                <strong>YÃ¶neten Gezegen:</strong><br>
                                 <span>{{ found_sign.ruling_planet }}</span>
                             </div>
                         </div>
@@ -38,7 +40,7 @@
                         
                         <div class="mt-4">
                             <a href="{% url 'zodiac:sign_detail' found_sign.slug %}" class="btn btn-primary btn-lg me-2">
-                                Burç Detayı
+                                BurÃ§ DetayÄ±
                             </a>
                             <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-secondary">
                                 Yeni Arama
@@ -48,7 +50,7 @@
                     {% else %}
                     <!-- Form -->
                     <div class="text-center mb-4">
-                        <p class="lead">Doğum tarihinizi girerek burcunuzu öğrenin</p>
+                        <p class="lead">DoÄŸum tarihinizi girerek burcunuzu Ã¶ÄŸrenin</p>
                     </div>
                     
                     <form method="post">
@@ -56,9 +58,9 @@
                         
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <label for="birth_day" class="form-label">Gün</label>
+                                <label for="birth_day" class="form-label">GÃ¼n</label>
                                 <select name="birth_day" id="birth_day" class="form-select" required>
-                                    <option value="">Gün seçin...</option>
+                                    <option value="">GÃ¼n seÃ§in...</option>
                                     {% for day in "x"|rjust:31 %}
                                         <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
                                     {% endfor %}
@@ -68,19 +70,19 @@
                             <div class="col-md-8 mb-3">
                                 <label for="birth_month" class="form-label">Ay</label>
                                 <select name="birth_month" id="birth_month" class="form-select" required>
-                                    <option value="">Ay seçin...</option>
+                                    <option value="">Ay seÃ§in...</option>
                                     <option value="1">Ocak</option>
-                                    <option value="2">Şubat</option>
+                                    <option value="2">Åubat</option>
                                     <option value="3">Mart</option>
                                     <option value="4">Nisan</option>
-                                    <option value="5">Mayıs</option>
+                                    <option value="5">MayÄ±s</option>
                                     <option value="6">Haziran</option>
                                     <option value="7">Temmuz</option>
-                                    <option value="8">Ağustos</option>
-                                    <option value="9">Eylül</option>
+                                    <option value="8">AÄŸustos</option>
+                                    <option value="9">EylÃ¼l</option>
                                     <option value="10">Ekim</option>
-                                    <option value="11">Kasım</option>
-                                    <option value="12">Aralık</option>
+                                    <option value="11">KasÄ±m</option>
+                                    <option value="12">AralÄ±k</option>
                                 </select>
                             </div>
                         </div>
@@ -93,14 +95,14 @@
                         
                         <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                ?? Burcumu Öğren
+                                â­ Burcumu Ã–ÄŸren
                             </button>
                         </div>
                     </form>
                     
                     <div class="text-center mt-4">
                         <small class="text-muted">
-                            Yıl bilgisi gerekmez, sadece gün ve ay yeterlidir.
+                            YÄ±l bilgisi gerekmez, sadece gÃ¼n ve ay yeterlidir.
                         </small>
                     </div>
                     {% endif %}
@@ -112,8 +114,8 @@
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body text-center">
-                            <h5>?? Günlük Yorumlar</h5>
-                            <p class="small text-muted">Burcunuzun günlük yorumunu okuyun</p>
+                            <h5><i class="fas fa-star text-warning me-2"></i>GÃ¼nlÃ¼k Yorumlar</h5>
+                            <p class="small text-muted">Burcunuzun gÃ¼nlÃ¼k yorumunu okuyun</p>
                             <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-sm btn-outline-primary">
                                 Yorumlara Git
                             </a>
@@ -124,10 +126,10 @@
                 <div class="col-md-6 mb-3">
                     <div class="card shadow-sm">
                         <div class="card-body text-center">
-                            <h5>?? Tüm Burçlar</h5>
-                            <p class="small text-muted">12 burcun özelliklerini keşfedin</p>
+                            <h5><i class="fas fa-moon text-info me-2"></i>TÃ¼m BurÃ§lar</h5>
+                            <p class="small text-muted">12 burcun Ã¶zelliklerini keÅŸfedin</p>
                             <a href="{% url 'zodiac:signs_list' %}" class="btn btn-sm btn-outline-primary">
-                                Burçları Gör
+                                BurÃ§larÄ± GÃ¶r
                             </a>
                         </div>
                     </div>
@@ -138,8 +140,70 @@
 </div>
 
 <style>
-.bg-gradient-primary {
-    background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
+/* Genel arka plan */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Ana kart arka planÄ± */
+.card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* BaÅŸlÄ±k arka planÄ± */
+.card-header {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.header-title-bg {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.header-title-bg h2 {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+/* Info kartlarÄ± arka planÄ± */
+.card-body h5 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Form etiketleri iÃ§in daha iyi okunabilirlik */
+.form-label {
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Buton metinleri iÃ§in kontras */
+.btn {
+    font-weight: 500;
+}
+
+/* Container pozisyonu */
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* KÃ¼Ã§Ã¼k info kartlarÄ± */
+.card-body .card {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(5px);
+}
+
+/* Alert mesajlarÄ± */
+.alert {
+    background-color: rgba(217, 237, 247, 0.95) !important;
+    backdrop-filter: blur(5px);
 }
 </style>
 {% endblock %}

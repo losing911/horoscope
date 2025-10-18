@@ -9,10 +9,14 @@
         <div class="col-lg-10">
             <!-- Başlık -->
             <div class="text-center mb-5">
-                <h1 class="display-4 mb-3">
-                    <i class="fas fa-calendar-alt text-primary me-2"></i>
-                    {{ month_name }} {{ year }} Aylık Burç Yorumum
-                </h1>
+                <div class="card shadow-lg">
+                    <div class="card-body bg-white py-5">
+                        <h1 class="display-4 mb-3">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            {{ month_name }} {{ year }} Aylık Burç Yorumum
+                        </h1>
+                    </div>
+                </div>
             </div>
 
             {% if user_sign %}
@@ -112,12 +116,7 @@
                         <div class="text-center mt-4 pt-3 border-top">
                             <small class="text-muted">
                                 <i class="far fa-clock me-1"></i>
-                                {{ monthly_horoscope.created_at|date:"d.m.Y H:i" }} tarihinde oluşturuldu
-                                {% if monthly_horoscope.ai_provider %}
-                                <span class="ms-2">
-                                    <i class="fas fa-robot me-1"></i>{{ monthly_horoscope.ai_provider|upper }}
-                                </span>
-                                {% endif %}
+                                {{ monthly_horoscope.created_at|date:"d.m.Y H:i" }}
                             </small>
                         </div>
 

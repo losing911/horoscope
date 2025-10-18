@@ -3,6 +3,9 @@ from django.db import models
 from django.utils import timezone
 import datetime
 
+# Legal models import
+from .legal_models import LegalDocument, UserConsent, DataDeletionRequest, ContactMessage
+
 class User(AbstractUser):
     """Genişletilmiş kullanıcı modeli"""
     birth_date = models.DateField(null=True, blank=True, verbose_name="Doğum Tarihi")

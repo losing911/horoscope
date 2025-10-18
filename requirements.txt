@@ -13,6 +13,9 @@ google-generativeai==0.4.0
 # Environment Variables
 python-decouple==3.8
 
+# HTTP Requests
+requests==2.31.0
+
 # Caching
 redis==5.0.1
 django-redis==5.4.0
@@ -46,3 +49,6 @@ django-cors-headers==4.3.1
 
 # Forms
 django-widget-tweaks==1.5.0
+
+# Translation Management
+django-rosetta==0.10.0

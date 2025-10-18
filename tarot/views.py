@@ -8,17 +8,29 @@ from django.utils import timezone
 from django.urls import reverse
 import random
 import json
-from .models import TarotCard, TarotSpread, TarotReading, DailyCard, SiteSettings, AIProvider
+from .models import TarotCard, TarotSpread, TarotReading, DailyCard, SiteSettings, HeroSection
 from .services import AIService, DailyCardService
 
 
 def index(request):
     """Ana sayfa"""
+    # Hero section içeriğini al
+    hero_section = HeroSection.get_active()
+    
     # Son okumaları al (herkese açık olanlar)
     recent_readings = TarotReading.objects.filter(is_public=True).order_by('-created_at')[:6]
     
     # Popüler yayılımları al
     popular_spreads = TarotSpread.objects.filter(is_active=True).order_by('difficulty_level')[:4]
+    
+    # YouTube videolarını al
+    youtube_videos = []
+    try:
+        from blog.youtube_service import YouTubeService
+        youtube_service = YouTubeService()
+        youtube_videos = youtube_service.get_latest_videos(max_results=6)
+    except Exception as e:
+        print(f"YouTube videoları alınamadı: {e}")
     
     # Günlük burç yorumlarını al ve gerekirse Gemini ile oluştur
     daily_horoscopes = []
@@ -59,9 +71,11 @@ def index(request):
     context = {
         'title': 'Tarot Yorum - AI Destekli Tarot Falı ve Astroloji',
         'description': 'Yapay zeka destekli tarot falı ve günlük burç yorumları',
+        'hero_section': hero_section,
         'recent_readings': recent_readings,
         'popular_spreads': popular_spreads,
         'daily_horoscopes': daily_horoscopes,
+        'youtube_videos': youtube_videos,
     }
     return render(request, 'tarot/index.html', context)
 

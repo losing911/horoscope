@@ -18,23 +18,21 @@
     
     <!-- Custom CSS -->
     {% load static %}
-    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link href="{% static 'css/main.css' %}?v=3.0" rel="stylesheet">
     
     <!-- Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5141522562233432"
          crossorigin="anonymous"></script>
     
-    <!-- Google Analytics (optional) -->
+    <!-- Google Analytics -->
     <!-- Global site tag (gtag.js) - Google Analytics -->
-    <!--
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7WY3GY223R"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-XXXXXXXXXX');
+      gtag('config', 'G-7WY3GY223R');
     </script>
-    -->
     
     {% block extra_css %}{% endblock %}
 </head>
@@ -185,6 +183,23 @@
                                 <i class="fas fa-brain me-2"></i>AI Sağlayıcılar
                             </a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-store text-warning me-2"></i>Mağaza Yönetimi</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:admin_dashboard' %}">
+                                <i class="fas fa-chart-pie me-2"></i>Mağaza Dashboard
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:order_management' %}">
+                                <i class="fas fa-shopping-bag me-2"></i>Siparişler
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:product_management' %}">
+                                <i class="fas fa-box me-2"></i>Ürün Yönetimi
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:sales_statistics' %}">
+                                <i class="fas fa-chart-bar me-2"></i>Satış İstatistikleri
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'shop:customer_list' %}">
+                                <i class="fas fa-users me-2"></i>Müşteri Listesi
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><h6 class="dropdown-header"><i class="fas fa-database text-success me-2"></i>Tam Yönetim</h6></li>
                             <li><a class="dropdown-item" href="/admin/">
                                 <i class="fas fa-database me-2"></i>Django Admin
@@ -299,47 +314,153 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer bg-dark text-light py-5 mt-5">
+    <footer class="footer">
         <div class="container">
-            <div class="row">
-                <div class="col-md-4 mb-4">
-                    <h5 class="text-warning">
-                        <i class="fas fa-star me-2"></i>Tarot Yorum
+            <div class="row g-4">
+                <!-- Hakkımızda -->
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <h5>
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        Tarot Yorum
                     </h5>
-                    <p class="text-muted">AI destekli tarot falı ve astroloji platformu. Evrenin sırlarını keşfet.</p>
+                    <p class="mb-4">
+                        AI destekli tarot ve astroloji platformu. Evrenin sırlarını keşfedin, 
+                        geleceğinize ışık tutun. Modern teknoloji ile antik bilgeliği buluşturuyoruz.
+                    </p>
                     <div class="social-links">
-                        <a href="#" class="text-light me-3"><i class="fab fa-facebook fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-twitter fa-lg"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-instagram fa-lg"></i></a>
+                        <a href="#" title="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" title="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" title="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" title="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="#" title="LinkedIn">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
                     </div>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-uppercase text-warning">Hızlı Erişim</h6>
+                
+                <!-- Hızlı Erişim -->
+                <div class="col-lg-2 col-md-6 mb-4">
+                    <h6>Keşfet</h6>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'tarot:spreads' %}" class="text-muted text-decoration-none">Tarot Yayılımları</a></li>
-                        <li><a href="{% url 'tarot:daily_card' %}" class="text-muted text-decoration-none">Günün Kartı</a></li>
-                        <li><a href="{% url 'zodiac:signs_list' %}" class="text-muted text-decoration-none">Burç Yorumları</a></li>
-                        <li><a href="{% url 'zodiac:technology' %}" class="text-muted text-decoration-none"><i class="fas fa-rocket me-1"></i>Teknolojimiz</a></li>
+                        <li>
+                            <a href="{% url 'tarot:spreads' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Tarot Yayılımları
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'tarot:daily_card' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Günün Kartı
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'zodiac:signs_list' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Burç Yorumları
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'zodiac:find_sign' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Burcunu Bul
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'shop:product_list' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Mağaza
+                            </a>
+                        </li>
                     </ul>
                 </div>
-                <div class="col-md-4 mb-4">
-                    <h6 class="text-uppercase text-warning">İletişim</h6>
-                    <p class="text-muted mb-1">
-                        <i class="fas fa-envelope me-2"></i>info@tarotyorum.com
-                    </p>
-                    <p class="text-muted">
-                        <i class="fas fa-phone me-2"></i>+90 (212) 555-0123
-                    </p>
+                
+                <!-- İleri Seviye -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>İleri Özellikler</h6>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="{% url 'zodiac:birth_chart' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Doğum Haritası
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'zodiac:compatibility' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Burç Uyumu
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'zodiac:ai_assistant' %}">
+                                <i class="fas fa-angle-right"></i>
+                                AI Danışman
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'zodiac:technology' %}">
+                                <i class="fas fa-angle-right"></i>
+                                Teknolojimiz
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- İletişim -->
+                <div class="col-lg-3 col-md-6 mb-4">
+                    <h6>İletişim</h6>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a href="mailto:info@tarotyorum.com">
+                                <i class="fas fa-envelope"></i>
+                                info@tarotyorum.com
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tel:+902125550123">
+                                <i class="fas fa-phone"></i>
+                                +90 (212) 555-0123
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'accounts:contact' %}">
+                                <i class="fas fa-paper-plane"></i>
+                                İletişim Formu
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" style="margin-top: 15px; display: inline-flex; align-items: center; background: linear-gradient(135deg, #FF6B35, #00B4D8); padding: 12px 24px; border-radius: 8px; font-weight: 700;">
+                                <i class="fas fa-robot me-2"></i>
+                                AI Destek
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <hr class="my-4">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <p class="text-muted mb-0">&copy; 2024 Tarot Yorum. Tüm hakları saklıdır.</p>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <a href="#" class="text-muted text-decoration-none me-3">Gizlilik Politikası</a>
-                    <a href="#" class="text-muted text-decoration-none">Kullanım Koşulları</a>
+            
+            <!-- Alt Footer -->
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
+                        <p>
+                            <i class="fas fa-copyright me-1"></i>
+                            2024 <strong>Tarot Yorum</strong>. Tüm hakları saklıdır.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-center text-md-end">
+                        <a href="{% url 'accounts:terms_of_service' %}">Kullanım Koşulları</a>
+                        <a href="{% url 'accounts:privacy_policy' %}">Gizlilik</a>
+                        <a href="{% url 'accounts:kvkk_clarification' %}">KVKK</a>
+                        <a href="{% url 'accounts:cookie_policy' %}">Çerezler</a>
+                    </div>
                 </div>
             </div>
         </div>

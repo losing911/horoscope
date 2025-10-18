@@ -7,56 +7,125 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 User = get_user_model()
 
 
+class HeroSection(models.Model):
+    """Ana sayfa hero bölümü içerikleri"""
+    # Ana Başlık
+    title_line1 = models.CharField(max_length=100, default="Geleceğinizin Sırları", verbose_name="Başlık Satır 1")
+    title_line2 = models.CharField(max_length=100, default="Tarot'ta Saklı", verbose_name="Başlık Satır 2 (Vurgulu)")
+    
+    # Alt Başlık
+    subtitle = models.TextField(
+        default="Yapay zeka destekli tarot falı ile kartların gizli mesajlarını keşfedin. 78 kart, sonsuz anlam, kişiselleştirilmiş yorumlar.",
+        verbose_name="Alt Başlık"
+    )
+    
+    # Duyuru/Bildirim
+    show_announcement = models.BooleanField(default=False, verbose_name="Duyuru Göster")
+    announcement_text = models.CharField(
+        max_length=200, 
+        default="Yeni Video Yayınlandı!",
+        verbose_name="Duyuru Metni"
+    )
+    announcement_icon = models.CharField(
+        max_length=50,
+        default="fas fa-video",
+        verbose_name="Duyuru İkonu (Font Awesome)"
+    )
+    announcement_link = models.URLField(blank=True, verbose_name="Duyuru Linki")
+    announcement_color = models.CharField(
+        max_length=20,
+        default="#FF0000",
+        verbose_name="Duyuru Rengi"
+    )
+    
+    # Butonlar
+    primary_button_text = models.CharField(max_length=50, default="Hemen Fal Bak", verbose_name="Ana Buton Metni")
+    primary_button_url = models.CharField(max_length=200, default="/spreads/", verbose_name="Ana Buton URL")
+    
+    secondary_button_text = models.CharField(max_length=50, default="Günlük Kart", verbose_name="İkinci Buton Metni")
+    secondary_button_url = models.CharField(max_length=200, default="/daily-card/", verbose_name="İkinci Buton URL")
+    
+    # Görsel Ayarları
+    background_gradient_start = models.CharField(max_length=20, default="#6B1B3D", verbose_name="Arka Plan Başlangıç Rengi")
+    background_gradient_end = models.CharField(max_length=20, default="#4A0E2A", verbose_name="Arka Plan Bitiş Rengi")
+    
+    # YouTube Video
+    show_video = models.BooleanField(default=False, verbose_name="Video Göster")
+    video_url = models.URLField(
+        blank=True, 
+        verbose_name="YouTube Video URL",
+        help_text="Örnek: https://www.youtube.com/watch?v=VIDEO_ID veya https://youtu.be/VIDEO_ID"
+    )
+    video_title = models.CharField(
+        max_length=200, 
+        blank=True, 
+        verbose_name="Video Başlığı",
+        help_text="Video için özel başlık (opsiyonel)"
+    )
+    
+    # Aktiflik
+    is_active = models.BooleanField(default=True, verbose_name="Aktif")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = "Hero Bölümü"
+        verbose_name_plural = "Hero Bölümü"
+        ordering = ['-is_active', '-updated_at']
+    
+    def __str__(self):
+        return f"Hero Section - {self.title_line1}"
+    
+    def get_video_id(self):
+        """YouTube URL'den video ID'sini çıkar"""
+        if not self.video_url:
+            return None
+        
+        import re
+        # YouTube URL formatları:
+        # https://www.youtube.com/watch?v=VIDEO_ID
+        # https://youtu.be/VIDEO_ID
+        # https://www.youtube.com/embed/VIDEO_ID
+        # https://www.youtube.com/shorts/VIDEO_ID
+        # https://m.youtube.com/watch?v=VIDEO_ID
+        
+        patterns = [
+            r'(?:youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})',
+            r'(?:youtu\.be\/)([a-zA-Z0-9_-]{11})',
+            r'(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})',
+            r'(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})',
+            r'(?:m\.youtube\.com\/watch\?v=)([a-zA-Z0-9_-]{11})',
+            # Video ID'yi direkt algıla (11 karakter)
+            r'^([a-zA-Z0-9_-]{11})$',
+        ]
+        
+        for pattern in patterns:
+            match = re.search(pattern, self.video_url)
+            if match:
+                video_id = match.group(1)
+                # Video ID'nin 11 karakter olduğunu doğrula
+                if len(video_id) == 11:
+                    return video_id
+        
+        return None
+    
+    @classmethod
+    def get_active(cls):
+        """Aktif hero section'ı getir"""
+        try:
+            return cls.objects.filter(is_active=True).first()
+        except cls.DoesNotExist:
+            # Yoksa varsayılan oluştur
+            return cls.objects.create()
+
+
 class SiteSettings(models.Model):
     """Site ayarları modeli - Singleton pattern"""
     # Genel Ayarlar
     site_title = models.CharField(max_length=200, default="Tarot Yorum", verbose_name="Site Başlığı")
     site_description = models.TextField(default="AI destekli tarot falı platformu", verbose_name="Site Açıklaması")
     site_keywords = models.CharField(max_length=500, default="tarot, fal, astroloji, ai", verbose_name="SEO Anahtar Kelimeleri")
-    
-    # AI Servis Ayarları
-    default_ai_provider = models.CharField(
-        max_length=20,
-        choices=[('openai', 'AstroTarot AI (Primary)'), ('gemini', 'AstroTarot AI (Alternative)')],
-        default='gemini',
-        verbose_name="Varsayılan AI Motoru"
-    )
-    
-    # OpenAI Ayarları (Primary Engine)
-    openai_api_key = models.CharField(max_length=200, blank=True, verbose_name="AstroTarot AI API Anahtarı (Primary)")
-    openai_model = models.CharField(
-        max_length=50,
-        choices=[
-            ('o1', 'Expert Model (En Akıllı)'),
-            ('o1-mini', 'Expert Mini (Hızlı Reasoning)'),
-            ('gpt-4o', 'Advanced Model (Güçlü - Multimodal)'),
-            ('gpt-4o-mini', 'Standard Model (Hızlı ve Uygun) ✅'),
-            ('gpt-4-turbo', 'Advanced Turbo (Güçlü)'),
-            ('gpt-4', 'Advanced (Standart)'),
-            ('gpt-3.5-turbo', 'Basic (Ekonomik)'),
-        ],
-        default='gpt-4o-mini',
-        verbose_name="AstroTarot AI Model (Primary)"
-    )
-    
-    # Gemini Ayarları (Alternative Engine)
-    gemini_api_key = models.CharField(max_length=200, blank=True, verbose_name="AstroTarot AI API Anahtarı (Alternative)")
-    gemini_model = models.CharField(
-        max_length=50,
-        choices=[
-            ('gemini-2.0-flash-exp', 'Alternative v2.0 Flash (Deneysel - En Hızlı)'),
-            ('gemini-1.5-pro-latest', 'Alternative v1.5 Pro (En Güçlü)'),
-            ('gemini-1.5-flash-latest', 'Alternative v1.5 Flash (Hızlı ve Dengeli)'),
-            ('gemini-pro', 'Alternative Pro (Standart)'),
-        ],
-        default='gemini-1.5-flash-latest',
-        verbose_name="AstroTarot AI Model (Alternative)"
-    )
-    ai_response_max_length = models.IntegerField(
-        default=1000, 
-        validators=[MinValueValidator(100), MaxValueValidator(5000)],
-        verbose_name="AI Yanıt Maksimum Uzunluk"
-    )
     
     # Kullanıcı Limitleri
     daily_reading_limit = models.IntegerField(
@@ -120,30 +189,6 @@ class SiteSettings(models.Model):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
 
-
-class AIProvider(models.Model):
-    """AI Sağlayıcı ayarları"""
-    name = models.CharField(max_length=50, unique=True, verbose_name="Sağlayıcı Adı")
-    display_name = models.CharField(max_length=100, verbose_name="Görünen Adı")
-    api_key = models.CharField(max_length=200, blank=True, verbose_name="API Anahtarı")
-    is_active = models.BooleanField(default=True, verbose_name="Aktif")
-    max_tokens = models.IntegerField(default=1000, verbose_name="Maksimum Token")
-    temperature = models.FloatField(
-        default=0.7,
-        validators=[MinValueValidator(0.0), MaxValueValidator(2.0)],
-        verbose_name="Yaratıcılık Seviyesi"
-    )
-    system_prompt = models.TextField(
-        default="Sen uzman bir tarot yorumcususun. Kartların anlamlarını detaylı ve anlayışlı bir şekilde açıkla.",
-        verbose_name="Sistem Mesajı"
-    )
-    
-    class Meta:
-        verbose_name = "AI Sağlayıcı"
-        verbose_name_plural = "AI Sağlayıcıları"
-    
-    def __str__(self):
-        return self.display_name
 
 class TarotCard(models.Model):
     """Tarot kartı modeli"""
@@ -215,9 +260,10 @@ class TarotReading(models.Model):
     cards = models.JSONField(verbose_name="Çekilen Kartlar")
     interpretation = models.TextField(verbose_name="Yorum")
     ai_provider = models.CharField(
-        max_length=20,
-        choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],
-        verbose_name="AI Sağlayıcı"
+        max_length=100,
+        default='openrouter',
+        verbose_name="AI Sağlayıcı",
+        help_text="Artık OpenRouter kullanılıyor"
     )
     is_public = models.BooleanField(default=False, verbose_name="Herkese Açık")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -239,9 +285,10 @@ class DailyCard(models.Model):
     is_reversed = models.BooleanField(default=False, verbose_name="Ters Çekildi")
     interpretation = models.TextField(verbose_name="Günlük Yorum")
     ai_provider = models.CharField(
-        max_length=20,
-        choices=[('openai', 'OpenAI'), ('gemini', 'Google Gemini')],
-        verbose_name="AI Sağlayıcı"
+        max_length=100,
+        default='openrouter',
+        verbose_name="AI Sağlayıcı",
+        help_text="Artık OpenRouter kullanılıyor"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     

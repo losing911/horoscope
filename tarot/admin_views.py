@@ -193,16 +193,8 @@ def admin_settings(request):
         settings.site_description = request.POST.get('site_description', settings.site_description)
         settings.daily_reading_limit = int(request.POST.get('daily_reading_limit', settings.daily_reading_limit))
         settings.max_question_length = int(request.POST.get('max_question_length', settings.max_question_length))
-        settings.default_ai_provider = request.POST.get('default_ai_provider', settings.default_ai_provider)
         
-        # OpenAI ayarları
-        settings.openai_api_key = request.POST.get('openai_api_key', settings.openai_api_key)
-        settings.openai_model = request.POST.get('openai_model', settings.openai_model)
-        
-        # Gemini ayarları
-        settings.gemini_api_key = request.POST.get('gemini_api_key', settings.gemini_api_key)
-        settings.gemini_model = request.POST.get('gemini_model', settings.gemini_model)
-        
+        # Site durumu
         settings.maintenance_mode = request.POST.get('maintenance_mode') == 'on'
         settings.allow_registration = request.POST.get('allow_registration') == 'on'
         settings.allow_guest_reading = request.POST.get('allow_guest_reading') == 'on'

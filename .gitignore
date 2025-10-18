@@ -38,6 +38,8 @@ db.sqlite3-journal
 # Environment variables
 .env
 .env.local
+.env.production
+*.env
 
 # IDE
 .vscode/
@@ -55,9 +57,34 @@ __pycache__/
 htmlcov/
 
 # Test files
-test_pages.py
+test_*.py
+check_*.py
+debug_*.py
+*_test.py
+
+# Configuration files
+nginx_*.conf
+*.conf
+
+# Deployment scripts
+deploy_*.sh
+*.sh
+
+# API notes and temp files
+*_NOTE.py
+*_API_NOTE.py
 
 # Backup files
 *.bak
 *.backup
 *~
+
+# Temporary Python scripts
+setup_*.py
+fix_*.py
+clear_*.py
+reset_*.py
+set_*.py
+update_*.py
+load_*.py
+find_*.py

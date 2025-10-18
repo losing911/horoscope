@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}{{ zodiac_sign.name }} Burcu - Özellikler ve Yorum{% endblock %}
+{% block title %}{{ zodiac_sign.name }} Burcu - Ã–zellikler ve Yorum{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -33,11 +33,11 @@
                                     <span class="badge bg-secondary ms-2">{{ zodiac_sign.get_quality_display }}</span>
                                 </div>
                                 <div class="col-sm-6 mb-3">
-                                    <strong>Yöneten Gezegen:</strong>
+                                    <strong>YÃ¶neten Gezegen:</strong>
                                     <span class="ms-2 text-dark">{{ zodiac_sign.ruling_planet }}</span>
                                 </div>
                                 <div class="col-sm-6 mb-3">
-                                    <strong>Şanslı Gün:</strong>
+                                    <strong>ÅanslÄ± GÃ¼n:</strong>
                                     <span class="ms-2 text-dark">{{ zodiac_sign.lucky_day }}</span>
                                 </div>
                             </div>
@@ -53,7 +53,7 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-body bg-white">
-                    <h3 class="card-title">Genel Özellikler</h3>
+                    <h3 class="card-title">Genel Ã–zellikler</h3>
                     <p class="card-text">{{ zodiac_sign.description }}</p>
                 </div>
             </div>
@@ -65,7 +65,7 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body bg-white">
-                    <h5 class="card-title">? Karakter Özellikleri</h5>
+                    <h5 class="card-title">ğŸ­ Karakter Ã–zellikleri</h5>
                     <p class="card-text">{{ zodiac_sign.traits }}</p>
                 </div>
             </div>
@@ -74,7 +74,7 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm border-success">
                 <div class="card-body bg-white">
-                    <h5 class="card-title text-success">?? Güçlü Yanları</h5>
+                    <h5 class="card-title text-success">ğŸ’ª GÃ¼Ã§lÃ¼ YanlarÄ±</h5>
                     <p class="card-text">{{ zodiac_sign.strengths }}</p>
                 </div>
             </div>
@@ -83,7 +83,7 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm border-warning">
                 <div class="card-body bg-white">
-                    <h5 class="card-title text-warning">?? Zayıf Yanları</h5>
+                    <h5 class="card-title text-warning">âš ï¸ ZayÄ±f YanlarÄ±</h5>
                     <p class="card-text">{{ zodiac_sign.weaknesses }}</p>
                 </div>
             </div>
@@ -95,7 +95,7 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h5 class="card-title">?? Şanslı Sayılar</h5>
+                    <h5 class="card-title">ğŸ”¢ ÅanslÄ± SayÄ±lar</h5>
                     <p class="display-6 text-primary">{{ zodiac_sign.lucky_numbers }}</p>
                 </div>
             </div>
@@ -104,7 +104,7 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h5 class="card-title">?? Şanslı Renkler</h5>
+                    <h5 class="card-title">ğŸ¨ ÅanslÄ± Renkler</h5>
                     <p class="text-muted">{{ zodiac_sign.lucky_colors }}</p>
                 </div>
             </div>
@@ -113,7 +113,7 @@
         <div class="col-md-4 mb-3">
             <div class="card shadow-sm">
                 <div class="card-body text-center">
-                    <h5 class="card-title">?? Uyumlu Burçlar</h5>
+                    <h5 class="card-title">ğŸ’• Uyumlu BurÃ§lar</h5>
                     <p class="text-muted">{{ zodiac_sign.compatibility }}</p>
                 </div>
             </div>
@@ -129,7 +129,7 @@
         <div class="col-12">
             <div class="card shadow border-primary">
                 <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">?? Bugünün Yorumu ({{ daily_horoscope.date|date:"d F Y" }})</h3>
+                    <h3 class="mb-0">ğŸŒŸ BugÃ¼nÃ¼n Yorumu ({{ daily_horoscope.date|date:"d F Y" }})</h3>
                 </div>
                 <div class="card-body bg-white">
                     <div class="row mb-3">
@@ -139,39 +139,39 @@
                             </p>
                         </div>
                         <div class="col-md-3">
-                            <p><strong>Şanslı Sayı:</strong> {{ daily_horoscope.lucky_number }}</p>
+                            <p><strong>ÅanslÄ± SayÄ±:</strong> {{ daily_horoscope.lucky_number }}</p>
                         </div>
                         <div class="col-md-3">
-                            <p><strong>Şanslı Renk:</strong> {{ daily_horoscope.lucky_color }}</p>
+                            <p><strong>ÅanslÄ± Renk:</strong> {{ daily_horoscope.lucky_color }}</p>
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <h5>?? Genel</h5>
+                            <h5>ğŸŒŸ Genel</h5>
                             <p>{{ daily_horoscope.general }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <h5>?? Aşk</h5>
+                            <h5>â¤ï¸ AÅŸk</h5>
                             <p>{{ daily_horoscope.love }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h5>?? Kariyer</h5>
+                            <h5>ğŸ’¼ Kariyer</h5>
                             <p>{{ daily_horoscope.career }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h5>?? Sağlık</h5>
+                            <h5>ğŸ’ª SaÄŸlÄ±k</h5>
                             <p>{{ daily_horoscope.health }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h5>?? Finans</h5>
+                            <h5>ğŸ’° Finans</h5>
                             <p>{{ daily_horoscope.money }}</p>
                         </div>
                     </div>
                     
                     <div class="mt-3">
                         <small class="text-muted">
-                            <i class="fas fa-robot me-1"></i>Bu yorum AstroTarot AI tarafından oluşturulmuştur
+                            <i class="fas fa-robot me-1"></i>Bu yorum AstroTarot AI tarafÄ±ndan oluÅŸturulmuÅŸtur
                         </small>
                     </div>
                 </div>
@@ -185,8 +185,8 @@
     <div class="row mb-5">
         <div class="col-12">
             <div class="alert alert-info text-center">
-                <h5>?? Günlük yorum hazırlanıyor...</h5>
-                <p>Bu burç için bugünün yorumu henüz oluşturulmamış. Lütfen biraz sonra tekrar kontrol edin.</p>
+                <h5>ğŸŒŸ GÃ¼nlÃ¼k yorum hazÄ±rlanÄ±yor...</h5>
+                <p>Bu burÃ§ iÃ§in bugÃ¼nÃ¼n yorumu henÃ¼z oluÅŸturulmamÄ±ÅŸ. LÃ¼tfen biraz sonra tekrar kontrol edin.</p>
             </div>
         </div>
     </div>
@@ -196,26 +196,26 @@
     <div class="row mb-5">
         <div class="col-12 text-center">
             <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-primary me-2">
-                ?? Tüm Günlük Yorumlar
+                ğŸŒŸ TÃ¼m GÃ¼nlÃ¼k Yorumlar
             </a>
             <a href="{% url 'zodiac:signs_list' %}" class="btn btn-outline-primary me-2">
-                ?? Tüm Burçlar
+                â™ˆ TÃ¼m BurÃ§lar
             </a>
             {% if user.is_authenticated %}
             <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-success">
-                ?? Uyum Analizi
+                ğŸ’• Uyum Analizi
             </a>
             {% endif %}
         </div>
     </div>
 </div>
 
-<!-- AdSense Alanı -->
+<!-- AdSense AlanÄ± -->
 <div class="container mt-4 mb-5">
     <div class="row">
         <div class="col-12 text-center">
             <div class="ad-placeholder" style="background: #f0f0f0; padding: 50px; border-radius: 8px;">
-                <small class="text-muted">Reklam Alanı - 728x90</small>
+                <small class="text-muted">Reklam AlanÄ± - 728x90</small>
             </div>
         </div>
     </div>

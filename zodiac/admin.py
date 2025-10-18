@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib import messages
 from django.utils import timezone
+from django.urls import path
+from django.shortcuts import redirect
 from .models import (
     ZodiacSign, DailyHoroscope, WeeklyHoroscope, 
     MonthlyHoroscope, CompatibilityReading, BirthChart,
@@ -8,6 +10,39 @@ from .models import (
     UserDailyHoroscope, UserWeeklyHoroscope, UserMonthlyHoroscope
 )
 from .views import generate_daily_horoscope
+
+
+# Custom admin site configuration
+class HoroscopeAdminSite(admin.AdminSite):
+    site_header = "Burç Yönetim Paneli"
+    site_title = "Burç Admin"
+    index_title = "Hoş Geldiniz"
+    
+    def get_app_list(self, request):
+        app_list = super().get_app_list(request)
+        
+        # Custom links ekle
+        app_list += [
+            {
+                "name": "Burç Görselleri",
+                "app_label": "horoscope_images",
+                "models": [
+                    {
+                        "name": "Instagram Görselleri",
+                        "object_name": "horoscope_images",
+                        "admin_url": "/admin/horoscope-images/",
+                        "view_only": True,
+                    }
+                ],
+            }
+        ]
+        
+        return app_list
+
+
+# Use custom admin site (optional - sadece özelleştirilmiş menü için)
+# admin_site = HoroscopeAdminSite(name='horoscope_admin')
+
 
 
 @admin.register(ZodiacSign)

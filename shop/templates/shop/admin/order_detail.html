@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+
+{% block title %}Sipariş Detayı - {{ order.order_number }}{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1><i class="fas fa-receipt me-2"></i>Sipariş Detayı</h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'tarot:index' %}">Ana Sayfa</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'shop:admin_dashboard' %}">Mağaza Yönetimi</a></li>
+                    <li class="breadcrumb-item"><a href="{% url 'shop:order_management' %}">Siparişler</a></li>
+                    <li class="breadcrumb-item active">{{ order.order_number }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Sipariş Bilgileri -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Sipariş Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Sipariş No:</strong> {{ order.order_number }}<br>
+                            <strong>Tarih:</strong> {{ order.created_at|date:"d M Y H:i" }}<br>
+                            <strong>Durum:</strong>
+                            {% if order.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Bekliyor</span>
+                            {% elif order.status == 'processing' %}
+                                <span class="badge bg-info">İşleniyor</span>
+                            {% elif order.status == 'shipped' %}
+                                <span class="badge bg-primary">Kargoda</span>
+                            {% elif order.status == 'completed' %}
+                                <span class="badge bg-success">Tamamlandı</span>
+                            {% elif order.status == 'cancelled' %}
+                                <span class="badge bg-danger">İptal</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Müşteri:</strong> {{ order.user.username }}<br>
+                            <strong>Email:</strong> {{ order.email }}<br>
+                            <strong>Telefon:</strong> {{ order.phone }}
+                        </div>
+                    </div>
+                    
+                    <!-- Durum Güncelleme Formu -->
+                    <form method="post" class="border-top pt-3">
+                        {% csrf_token %}
+                        <div class="row align-items-end">
+                            <div class="col-md-8">
+                                <label class="form-label"><strong>Sipariş Durumunu Güncelle:</strong></label>
+                                <select name="status" class="form-select">
+                                    {% for value, label in status_choices %}
+                                    <option value="{{ value }}" {% if order.status == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-save me-1"></i> Güncelle
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sipariş İçeriği -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Sipariş İçeriği</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Ürün</th>
+                                <th class="text-center">Adet</th>
+                                <th class="text-end">Birim Fiyat</th>
+                                <th class="text-end">Toplam</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.items.all %}
+                            <tr>
+                                <td>{{ item.product_name }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-end">₺{{ item.product_price|floatformat:2 }}</td>
+                                <td class="text-end"><strong>₺{{ item.total_price|floatformat:2 }}</strong></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Ara Toplam:</strong></td>
+                                <td class="text-end"><strong>₺{{ order.subtotal|floatformat:2 }}</strong></td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="text-end"><strong>Kargo:</strong></td>
+                                <td class="text-end"><strong>₺{{ order.shipping_cost|floatformat:2 }}</strong></td>
+                            </tr>
+                            <tr class="table-primary">
+                                <td colspan="3" class="text-end"><strong>TOPLAM:</strong></td>
+                                <td class="text-end"><strong>₺{{ order.total|floatformat:2 }}</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <!-- Teslimat Bilgileri -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Teslimat Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>{{ order.full_name }}</strong></p>
+                    <p class="mb-1">{{ order.address }}</p>
+                    <p class="mb-1">{{ order.city }} {{ order.postal_code }}</p>
+                    <p class="mb-0"><i class="fas fa-phone me-1"></i> {{ order.phone }}</p>
+                </div>
+            </div>
+
+            <!-- Ödeme Bilgileri -->
+            <div class="card mb-4">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">Ödeme Bilgileri</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Ödeme Yöntemi:</strong> {{ order.payment_method }}</p>
+                    <p class="mb-1"><strong>Durum:</strong> 
+                        {% if order.is_paid %}
+                            <span class="badge bg-success">Ödendi</span>
+                        {% else %}
+                            <span class="badge bg-danger">Ödenmedi</span>
+                        {% endif %}
+                    </p>
+                    {% if order.paid_at %}
+                    <p class="mb-0"><strong>Ödeme Tarihi:</strong> {{ order.paid_at|date:"d M Y H:i" }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Notlar -->
+            {% if order.notes or order.admin_notes %}
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Notlar</h5>
+                </div>
+                <div class="card-body">
+                    {% if order.notes %}
+                    <p class="mb-2"><strong>Müşteri Notu:</strong></p>
+                    <p class="mb-3">{{ order.notes }}</p>
+                    {% endif %}
+                    {% if order.admin_notes %}
+                    <p class="mb-2"><strong>Admin Notu:</strong></p>
+                    <p class="mb-0">{{ order.admin_notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <a href="{% url 'shop:order_management' %}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Sipariş Listesine Dön
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

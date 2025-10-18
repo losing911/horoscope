@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Satış İstatistikleri{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1><i class="fas fa-chart-bar me-2"></i>Satış İstatistikleri</h1>
+    
+    <!-- Periyot Seçimi -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row align-items-end">
+                <div class="col-md-4">
+                    <label class="form-label">Zaman Aralığı</label>
+                    <select name="period" class="form-select">
+                        <option value="7days" {% if period == '7days' %}selected{% endif %}>Son 7 Gün</option>
+                        <option value="30days" {% if period == '30days' %}selected{% endif %}>Son 30 Gün</option>
+                        <option value="90days" {% if period == '90days' %}selected{% endif %}>Son 90 Gün</option>
+                        <option value="year" {% if period == 'year' %}selected{% endif %}>Son 1 Yıl</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i> Uygula
+                    </button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="{% url 'shop:admin_dashboard' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Dashboard'a Dön
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Özet Kartlar -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body text-center">
+                    <h6>Toplam Sipariş</h6>
+                    <h2>{{ total_stats.total_orders|default:0 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white">
+                <div class="card-body text-center">
+                    <h6>Toplam Gelir</h6>
+                    <h2>₺{{ total_stats.total_revenue|default:0|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white">
+                <div class="card-body text-center">
+                    <h6>Ortalama Sipariş</h6>
+                    <h2>₺{{ total_stats.avg_order_value|default:0|floatformat:2 }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- En Çok Satan Ürünler -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-warning">
+                    <h5 class="mb-0">En Çok Satan Ürünler</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Ürün</th>
+                                <th class="text-center">Adet</th>
+                                <th class="text-end">Gelir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in top_selling_products %}
+                            <tr>
+                                <td>{{ item.product__name }}</td>
+                                <td class="text-center">{{ item.total_quantity }}</td>
+                                <td class="text-end">₺{{ item.total_revenue|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Veri yok</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kategori İstatistikleri -->
+        <div class="col-md-6 mb-4">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Kategori Bazlı Satışlar</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Kategori</th>
+                                <th class="text-center">Adet</th>
+                                <th class="text-end">Gelir</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for cat in category_stats %}
+                            <tr>
+                                <td>{{ cat.product__category__name|default:"Kategorisiz" }}</td>
+                                <td class="text-center">{{ cat.total_quantity }}</td>
+                                <td class="text-end">₺{{ cat.total_revenue|floatformat:2 }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3" class="text-center text-muted">Veri yok</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Günlük Satış Trendi -->
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Günlük Satış Trendi</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Tarih</th>
+                            <th class="text-center">Sipariş Sayısı</th>
+                            <th class="text-end">Günlük Gelir</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for day in daily_sales %}
+                        <tr>
+                            <td>{{ day.day }}</td>
+                            <td class="text-center">{{ day.orders }}</td>
+                            <td class="text-end">₺{{ day.revenue|floatformat:2 }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted">Bu dönemde satış yok</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,24 +1,26 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Astroloji - Burç Yorumları{% endblock %}
+{% block title %}Astroloji - BurÃ§ YorumlarÄ±{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <!-- Hero Section -->
     <div class="row mb-5">
         <div class="col-12 text-center">
-            <h1 class="display-4 mb-3">?? Astroloji & Burç Yorumları</h1>
-            <p class="lead text-muted">
-                12 burçun gizli sırlarını keşfedin. Günlük, haftalık ve aylık burç yorumlarınızı öğrenin.
-            </p>
+            <div class="hero-title-bg p-4 rounded mb-4">
+                <h1 class="display-4 mb-3">â­ Astroloji & BurÃ§ YorumlarÄ±</h1>
+                <p class="lead">
+                    12 burcun gizli sÄ±rlarÄ±nÄ± keÅŸfedin. GÃ¼nlÃ¼k, haftalÄ±k ve aylÄ±k burÃ§ yorumlarÄ±nÄ±zÄ± Ã¶ÄŸrenin.
+                </p>
+            </div>
             
             {% if user.is_authenticated and user_sign %}
             <div class="alert alert-info mt-4">
-                <h5>Merhaba {{ user.first_name|default:user.username }}! ?</h5>
+                <h5>Merhaba {{ user.first_name|default:user.username }}! ğŸ‘‹</h5>
                 <p class="mb-2">Burcunuz: <strong>{{ user_sign.name }} {{ user_sign.symbol }}</strong></p>
                 <a href="{% url 'zodiac:sign_detail' user_sign.slug %}" class="btn btn-primary">
-                    Burç Detayına Git
+                    BurÃ§ DetayÄ±na Git
                 </a>
             </div>
             {% endif %}
@@ -30,11 +32,11 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">??</div>
-                    <h5 class="card-title">Günlük Burç Yorumları</h5>
-                    <p class="card-text">Bugün için tüm burçların yorumlarını görün</p>
+                    <div class="display-4 mb-3">ğŸ“…</div>
+                    <h5 class="card-title">GÃ¼nlÃ¼k BurÃ§ YorumlarÄ±</h5>
+                    <p class="card-text">BugÃ¼n iÃ§in tÃ¼m burÃ§larÄ±n yorumlarÄ±nÄ± gÃ¶rÃ¼n</p>
                     <a href="{% url 'zodiac:daily_horoscopes' %}" class="btn btn-outline-primary">
-                        Günlük Yorumlar
+                        GÃ¼nlÃ¼k Yorumlar
                     </a>
                 </div>
             </div>
@@ -43,9 +45,9 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">??</div>
-                    <h5 class="card-title">Burcunu Öğren</h5>
-                    <p class="card-text">Doğum tarihinizden burcunuzu bulun</p>
+                    <div class="display-4 mb-3">ğŸ”</div>
+                    <h5 class="card-title">Burcunu Ã–ÄŸren</h5>
+                    <p class="card-text">DoÄŸum tarihinizden burcunuzu bulun</p>
                     <a href="{% url 'zodiac:find_sign' %}" class="btn btn-outline-primary">
                         Burcumu Bul
                     </a>
@@ -56,16 +58,16 @@
         <div class="col-md-4 mb-3">
             <div class="card h-100 shadow-sm">
                 <div class="card-body text-center">
-                    <div class="display-4 mb-3">??</div>
+                    <div class="display-4 mb-3">ğŸ’•</div>
                     <h5 class="card-title">Uyum Analizi</h5>
-                    <p class="card-text">İki burç arasındaki uyumu öğrenin</p>
+                    <p class="card-text">Ä°ki burÃ§ arasÄ±ndaki uyumu Ã¶ÄŸrenin</p>
                     {% if user.is_authenticated %}
                     <a href="{% url 'zodiac:compatibility' %}" class="btn btn-outline-primary">
                         Uyumu Kontrol Et
                     </a>
                     {% else %}
                     <a href="{% url 'login' %}" class="btn btn-outline-secondary">
-                        Giriş Yapın
+                        GiriÅŸ YapÄ±n
                     </a>
                     {% endif %}
                 </div>
@@ -75,8 +77,10 @@
 
     <!-- Zodiac Signs Grid -->
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="text-center mb-4">12 Burç</h2>
+        <div class="col-12 text-center">
+            <div class="section-title-bg p-3 rounded mb-4 d-inline-block">
+                <h2 class="mb-0">12 BurÃ§</h2>
+            </div>
         </div>
     </div>
     
@@ -107,7 +111,7 @@
         {% empty %}
         <div class="col-12">
             <div class="alert alert-warning text-center">
-                Henüz burç bilgisi eklenmemiş. Lütfen admin panelinden burçları ekleyin.
+                HenÃ¼z burÃ§ bilgisi eklenmemiÅŸ. LÃ¼tfen admin panelinden burÃ§larÄ± ekleyin.
             </div>
         </div>
         {% endfor %}
@@ -127,6 +131,68 @@
 .bg-gradient-primary {
     background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);
     color: white;
+}
+
+/* Arkaplan desteÄŸi */
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+/* Ana baÅŸlÄ±k iÃ§in arka plan */
+.hero-title-bg {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.hero-title-bg h1 {
+    color: #2c3e50 !important;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.hero-title-bg p {
+    color: #5a6c7d !important;
+    font-size: 1.1rem;
+    margin-bottom: 0;
+}
+
+/* BÃ¶lÃ¼m baÅŸlÄ±klarÄ± iÃ§in arka plan */
+.section-title-bg {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.section-title-bg h2 {
+    color: #2c3e50 !important;
+    font-weight: 600;
+}
+
+/* Card baÅŸlÄ±klarÄ± iÃ§in daha iyi okunabilirlik */
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.card-text {
+    color: #6c757d;
+}
+
+/* Container arka planÄ± */
+.container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Alert kutularÄ±nÄ±n arka planÄ±nÄ± gÃ¼Ã§lendir */
+.alert-info {
+    background-color: rgba(217, 237, 247, 0.95) !important;
+    border-color: rgba(126, 182, 193, 0.8) !important;
+    backdrop-filter: blur(5px);
 }
 </style>
 {% endblock %}

@@ -2,11 +2,23 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1 class="text-center mb-4">📆 {{ month_name }} {{ year }} Burç Yorumları</h1>
-    
-    <div class="text-center mb-4">
-        <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-primary">« Önceki Ay</a>
-        <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-primary">Sonraki Ay »</a>
+    <!-- Başlık Kartı -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-lg">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-4 mb-3">📆 {{ month_name }} {{ year }} Burç Yorumları</h1>
+                    <div class="btn-group mt-3" role="group">
+                        <a href="?year={{ prev_year }}&month={{ prev_month }}" class="btn btn-outline-primary">
+                            <i class="fas fa-chevron-left me-2"></i>Önceki Ay
+                        </a>
+                        <a href="?year={{ next_year }}&month={{ next_month }}" class="btn btn-outline-primary">
+                            Sonraki Ay<i class="fas fa-chevron-right ms-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="row">

@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Günlük Burç Yorumları - {{ date|date:"d F Y" }}{% endblock %}
+{% block title %}GÃ¼nlÃ¼k BurÃ§ YorumlarÄ± - {{ date|date:"d F Y" }}{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -9,7 +9,7 @@
         <div class="col-12">
             <div class="card shadow-lg">
                 <div class="card-body text-center py-5">
-                    <h1 class="display-4 mb-3">?? Günlük Burç Yorumları</h1>
+                    <h1 class="display-4 mb-3">ğŸŒŸ GÃ¼nlÃ¼k BurÃ§ YorumlarÄ±</h1>
                     <p class="lead text-muted mb-0">{{ date|date:"d F Y, l" }}</p>
                 </div>
             </div>
@@ -30,7 +30,7 @@
                         </div>
                         <div class="col-md-4 text-end">
                             <span class="badge bg-light text-dark">Ruh Hali: {{ horoscope.horoscope.mood_score }}/10</span>
-                            <span class="badge bg-warning text-dark">Şanslı: {{ horoscope.horoscope.lucky_number }}</span>
+                            <span class="badge bg-warning text-dark">ÅanslÄ±: {{ horoscope.horoscope.lucky_number }}</span>
                         </div>
                     </div>
                 </div>
@@ -38,37 +38,37 @@
                 <div class="card-body bg-white">
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-primary">?? Genel</h6>
+                            <h6 class="text-primary">ğŸŒŸ Genel</h6>
                             <p>{{ horoscope.horoscope.general }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <h6 class="text-danger">?? Aşk</h6>
+                            <h6 class="text-danger">â¤ï¸ AÅŸk</h6>
                             <p>{{ horoscope.horoscope.love }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h6 class="text-success">?? Kariyer</h6>
+                            <h6 class="text-success">ğŸ’¼ Kariyer</h6>
                             <p>{{ horoscope.horoscope.career }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h6 class="text-info">?? Sağlık</h6>
+                            <h6 class="text-info">ğŸ’ª SaÄŸlÄ±k</h6>
                             <p>{{ horoscope.horoscope.health }}</p>
                         </div>
                         <div class="col-md-4 mb-3">
-                            <h6 class="text-warning">?? Finans</h6>
+                            <h6 class="text-warning">ğŸ’° Finans</h6>
                             <p>{{ horoscope.horoscope.money }}</p>
                         </div>
                     </div>
                     
                     <div class="mt-3">
                         <small class="text-muted">
-                            Şanslı Renk: <strong>{{ horoscope.horoscope.lucky_color }}</strong>
+                            ÅanslÄ± Renk: <strong>{{ horoscope.horoscope.lucky_color }}</strong>
                         </small>
                     </div>
                 </div>
                 
                 <div class="card-footer">
                     <a href="{% url 'zodiac:sign_detail' horoscope.sign.slug %}" class="btn btn-sm btn-outline-primary">
-                        {{ horoscope.sign.name }} Detayı
+                        {{ horoscope.sign.name }} DetayÄ±
                     </a>
                 </div>
             </div>
@@ -78,8 +78,8 @@
     <div class="row">
         <div class="col-12">
             <div class="alert alert-info text-center">
-                <h5>Günlük yorumlar hazırlanıyor...</h5>
-                <p>Lütfen biraz sonra tekrar kontrol edin.</p>
+                <h5>GÃ¼nlÃ¼k yorumlar hazÄ±rlanÄ±yor...</h5>
+                <p>LÃ¼tfen biraz sonra tekrar kontrol edin.</p>
             </div>
         </div>
     </div>
@@ -88,7 +88,7 @@
     <div class="row mt-5 mb-5">
         <div class="col-12 text-center">
             <a href="{% url 'zodiac:home' %}" class="btn btn-primary">
-                ?? Burçlar Ana Sayfa
+                ğŸŒ™ BurÃ§lar Ana Sayfa
             </a>
         </div>
     </div>
