@@ -118,7 +118,7 @@ echo -e "${BLUE}=========================================${NC}"
 echo ""
 
 # Ana sayfa testi
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/)
 if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 301 ] || [ "$HTTP_STATUS" -eq 302 ]; then
     echo -e "${GREEN}✅ Ana Sayfa: OK (HTTP $HTTP_STATUS)${NC}"
 else
@@ -126,7 +126,7 @@ else
 fi
 
 # Django Admin testi
-HTTP_STATUS_ADMIN=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/admin/)
+HTTP_STATUS_ADMIN=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/admin/)
 if [ "$HTTP_STATUS_ADMIN" -eq 200 ] || [ "$HTTP_STATUS_ADMIN" -eq 302 ]; then
     echo -e "${GREEN}✅ Django Admin: OK (HTTP $HTTP_STATUS_ADMIN)${NC}"
 else
@@ -134,7 +134,7 @@ else
 fi
 
 # Custom Admin testi
-HTTP_STATUS_CUSTOM=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/shop/manage/)
+HTTP_STATUS_CUSTOM=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/shop/manage/)
 if [ "$HTTP_STATUS_CUSTOM" -eq 200 ] || [ "$HTTP_STATUS_CUSTOM" -eq 302 ]; then
     echo -e "${GREEN}✅ Custom Admin: OK (HTTP $HTTP_STATUS_CUSTOM)${NC}"
 else
@@ -142,7 +142,7 @@ else
 fi
 
 # Static dosyalar testi
-HTTP_STATUS_STATIC=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/static/css/main.css)
+HTTP_STATUS_STATIC=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/static/css/main.css)
 if [ "$HTTP_STATUS_STATIC" -eq 200 ]; then
     echo -e "${GREEN}✅ Static Files: OK (HTTP $HTTP_STATUS_STATIC)${NC}"
 else
@@ -160,10 +160,10 @@ sudo systemctl status gunicorn --no-pager | head -3
 sudo systemctl status nginx --no-pager | head -3
 echo ""
 echo -e "${GREEN}🌐 Test Edilebilir URL'ler:${NC}"
-echo "   • Ana Sayfa: http://138.68.76.120/"
-echo "   • Django Admin: http://138.68.76.120/admin/"
-echo "   • Custom Admin: http://138.68.76.120/shop/manage/"
-echo "   • EPROLO Settings: http://138.68.76.120/shop/manage/eprolo/settings/"
+echo "   • Ana Sayfa: http://159.89.108.100/"
+echo "   • Django Admin: http://159.89.108.100/admin/"
+echo "   • Custom Admin: http://159.89.108.100/shop/manage/"
+echo "   • EPROLO Settings: http://159.89.108.100/shop/manage/eprolo/settings/"
 echo ""
 echo -e "${GREEN}📊 Log Komutları:${NC}"
 echo "   • Gunicorn: sudo journalctl -u gunicorn -f"

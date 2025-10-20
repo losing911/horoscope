@@ -2,7 +2,7 @@
 
 ## 1. Sunucuya SSH ile Bağlan
 ```bash
-ssh root@138.68.76.120
+ssh root@159.89.108.100
 # Şifre: losing2016
 ```
 
@@ -59,10 +59,10 @@ tail -f /home/django/projects/horoscope/logs/django.log
 ## 10. Test Et
 ```bash
 # Site çalışıyor mu kontrol et
-curl http://138.68.76.120
+curl http://159.89.108.100
 
 # Custom admin panele erişimi test et
-curl http://138.68.76.120/shop/manage/
+curl http://159.89.108.100/shop/manage/
 ```
 
 ---
@@ -132,15 +132,15 @@ sudo nano /etc/nginx/sites-available/horoscope
 
 ## 🎯 DEPLOY SONRASI TEST NOKTALARI
 
-1. **Ana Sayfa**: http://138.68.76.120/
-2. **Django Admin**: http://138.68.76.120/admin/
-3. **Custom Admin Dashboard**: http://138.68.76.120/shop/manage/
-4. **Ürün Yönetimi**: http://138.68.76.120/shop/manage/products/
-5. **Sipariş Yönetimi**: http://138.68.76.120/shop/manage/orders/
-6. **Kategori Yönetimi**: http://138.68.76.120/shop/manage/categories/
-7. **EPROLO Dashboard**: http://138.68.76.120/shop/manage/eprolo/
-8. **EPROLO Ayarları**: http://138.68.76.120/shop/manage/eprolo/settings/
-9. **İstatistikler**: http://138.68.76.120/shop/manage/statistics/
+1. **Ana Sayfa**: http://159.89.108.100/
+2. **Django Admin**: http://159.89.108.100/admin/
+3. **Custom Admin Dashboard**: http://159.89.108.100/shop/manage/
+4. **Ürün Yönetimi**: http://159.89.108.100/shop/manage/products/
+5. **Sipariş Yönetimi**: http://159.89.108.100/shop/manage/orders/
+6. **Kategori Yönetimi**: http://159.89.108.100/shop/manage/categories/
+7. **EPROLO Dashboard**: http://159.89.108.100/shop/manage/eprolo/
+8. **EPROLO Ayarları**: http://159.89.108.100/shop/manage/eprolo/settings/
+9. **İstatistikler**: http://159.89.108.100/shop/manage/statistics/
 
 ---
 
@@ -149,7 +149,7 @@ sudo nano /etc/nginx/sites-available/horoscope
 Tüm deployment adımlarını tek seferde yapmak için:
 
 ```bash
-ssh root@138.68.76.120 << 'EOF'
+ssh root@159.89.108.100 << 'EOF'
 cd /home/django/projects/horoscope && \
 source venv/bin/activate && \
 git pull origin main && \

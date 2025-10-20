@@ -97,7 +97,7 @@ fi
 # Test et
 echo ""
 echo "🧪 Site testi yapılıyor..."
-HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/)
+HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/)
 
 if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 301 ] || [ "$HTTP_STATUS" -eq 302 ]; then
     echo -e "${GREEN}✅ Ana sayfa erişilebilir! (HTTP $HTTP_STATUS)${NC}"
@@ -106,7 +106,7 @@ else
 fi
 
 # Custom Admin test
-HTTP_STATUS_ADMIN=$(curl -s -o /dev/null -w "%{http_code}" http://138.68.76.120/shop/manage/)
+HTTP_STATUS_ADMIN=$(curl -s -o /dev/null -w "%{http_code}" http://159.89.108.100/shop/manage/)
 if [ "$HTTP_STATUS_ADMIN" -eq 200 ] || [ "$HTTP_STATUS_ADMIN" -eq 302 ]; then
     echo -e "${GREEN}✅ Custom Admin erişilebilir! (HTTP $HTTP_STATUS_ADMIN)${NC}"
 else
