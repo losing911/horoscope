@@ -88,3 +88,10 @@ set_*.py
 update_*.py
 load_*.py
 find_*.py
+
+# Promotional and private documentation
+TANITIM.md
+PROJE_DETAY.md
+PRIVATE_*.md
+EPROLO_KULLANIM_KILAVUZU.md
+EPROLO_SUMMARY.md
