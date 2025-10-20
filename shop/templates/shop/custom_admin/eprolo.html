@@ -75,44 +75,62 @@
     </div>
 
     <!-- Quick Sync Actions -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('products')">
-            <div class="flex items-center">
-                <div class="bg-purple-100 p-4 rounded-lg">
-                    <i class="fas fa-box text-3xl text-purple-600"></i>
-                </div>
-                <div class="ml-4 flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900">Ürünleri Senkronize Et</h3>
-                    <p class="text-sm text-gray-600">EPROLO'dan yeni ürünleri içe aktar</p>
-                </div>
-                <i class="fas fa-chevron-right text-gray-400"></i>
-            </div>
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">
+            <i class="fas fa-sync-alt text-purple-600 mr-2"></i>
+            Hızlı Senkronizasyon
+        </h2>
+        
+        <!-- Kategori Seçimi -->
+        <div class="mb-6">
+            <label for="sync_category" class="block text-sm font-medium text-gray-700 mb-2">
+                Kategori Seç
+            </label>
+            <select id="sync_category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <option value="">-- Kategori Seçin --</option>
+                {% for category in categories %}
+                <option value="{{ category.id }}">
+                    {{ category.name }}
+                    {% if category.enable_eprolo_sync %}✓ EPROLO Aktif{% endif %}
+                </option>
+                {% endfor %}
+            </select>
+            <p class="text-xs text-gray-500 mt-1">
+                <i class="fas fa-info-circle"></i> 
+                Senkronizasyon yapmak için önce kategori seçmelisiniz
+            </p>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('prices')">
-            <div class="flex items-center">
-                <div class="bg-green-100 p-4 rounded-lg">
-                    <i class="fas fa-tag text-3xl text-green-600"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button onclick="syncAction('products')" class="flex items-center p-4 border-2 border-purple-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-all">
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-box text-2xl text-purple-600"></i>
                 </div>
-                <div class="ml-4 flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900">Fiyatları Güncelle</h3>
-                    <p class="text-sm text-gray-600">EPROLO fiyat güncellemelerini al</p>
+                <div class="ml-3 text-left">
+                    <h3 class="font-semibold text-gray-900">Ürünleri İçe Aktar</h3>
+                    <p class="text-xs text-gray-600">Yeni ürünler ekle</p>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400"></i>
-            </div>
-        </div>
+            </button>
 
-        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('stock')">
-            <div class="flex items-center">
-                <div class="bg-blue-100 p-4 rounded-lg">
-                    <i class="fas fa-warehouse text-3xl text-blue-600"></i>
+            <button onclick="syncAction('prices')" class="flex items-center p-4 border-2 border-green-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-all">
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-tag text-2xl text-green-600"></i>
                 </div>
-                <div class="ml-4 flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900">Stok Durumunu Senkronize Et</h3>
-                    <p class="text-sm text-gray-600">Stok miktarlarını güncelle</p>
+                <div class="ml-3 text-left">
+                    <h3 class="font-semibold text-gray-900">Fiyatları Güncelle</h3>
+                    <p class="text-xs text-gray-600">EPROLO fiyatlarını al</p>
                 </div>
-                <i class="fas fa-chevron-right text-gray-400"></i>
-            </div>
+            </button>
+
+            <button onclick="syncAction('stock')" class="flex items-center p-4 border-2 border-blue-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-warehouse text-2xl text-blue-600"></i>
+                </div>
+                <div class="ml-3 text-left">
+                    <h3 class="font-semibold text-gray-900">Stokları Güncelle</h3>
+                    <p class="text-xs text-gray-600">Stok bilgilerini senkronize et</p>
+                </div>
+            </button>
         </div>
     </div>
 
@@ -310,8 +328,56 @@
 
 <script>
     function syncAction(type) {
-        if (confirm(`${type} senkronizasyonunu başlatmak istediğinizden emin misiniz?`)) {
-            window.location.href = `{% url 'shop:admin_eprolo_sync' %}?action=${type}`;
+        const categorySelect = document.getElementById('sync_category');
+        const categoryId = categorySelect.value;
+        
+        if (!categoryId) {
+            alert('Lütfen önce bir kategori seçin!');
+            categorySelect.focus();
+            return;
+        }
+        
+        const syncTypes = {
+            'products': 'import_products',
+            'prices': 'update_prices',
+            'stock': 'update_stock'
+        };
+        
+        const syncType = syncTypes[type];
+        const categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+        
+        if (confirm(`"${categoryName}" kategorisi için ${type} senkronizasyonunu başlatmak istediğinizden emin misiniz?`)) {
+            // Form oluştur ve gönder
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "shop:admin_eprolo_sync" %}';
+            
+            // CSRF token
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+            if (csrfToken) {
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = 'csrfmiddlewaretoken';
+                csrfInput.value = csrfToken.value;
+                form.appendChild(csrfInput);
+            }
+            
+            // Sync type
+            const typeInput = document.createElement('input');
+            typeInput.type = 'hidden';
+            typeInput.name = 'sync_type';
+            typeInput.value = syncType;
+            form.appendChild(typeInput);
+            
+            // Category ID
+            const categoryInput = document.createElement('input');
+            categoryInput.type = 'hidden';
+            categoryInput.name = 'category_id';
+            categoryInput.value = categoryId;
+            form.appendChild(categoryInput);
+            
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 

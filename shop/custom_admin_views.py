@@ -487,11 +487,19 @@ def admin_eprolo(request):
     # EPROLO ürünleri
     products = eprolo_products.select_related('category').order_by('-eprolo_last_sync')[:20]
     
+    # Kategoriler (senkronizasyon için)
+    categories = Category.objects.all().order_by('name')
+    
     context = {
         'settings': settings,
         'stats': stats,
         'sync_logs': sync_logs,
         'products': products,
+        'categories': categories,
+        'total_eprolo_products': stats['total'],
+        'active_eprolo_products': stats['active'],
+        'out_of_stock_eprolo': stats['out_of_stock'],
+        'total_eprolo_sales': eprolo_products.aggregate(Sum('sales_count'))['sales_count__sum'] or 0,
     }
     
     return render(request, 'shop/custom_admin/eprolo.html', context)
@@ -542,21 +550,57 @@ def admin_eprolo_settings(request):
 @staff_member_required
 def admin_eprolo_sync(request):
     """EPROLO Senkronizasyon"""
+    from .services import EproloService, EproloAPIError
     
     if request.method == 'POST':
         sync_type = request.POST.get('sync_type')
+        category_id = request.POST.get('category_id')
         
-        if sync_type == 'import_products':
-            # TODO: Ürün içe aktarma
-            messages.info(request, 'Ürün içe aktarma başlatıldı. Bu işlem arka planda çalışacak.')
+        try:
+            service = EproloService()
+            
+            if sync_type == 'import_products':
+                if not category_id:
+                    messages.error(request, 'Lütfen bir kategori seçin.')
+                    return redirect('shop:admin_eprolo')
+                
+                # Kategori bazlı ürün senkronizasyonu başlat
+                result = service.sync_products_by_category(int(category_id))
+                
+                messages.success(request, 
+                    f'Senkronizasyon tamamlandı! Kategori: {result["category"]}, '
+                    f'Toplam: {result["total"]}, Başarılı: {result["success"]}, '
+                    f'Başarısız: {result["failed"]}'
+                )
+            
+            elif sync_type == 'update_prices':
+                if not category_id:
+                    messages.error(request, 'Lütfen bir kategori seçin.')
+                    return redirect('shop:admin_eprolo')
+                
+                # Fiyat güncelleme
+                result = service.update_prices_by_category(int(category_id))
+                messages.success(request, 
+                    f'Fiyat güncelleme tamamlandı! '
+                    f'Kategori: {result["category"]}, Güncellenen: {result["updated"]}'
+                )
+            
+            elif sync_type == 'update_stock':
+                if not category_id:
+                    messages.error(request, 'Lütfen bir kategori seçin.')
+                    return redirect('shop:admin_eprolo')
+                
+                # Stok güncelleme
+                result = service.update_stock_by_category(int(category_id))
+                messages.success(request, 
+                    f'Stok güncelleme tamamlandı! '
+                    f'Kategori: {result["category"]}, Güncellenen: {result["updated"]}'
+                )
         
-        elif sync_type == 'update_prices':
-            # TODO: Fiyat güncelleme
-            messages.info(request, 'Fiyat güncelleme başlatıldı.')
-        
-        elif sync_type == 'update_stock':
-            # TODO: Stok güncelleme
-            messages.info(request, 'Stok güncelleme başlatıldı.')
+        except EproloAPIError as e:
+            messages.error(request, f'Senkronizasyon hatası: {str(e)}')
+        except Exception as e:
+            messages.error(request, f'Beklenmeyen hata: {str(e)}')
     
     return redirect('shop:admin_eprolo')
 
