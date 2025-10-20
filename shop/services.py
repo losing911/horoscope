@@ -40,7 +40,7 @@ class EproloService:
     
     def _make_request(self, method: str, endpoint: str, data: dict = None) -> dict:
         """API isteği yap"""
-        if self.settings.use_mock_api:
+        if self.settings.use_mock:
             return self._mock_api_response(endpoint, data)
         
         url = f"{self.base_url}/{endpoint}"
@@ -117,9 +117,9 @@ class EproloService:
         
         # Log başlat
         sync_log = EproloSyncLog.objects.create(
-            sync_type='product',
-            status='running',
-            details=f'Kategori: {category.name}'
+            sync_type='product_import',
+            status='success',
+            message=f'Kategori: {category.name}'
         )
         
         try:
@@ -172,7 +172,7 @@ class EproloService:
         
         except Exception as e:
             sync_log.status = 'failed'
-            sync_log.error_message = str(e)
+            sync_log.error_details = str(e)
             sync_log.completed_at = timezone.now()
             sync_log.save()
             raise
@@ -273,9 +273,9 @@ class EproloService:
         
         # Log başlat
         sync_log = EproloSyncLog.objects.create(
-            sync_type='stock',
-            status='running',
-            details=f'Kategori: {category.name}'
+            sync_type='stock_update',
+            status='success',
+            message=f'Kategori: {category.name}'
         )
         
         try:
@@ -339,7 +339,7 @@ class EproloService:
         
         except Exception as e:
             sync_log.status = 'failed'
-            sync_log.error_message = str(e)
+            sync_log.error_details = str(e)
             sync_log.completed_at = timezone.now()
             sync_log.save()
             raise
@@ -359,9 +359,9 @@ class EproloService:
         
         # Log başlat
         sync_log = EproloSyncLog.objects.create(
-            sync_type='price',
-            status='running',
-            details=f'Kategori: {category.name}, Yeni marj: {new_margin}%' if new_margin else f'Kategori: {category.name}'
+            sync_type='price_update',
+            status='success',
+            message=f'Kategori: {category.name}, Yeni marj: {new_margin}%' if new_margin else f'Kategori: {category.name}'
         )
         
         try:
@@ -418,7 +418,7 @@ class EproloService:
         
         except Exception as e:
             sync_log.status = 'failed'
-            sync_log.error_message = str(e)
+            sync_log.error_details = str(e)
             sync_log.completed_at = timezone.now()
             sync_log.save()
             raise
