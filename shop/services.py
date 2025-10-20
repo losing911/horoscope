@@ -25,7 +25,7 @@ class EproloService:
     
     def __init__(self):
         self.settings = self._get_settings()
-        self.base_url = "https://api.eprolo.com/v1"
+        self.base_url = "https://openapi.eprolo.com"
         self.headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {self.settings.api_key}'
