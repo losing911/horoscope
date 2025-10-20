@@ -1,0 +1,30 @@
+# Gunicorn systemd service file
+# /etc/systemd/system/gunicorn.service
+
+[Unit]
+Description=Gunicorn daemon for Horoscope Django project
+After=network.target
+
+[Service]
+Type=notify
+User=django
+Group=www-data
+WorkingDirectory=/home/django/projects/horoscope
+Environment="PATH=/home/django/projects/horoscope/venv/bin"
+
+ExecStart=/home/django/projects/horoscope/venv/bin/gunicorn \
+    --workers 3 \
+    --bind unix:/home/django/projects/horoscope/gunicorn.sock \
+    --timeout 300 \
+    --access-logfile /home/django/projects/horoscope/logs/gunicorn_access.log \
+    --error-logfile /home/django/projects/horoscope/logs/gunicorn_error.log \
+    --log-level info \
+    tarot_project.wsgi:application
+
+ExecReload=/bin/kill -s HUP $MAINPID
+KillMode=mixed
+TimeoutStopSec=5
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
