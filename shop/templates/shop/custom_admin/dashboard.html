@@ -83,7 +83,9 @@
                 </select>
             </div>
         </div>
-        <canvas id="salesChart" height="80"></canvas>
+        <div style="height: 300px; position: relative;">
+            <canvas id="salesChart"></canvas>
+        </div>
     </div>
     
     <!-- Sipariş Durumları -->
@@ -278,15 +280,29 @@ new Chart(ctx, {
             borderColor: 'rgb(147, 51, 234)',
             backgroundColor: 'rgba(147, 51, 234, 0.1)',
             tension: 0.4,
-            fill: true
+            fill: true,
+            borderWidth: 2,
+            pointRadius: 4,
+            pointHoverRadius: 6
         }]
     },
     options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
+        aspectRatio: 2.5,
         plugins: {
             legend: {
                 display: false
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                padding: 12,
+                titleFont: {
+                    size: 14
+                },
+                bodyFont: {
+                    size: 13
+                }
             }
         },
         scales: {
@@ -296,6 +312,14 @@ new Chart(ctx, {
                     callback: function(value) {
                         return value.toLocaleString('tr-TR') + ' ₺';
                     }
+                },
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.05)'
+                }
+            },
+            x: {
+                grid: {
+                    display: false
                 }
             }
         }
