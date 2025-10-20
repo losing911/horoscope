@@ -28,7 +28,8 @@ class EproloService:
         self.base_url = "https://openapi.eprolo.com"
         self.headers = {
             'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.settings.api_key}'
+            'api-key': self.settings.api_key,
+            'api-secret': self.settings.api_secret
         }
     
     def _get_settings(self) -> EproloSettings:
@@ -43,6 +44,8 @@ class EproloService:
         if self.settings.use_mock:
             return self._mock_api_response(endpoint, data)
         
+        # Endpoint başında / varsa kaldır (base_url'de zaten var)
+        endpoint = endpoint.lstrip('/')
         url = f"{self.base_url}/{endpoint}"
         
         try:
@@ -123,12 +126,17 @@ class EproloService:
         )
         
         try:
-            # EPROLO'dan kategoriye ait ürünleri çek
-            response = self._make_request('GET', 'products/list', {
-                'category': category.eprolo_category_id or category.name,
+            # EPROLO'dan kategoriye ait ürünleri çek (POST metodu ile)
+            request_data = {
                 'page': page,
-                'per_page': per_page
-            })
+                'pageSize': per_page
+            }
+            
+            # Eğer EPROLO kategori ID'si varsa ekle
+            if category.eprolo_category_id:
+                request_data['categoryId'] = category.eprolo_category_id
+            
+            response = self._make_request('POST', '/product/list', request_data)
             
             if response.get('code') != 200:
                 raise EproloAPIError(response.get('message', 'API hatası'))
@@ -181,22 +189,27 @@ class EproloService:
         """Tek bir ürünü senkronize et"""
         eprolo_id = product_data['product_id']
         
+        # Fiyat hesapla (USD -> TRY + kar marjı)
+        cost_usd = Decimal(str(product_data.get('cost_price', product_data['price'])))
+        cost_try = cost_usd * self.settings.usd_to_try_rate
+        profit_margin = category.custom_profit_margin or self.settings.default_profit_margin
+        price_try = cost_try * (1 + profit_margin / 100)
+        
         # Ürünü bul veya oluştur
         product, created = Product.objects.get_or_create(
             eprolo_product_id=eprolo_id,
             defaults={
                 'name': product_data['title'],
+                'description': product_data.get('description', ''),
                 'source': 'eprolo',
                 'category': category,
-                'is_active': False  # Manuel onay için pasif başlat
+                'price': price_try.quantize(Decimal('0.01')),
+                'cost_price': cost_try.quantize(Decimal('0.01')),
+                'stock': product_data.get('stock', 0),
+                'is_active': category.auto_activate_products,
+                'profit_margin': profit_margin
             }
         )
-        
-        # Fiyat hesapla (USD -> TRY + kar marjı)
-        cost_usd = Decimal(str(product_data.get('cost_price', product_data['price'])))
-        cost_try = cost_usd * self.settings.usd_to_try_rate
-        profit_margin = product.profit_margin or self.settings.default_profit_margin
-        price_try = cost_try * (1 + profit_margin / 100)
         
         # Ürün bilgilerini güncelle
         product.name = product_data['title']

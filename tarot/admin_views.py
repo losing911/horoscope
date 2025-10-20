@@ -62,6 +62,9 @@ def admin_dashboard(request):
             'readings': readings_count
         })
     
+    import json
+    daily_stats_json = json.dumps(daily_stats)
+    
     context = {
         'title': 'Admin Dashboard - Tarot Yorum',
         'total_users': total_users,
@@ -75,10 +78,10 @@ def admin_dashboard(request):
         'recent_readings': recent_readings,
         'popular_spreads': popular_spreads,
         'active_users': active_users,
-        'daily_stats': daily_stats,
+        'daily_stats': daily_stats_json,
     }
     
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'tarot/admin/dashboard.html', context)
 
 
 @login_required
@@ -123,7 +126,7 @@ def admin_users(request):
         'total_users': users.count(),
     }
     
-    return render(request, 'admin/users.html', context)
+    return render(request, 'tarot/admin/users.html', context)
 
 
 @login_required
@@ -177,7 +180,7 @@ def admin_readings(request):
         'total_readings': readings.count(),
     }
     
-    return render(request, 'admin/readings.html', context)
+    return render(request, 'tarot/admin/readings.html', context)
 
 
 @login_required
@@ -208,7 +211,7 @@ def admin_settings(request):
         'settings': settings,
     }
     
-    return render(request, 'admin/settings.html', context)
+    return render(request, 'tarot/admin/settings.html', context)
 
 
 @login_required
@@ -235,6 +238,9 @@ def admin_statistics(request):
             'users': users_count
         })
     
+    import json
+    daily_stats_json = json.dumps(daily_stats)
+    
     # En popüler yayılımlar
     popular_spreads = TarotReading.objects.filter(
         created_at__gte=start_date
@@ -251,7 +257,7 @@ def admin_statistics(request):
     
     context = {
         'title': 'İstatistikler - Admin',
-        'daily_stats': daily_stats,
+        'daily_stats': daily_stats_json,
         'popular_spreads': popular_spreads,
         'user_activity': user_activity,
         'period': period,
@@ -259,7 +265,7 @@ def admin_statistics(request):
         'end_date': end_date.strftime('%Y-%m-%d'),
     }
     
-    return render(request, 'admin/statistics.html', context)
+    return render(request, 'tarot/admin/statistics.html', context)
 
 
 @login_required
