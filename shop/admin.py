@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Category, Product, Cart, CartItem, Order, OrderItem
+from django.utils.html import format_html
+from django.db.models import Avg
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, EproloSyncLog, EproloSettings
 
 
 @admin.register(Category)
@@ -13,28 +15,39 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['name', 'category', 'display_price', 'stock', 'stock_status', 'sales_count', 'display_revenue', 'is_active']
-    list_filter = ['category', 'stock_status', 'is_featured', 'is_active', 'created_at']
-    search_fields = ['name', 'description', 'zodiac_signs']
+    list_display = ['thumbnail', 'name', 'category', 'source_display', 'display_price', 'stock', 'stock_status', 'sales_count', 'display_revenue', 'eprolo_sync_status', 'is_active']
+    list_filter = ['source', 'category', 'stock_status', 'is_featured', 'is_active', 'created_at']
+    search_fields = ['name', 'description', 'zodiac_signs', 'eprolo_product_id', 'eprolo_sku']
     prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ['views', 'sales_count', 'discount_percentage', 'display_revenue', 'display_sales_quantity', 'created_at', 'updated_at']
+    readonly_fields = ['views', 'sales_count', 'discount_percentage', 'display_revenue', 'display_sales_quantity', 'eprolo_last_sync', 'eprolo_sync_detail', 'created_at', 'updated_at']
+    list_per_page = 50
+    actions = ['mark_as_featured', 'mark_as_not_featured', 'update_from_eprolo']
     
     fieldsets = (
         ('Temel Bilgiler', {
-            'fields': ('category', 'name', 'slug', 'description', 'short_description')
+            'fields': ('category', 'name', 'slug', 'description', 'short_description', 'is_active')
         }),
-        ('Fiyat ve Stok', {
-            'fields': ('price_usd', 'usd_to_try_rate', 'price', 'original_price', 'discount_percentage', 'stock', 'stock_status'),
-            'description': 'USD fiyat girerseniz otomatik olarak TL\'ye çevrilir. TL fiyat manuel de girebilirsiniz.'
+        ('🌐 EPROLO Entegrasyonu', {
+            'fields': ('source', 'eprolo_product_id', 'eprolo_variant_id', 'eprolo_sku', 'eprolo_supplier', 'eprolo_warehouse', 'eprolo_last_sync', 'eprolo_sync_detail'),
+            'classes': ('collapse',),
+            'description': 'EPROLO ile senkronize edilen ürünler için otomatik doldurulur.'
+        }),
+        ('Fiyat ve Maliyet', {
+            'fields': ('cost_price', 'profit_margin', 'price_usd', 'usd_to_try_rate', 'price', 'original_price', 'discount_percentage'),
+            'description': 'Maliyet fiyatı ve kar marjı ile otomatik satış fiyatı hesaplanır. USD fiyat girerseniz otomatik TL\'ye çevrilir.'
+        }),
+        ('Stok', {
+            'fields': ('stock', 'stock_status')
         }),
         ('Görseller', {
             'fields': ('image', 'image_2', 'image_3')
         }),
         ('Özellikler', {
-            'fields': ('features', 'zodiac_signs')
+            'fields': ('features', 'zodiac_signs', 'is_featured')
         }),
-        ('SEO ve Durum', {
-            'fields': ('meta_description', 'is_featured', 'is_active')
+        ('SEO', {
+            'fields': ('meta_description',),
+            'classes': ('collapse',)
         }),
         ('İstatistikler', {
             'fields': ('views', 'sales_count', 'display_sales_quantity', 'display_revenue', 'created_at', 'updated_at'),
@@ -70,6 +83,93 @@ class ProductAdmin(admin.ModelAdmin):
         if quantity != obj.sales_count:
             return f'{quantity} adet (Kayıt: {obj.sales_count})'
         return f'{quantity} adet'
+    
+    @admin.display(description='Görsel')
+    def thumbnail(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover; border-radius: 4px;" />', obj.image)
+        return '📦'
+    
+    @admin.display(description='Kaynak', ordering='source')
+    def source_display(self, obj):
+        if obj.source == 'eprolo':
+            return format_html(
+                '<span style="background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">🌐 EPROLO</span>'
+            )
+        return format_html(
+            '<span style="background: #f5f5f5; color: #666; padding: 2px 8px; border-radius: 3px; font-size: 11px;">✏️ Manuel</span>'
+        )
+    
+    @admin.display(description='EPROLO Senkronizasyon')
+    def eprolo_sync_status(self, obj):
+        if obj.source != 'eprolo':
+            return '-'
+        
+        if not obj.eprolo_last_sync:
+            return format_html('<span style="color: #999; font-size: 11px;">Henüz senkronize edilmedi</span>')
+        
+        # Son senkronizasyondan bu yana geçen süre
+        from django.utils import timezone
+        now = timezone.now()
+        diff = now - obj.eprolo_last_sync
+        
+        if diff.days > 7:
+            color = '#f44336'
+            status = f'{diff.days} gün önce ⚠️'
+        elif diff.days > 1:
+            color = '#ff9800'
+            status = f'{diff.days} gün önce'
+        else:
+            color = '#4caf50'
+            status = 'Güncel ✓'
+        
+        return format_html(
+            '<div style="color: {}; font-size: 11px; font-weight: bold;">{}</div>',
+            color, status
+        )
+    
+    @admin.display(description='EPROLO Detayı')
+    def eprolo_sync_detail(self, obj):
+        if obj.source != 'eprolo':
+            return 'Bu ürün manuel eklenmiştir.'
+        
+        parts = []
+        parts.append(f'<div style="margin-bottom: 8px;"><strong>EPROLO Ürün ID:</strong> {obj.eprolo_product_id or "N/A"}</div>')
+        parts.append(f'<div style="margin-bottom: 8px;"><strong>SKU:</strong> {obj.eprolo_sku or "N/A"}</div>')
+        parts.append(f'<div style="margin-bottom: 8px;"><strong>Tedarikçi:</strong> {obj.eprolo_supplier or "N/A"}</div>')
+        parts.append(f'<div style="margin-bottom: 8px;"><strong>Depo:</strong> {obj.eprolo_warehouse or "N/A"}</div>')
+        
+        if obj.eprolo_last_sync:
+            parts.append(f'<div style="margin-bottom: 8px;"><strong>Son Senkronizasyon:</strong> {obj.eprolo_last_sync.strftime("%Y-%m-%d %H:%M:%S")}</div>')
+        else:
+            parts.append('<div style="margin-bottom: 8px;"><strong>Son Senkronizasyon:</strong> <span style="color: #f44336;">Henüz yapılmadı</span></div>')
+        
+        return format_html(''.join(parts))
+    
+    # Actions
+    @admin.action(description='⭐ Öne Çıkan Olarak İşaretle')
+    def mark_as_featured(self, request, queryset):
+        updated = queryset.update(is_featured=True)
+        self.message_user(request, f'{updated} ürün öne çıkan olarak işaretlendi.')
+    
+    @admin.action(description='Öne Çıkanlıktan Kaldır')
+    def mark_as_not_featured(self, request, queryset):
+        updated = queryset.update(is_featured=False)
+        self.message_user(request, f'{updated} ürün öne çıkanlıktan kaldırıldı.')
+    
+    @admin.action(description='🔄 EPROLO\'dan Güncelle')
+    def update_from_eprolo(self, request, queryset):
+        eprolo_products = queryset.filter(source='eprolo')
+        count = eprolo_products.count()
+        
+        if count == 0:
+            from django.contrib import messages
+            self.message_user(request, 'Seçili ürünlerde EPROLO ürünü bulunamadı.', level=messages.WARNING)
+            return
+        
+        # TODO: EPROLO API ile senkronizasyon
+        from django.contrib import messages
+        self.message_user(request, f'{count} EPROLO ürünü senkronize ediliyor... (Bu özellik yakında aktif olacak)', level=messages.INFO)
 
 
 class CartItemInline(admin.TabularInline):
@@ -217,3 +317,148 @@ class OrderAdmin(admin.ModelAdmin):
     def mark_as_cancelled(self, request, queryset):
         updated = queryset.update(status='cancelled')
         self.message_user(request, f'{updated} sipariş iptal edildi.')
+
+
+@admin.register(EproloSyncLog)
+class EproloSyncLogAdmin(admin.ModelAdmin):
+    """EPROLO Senkronizasyon Logları Admin"""
+    list_display = ['sync_type_badge', 'status_badge', 'stats_display', 'duration_display', 'user', 'started_at']
+    list_filter = ['sync_type', 'status', 'started_at']
+    search_fields = ['message', 'error_details']
+    readonly_fields = ['sync_type', 'status', 'total_items', 'successful_items', 'failed_items', 'message', 'error_details', 'started_at', 'completed_at', 'duration_seconds', 'user', 'success_rate_display']
+    filter_horizontal = ['affected_products']
+    date_hierarchy = 'started_at'
+    list_per_page = 50
+    
+    fieldsets = (
+        ('Genel Bilgiler', {
+            'fields': ('sync_type', 'status', 'user', 'started_at', 'completed_at', 'duration_seconds')
+        }),
+        ('İstatistikler', {
+            'fields': ('total_items', 'successful_items', 'failed_items', 'success_rate_display')
+        }),
+        ('Detaylar', {
+            'fields': ('message', 'error_details'),
+            'classes': ('collapse',)
+        }),
+        ('Etkilenen Ürünler', {
+            'fields': ('affected_products',),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    @admin.display(description='Senkronizasyon Tipi')
+    def sync_type_badge(self, obj):
+        colors = {
+            'product_import': '#4caf50',
+            'product_update': '#2196f3',
+            'price_update': '#ff9800',
+            'stock_update': '#9c27b0',
+            'order_create': '#00bcd4',
+            'order_update': '#3f51b5',
+        }
+        
+        color = colors.get(obj.sync_type, '#999')
+        return format_html(
+            '<span style="background: {}; color: white; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: bold;">{}</span>',
+            color, obj.get_sync_type_display()
+        )
+    
+    @admin.display(description='Durum')
+    def status_badge(self, obj):
+        if obj.status == 'success':
+            color = '#4caf50'
+            icon = '✓'
+        elif obj.status == 'failed':
+            color = '#f44336'
+            icon = '✗'
+        else:
+            color = '#ff9800'
+            icon = '⚠'
+        
+        return format_html(
+            '<span style="background: {}; color: white; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: bold;">{} {}</span>',
+            color, icon, obj.get_status_display()
+        )
+    
+    @admin.display(description='İstatistikler')
+    def stats_display(self, obj):
+        return format_html(
+            '<div><strong>Toplam:</strong> {}</div>'
+            '<div style="color: green;"><strong>Başarılı:</strong> {}</div>'
+            '<div style="color: red;"><strong>Başarısız:</strong> {}</div>'
+            '<div style="font-size: 11px; color: #999;">Başarı Oranı: %{}</div>',
+            obj.total_items, obj.successful_items, obj.failed_items, obj.success_rate
+        )
+    
+    @admin.display(description='Süre')
+    def duration_display(self, obj):
+        if obj.duration_seconds:
+            return f'{obj.duration_seconds} saniye'
+        return '-'
+    
+    @admin.display(description='Başarı Oranı')
+    def success_rate_display(self, obj):
+        rate = obj.success_rate
+        if rate >= 90:
+            color = '#4caf50'
+        elif rate >= 70:
+            color = '#ff9800'
+        else:
+            color = '#f44336'
+        
+        return format_html(
+            '<span style="color: {}; font-weight: bold; font-size: 16px;">%{}</span>',
+            color, rate
+        )
+
+
+@admin.register(EproloSettings)
+class EproloSettingsAdmin(admin.ModelAdmin):
+    """EPROLO Ayarları Admin (Singleton)"""
+    
+    fieldsets = (
+        ('📡 API Bilgileri', {
+            'fields': ('api_key', 'api_secret', 'use_mock'),
+            'description': '🔑 EPROLO API bağlantı ayarları. Test için Mock modu kullanabilirsiniz.'
+        }),
+        ('💰 Fiyatlandırma Ayarları', {
+            'fields': ('usd_to_try_rate', 'default_profit_margin', 'auto_update_prices')
+        }),
+        ('📦 Stok Ayarları', {
+            'fields': ('auto_update_stock', 'low_stock_threshold', 'out_of_stock_threshold')
+        }),
+        ('📋 Sipariş Ayarları', {
+            'fields': ('auto_create_eprolo_orders', 'order_status_for_auto_send')
+        }),
+        ('🗂️ Kategori Ayarları', {
+            'fields': ('default_category',)
+        }),
+        ('🔄 Senkronizasyon Bilgileri', {
+            'fields': ('last_product_sync', 'last_stock_sync', 'last_price_sync'),
+            'classes': ('collapse',)
+        }),
+        ('🔔 Bildirim Ayarları', {
+            'fields': ('notify_on_sync_complete', 'notify_on_sync_error', 'notification_email'),
+            'classes': ('collapse',)
+        }),
+        ('⏰ Tarihler', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['last_product_sync', 'last_stock_sync', 'last_price_sync', 'created_at', 'updated_at']
+    
+    def has_add_permission(self, request):
+        # Singleton - sadece bir kayıt olabilir
+        return not EproloSettings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        return False

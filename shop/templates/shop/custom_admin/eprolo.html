@@ -1,0 +1,323 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}EPROLO Yönetimi - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900 flex items-center">
+                <i class="fas fa-link text-purple-600 mr-3"></i>
+                EPROLO Yönetimi
+            </h1>
+            <p class="text-gray-600 mt-1">EPROLO entegrasyonu ve senkronizasyon yönetimi</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <a href="{% url 'shop:admin_eprolo_settings' %}" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                <i class="fas fa-cog mr-2"></i>Ayarlar
+            </a>
+            <a href="{% url 'shop:admin_eprolo_sync' %}" class="px-4 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg">
+                <i class="fas fa-sync-alt mr-2"></i>Senkronize Et
+            </a>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Toplam EPROLO Ürünü</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_eprolo_products }}</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-link text-2xl text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Aktif Ürünler</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ active_eprolo_products }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-check-circle text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-red-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Stokta Yok</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ out_of_stock_eprolo }}</p>
+                </div>
+                <div class="bg-red-100 p-3 rounded-lg">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Toplam Satış</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_eprolo_sales }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Sync Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('products')">
+            <div class="flex items-center">
+                <div class="bg-purple-100 p-4 rounded-lg">
+                    <i class="fas fa-box text-3xl text-purple-600"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">Ürünleri Senkronize Et</h3>
+                    <p class="text-sm text-gray-600">EPROLO'dan yeni ürünleri içe aktar</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('prices')">
+            <div class="flex items-center">
+                <div class="bg-green-100 p-4 rounded-lg">
+                    <i class="fas fa-tag text-3xl text-green-600"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">Fiyatları Güncelle</h3>
+                    <p class="text-sm text-gray-600">EPROLO fiyat güncellemelerini al</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow cursor-pointer" onclick="syncAction('stock')">
+            <div class="flex items-center">
+                <div class="bg-blue-100 p-4 rounded-lg">
+                    <i class="fas fa-warehouse text-3xl text-blue-600"></i>
+                </div>
+                <div class="ml-4 flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900">Stok Durumunu Senkronize Et</h3>
+                    <p class="text-sm text-gray-600">Stok miktarlarını güncelle</p>
+                </div>
+                <i class="fas fa-chevron-right text-gray-400"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Last Sync Info -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-md p-6 text-white">
+        <h2 class="text-xl font-semibold mb-4 flex items-center">
+            <i class="fas fa-info-circle mr-2"></i>
+            Son Senkronizasyon Bilgileri
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                <p class="text-sm opacity-90 mb-1">Son Ürün Senkronizasyonu</p>
+                <p class="text-lg font-semibold">
+                    {% if settings.last_product_sync %}
+                    {{ settings.last_product_sync|date:"d.m.Y H:i" }}
+                    {% else %}
+                    Henüz yapılmadı
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                <p class="text-sm opacity-90 mb-1">Son Stok Senkronizasyonu</p>
+                <p class="text-lg font-semibold">
+                    {% if settings.last_stock_sync %}
+                    {{ settings.last_stock_sync|date:"d.m.Y H:i" }}
+                    {% else %}
+                    Henüz yapılmadı
+                    {% endif %}
+                </p>
+            </div>
+            
+            <div class="bg-white bg-opacity-20 rounded-lg p-4">
+                <p class="text-sm opacity-90 mb-1">Son Fiyat Senkronizasyonu</p>
+                <p class="text-lg font-semibold">
+                    {% if settings.last_price_sync %}
+                    {{ settings.last_price_sync|date:"d.m.Y H:i" }}
+                    {% else %}
+                    Henüz yapılmadı
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sync Logs -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-history text-purple-600 mr-2"></i>
+                Senkronizasyon Geçmişi
+            </h2>
+            <a href="{% url 'shop:admin_eprolo_sync' %}" class="text-purple-600 hover:text-purple-800 text-sm">
+                Tümünü Gör <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tarih</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tip</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Durum</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ürün Sayısı</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Başarı Oranı</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Süre</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Detay</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for log in recent_syncs %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ log.started_at|date:"d.m.Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if log.sync_type == 'product_import' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                                <i class="fas fa-download mr-1"></i>Ürün İçe Aktarma
+                            </span>
+                            {% elif log.sync_type == 'price_update' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                <i class="fas fa-tag mr-1"></i>Fiyat Güncelleme
+                            </span>
+                            {% elif log.sync_type == 'stock_update' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                                <i class="fas fa-warehouse mr-1"></i>Stok Güncelleme
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                                {{ log.get_sync_type_display }}
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if log.status == 'success' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                                <i class="fas fa-check mr-1"></i>Başarılı
+                            </span>
+                            {% elif log.status == 'failed' %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                                <i class="fas fa-times mr-1"></i>Başarısız
+                            </span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                <i class="fas fa-exclamation mr-1"></i>Kısmi
+                            </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ log.successful_items }}/{{ log.total_items }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: {{ log.success_rate }}%"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-700">{{ log.success_rate|floatformat:0 }}%</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {% if log.duration_seconds %}
+                            {{ log.duration_seconds }}s
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            <button class="text-blue-600 hover:text-blue-800 transition-colors" onclick="showSyncDetail({{ log.id }})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            <i class="fas fa-history text-4xl mb-4 text-gray-400"></i>
+                            <p class="text-lg">Henüz senkronizasyon kaydı bulunmuyor.</p>
+                            <a href="{% url 'shop:admin_eprolo_sync' %}" class="text-purple-600 hover:text-purple-800 mt-2 inline-block">
+                                İlk senkronizasyonu başlat <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- EPROLO Products -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900 flex items-center">
+                <i class="fas fa-box text-purple-600 mr-2"></i>
+                EPROLO Ürünleri
+            </h2>
+            <a href="{% url 'shop:admin_products' %}?source=eprolo" class="text-purple-600 hover:text-purple-800 text-sm">
+                Tümünü Gör <i class="fas fa-arrow-right ml-1"></i>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {% for product in eprolo_products|slice:":8" %}
+            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-32 object-cover rounded-lg mb-3">
+                {% else %}
+                <div class="w-full h-32 bg-gray-200 rounded-lg mb-3 flex items-center justify-center">
+                    <i class="fas fa-image text-gray-400 text-3xl"></i>
+                </div>
+                {% endif %}
+                <h3 class="font-medium text-gray-900 text-sm mb-2 line-clamp-2">{{ product.name }}</h3>
+                <div class="flex items-center justify-between text-sm">
+                    <span class="text-gray-600">{{ product.price }} ₺</span>
+                    <span class="{% if product.stock > 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                        Stok: {{ product.stock }}
+                    </span>
+                </div>
+                <div class="mt-2 text-xs text-gray-500">
+                    <i class="fas fa-clock mr-1"></i>
+                    {{ product.eprolo_last_sync|date:"d.m.Y" }}
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-4 text-center text-gray-500 py-12">
+                <i class="fas fa-box-open text-4xl mb-4 text-gray-400"></i>
+                <p>Henüz EPROLO ürünü eklenmemiş.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+    function syncAction(type) {
+        if (confirm(`${type} senkronizasyonunu başlatmak istediğinizden emin misiniz?`)) {
+            window.location.href = `{% url 'shop:admin_eprolo_sync' %}?action=${type}`;
+        }
+    }
+
+    function showSyncDetail(logId) {
+        // TODO: Modal ile detay göster
+        alert('Senkronizasyon detayı: ' + logId);
+    }
+</script>
+{% endblock %}

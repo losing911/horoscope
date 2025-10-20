@@ -1,0 +1,315 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}EPROLO Ayarları - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">EPROLO Ayarları</h1>
+            <p class="text-gray-600 mt-1">EPROLO entegrasyon ayarlarını yapılandırın</p>
+        </div>
+        <a href="{% url 'shop:admin_eprolo' %}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-2"></i>Geri Dön
+        </a>
+    </div>
+
+    <form method="post" class="space-y-6">
+        {% csrf_token %}
+
+        <!-- API Settings -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-key text-purple-600 mr-2"></i>
+                API Ayarları
+            </h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        API Key <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="api_key" value="{{ settings.api_key|default:'' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="EPROLO API anahtarınızı girin">
+                    <p class="text-xs text-gray-500 mt-1">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        EPROLO hesabınızdan API anahtarını alabilirsiniz.
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        API Secret <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" name="api_secret" value="{{ settings.api_secret|default:'' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="API secret anahtarı">
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="use_mock" id="use_mock" {% if settings.use_mock %}checked{% endif %}
+                           class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                    <label for="use_mock" class="text-sm text-gray-700">
+                        Test modu kullan (Mock API)
+                    </label>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-sm text-blue-800 font-medium">Bağlantı Durumu</p>
+                            <p class="text-xs text-blue-600">API bağlantınızı test edin</p>
+                        </div>
+                        <button type="button" onclick="testConnection()" 
+                                class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-plug mr-2"></i>Test Et
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing Settings -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-tag text-purple-600 mr-2"></i>
+                Fiyatlandırma Ayarları
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        USD/TRY Kuru <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" step="0.01" name="usd_to_try_rate" value="{{ settings.usd_to_try_rate|default:'34.50' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="34.50">
+                    <p class="text-xs text-gray-500 mt-1">
+                        EPROLO fiyatları USD olarak gelir, bu kur ile TRY'ye çevrilir
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Varsayılan Kar Marjı (%) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" step="0.01" name="default_profit_margin" value="{{ settings.default_profit_margin|default:'30.00' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="30.00">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Yeni ürünler için otomatik uygulanacak kar marjı
+                    </p>
+                </div>
+
+                <div class="col-span-2">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="auto_update_prices" id="auto_update_prices" {% if settings.auto_update_prices %}checked{% endif %}
+                               class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                        <label for="auto_update_prices" class="text-sm text-gray-700">
+                            Fiyatları otomatik güncelle
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-6">
+                        EPROLO'dan gelen fiyat güncellemelerini otomatik olarak uygula
+                    </p>
+                </div>
+
+                <div class="col-span-2 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-calculator text-yellow-600 text-xl mt-1 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-yellow-800">Fiyat Hesaplama Örneği</p>
+                            <p class="text-xs text-yellow-700 mt-1">
+                                EPROLO fiyatı: ${{ example_usd_price }} → 
+                                Maliyet: {{ settings.usd_to_try_rate|floatformat:2 }} x {{ example_usd_price }} = {{ example_cost_try }} ₺ → 
+                                Satış fiyatı: {{ example_cost_try }} ₺ + %{{ settings.default_profit_margin }} kar = 
+                                <strong class="text-yellow-900">{{ example_sale_price }} ₺</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock Settings -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-warehouse text-purple-600 mr-2"></i>
+                Stok Ayarları
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Düşük Stok Eşiği
+                    </label>
+                    <input type="number" name="low_stock_threshold" value="{{ settings.low_stock_threshold|default:'5' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="5">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Bu sayının altındaki ürünler için uyarı gösterilir
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Stok Yok Eşiği
+                    </label>
+                    <input type="number" name="out_of_stock_threshold" value="{{ settings.out_of_stock_threshold|default:'0' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="0">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Bu sayıya eşit veya altındaki ürünler stokta yok sayılır
+                    </p>
+                </div>
+
+                <div class="col-span-2">
+                    <div class="flex items-center">
+                        <input type="checkbox" name="auto_update_stock" id="auto_update_stock" {% if settings.auto_update_stock %}checked{% endif %}
+                               class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                        <label for="auto_update_stock" class="text-sm text-gray-700">
+                            Stok miktarlarını otomatik güncelle
+                        </label>
+                    </div>
+                    <p class="text-xs text-gray-500 ml-6">
+                        EPROLO'dan gelen stok güncellemelerini otomatik olarak uygula
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Automation -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-shopping-cart text-purple-600 mr-2"></i>
+                Sipariş Otomasyonu
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="checkbox" name="auto_create_eprolo_orders" id="auto_create_eprolo_orders" {% if settings.auto_create_eprolo_orders %}checked{% endif %}
+                           class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                    <label for="auto_create_eprolo_orders" class="text-sm text-gray-700">
+                        Siparişleri otomatik olarak EPROLO'ya gönder
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Otomatik Gönderim İçin Sipariş Durumu
+                    </label>
+                    <select name="order_status_for_auto_send"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="pending" {% if settings.order_status_for_auto_send == 'pending' %}selected{% endif %}>Bekliyor</option>
+                        <option value="confirmed" {% if settings.order_status_for_auto_send == 'confirmed' %}selected{% endif %}>Onaylandı</option>
+                        <option value="paid" {% if settings.order_status_for_auto_send == 'paid' %}selected{% endif %}>Ödendi</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Bu duruma geldiğinde sipariş otomatik olarak EPROLO'ya gönderilir
+                    </p>
+                </div>
+
+                <div class="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <i class="fas fa-exclamation-triangle text-orange-600 text-xl mt-1 mr-3"></i>
+                        <div>
+                            <p class="text-sm font-medium text-orange-800">Dikkat!</p>
+                            <p class="text-xs text-orange-700 mt-1">
+                                Otomatik sipariş gönderimi aktif edildiğinde, belirlenen duruma gelen tüm siparişler otomatik olarak EPROLO'ya gönderilecektir. 
+                                Bu özelliği aktif etmeden önce test modunda deneyin.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Default Settings -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-cog text-purple-600 mr-2"></i>
+                Varsayılan Ayarlar
+            </h2>
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Varsayılan Kategori
+                </label>
+                <select name="default_category"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <option value="">Kategori seçin</option>
+                    {% for category in categories %}
+                    <option value="{{ category.id }}" {% if settings.default_category.id == category.id %}selected{% endif %}>
+                        {{ category.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+                <p class="text-xs text-gray-500 mt-1">
+                    EPROLO'dan gelen yeni ürünler bu kategoriye atanacak
+                </p>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-bell text-purple-600 mr-2"></i>
+                Bildirim Ayarları
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center">
+                    <input type="checkbox" name="notify_on_sync_complete" id="notify_on_sync_complete" {% if settings.notify_on_sync_complete %}checked{% endif %}
+                           class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                    <label for="notify_on_sync_complete" class="text-sm text-gray-700">
+                        Senkronizasyon tamamlandığında bildir
+                    </label>
+                </div>
+
+                <div class="flex items-center">
+                    <input type="checkbox" name="notify_on_sync_error" id="notify_on_sync_error" {% if settings.notify_on_sync_error %}checked{% endif %}
+                           class="rounded border-gray-300 text-purple-600 focus:ring-purple-500 mr-2">
+                    <label for="notify_on_sync_error" class="text-sm text-gray-700">
+                        Senkronizasyon hatası olduğunda bildir
+                    </label>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Bildirim E-posta Adresi
+                    </label>
+                    <input type="email" name="notification_email" value="{{ settings.notification_email|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="admin@example.com">
+                    <p class="text-xs text-gray-500 mt-1">
+                        Bildirimler bu adrese gönderilecek
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'shop:admin_eprolo' %}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-times mr-2"></i>İptal
+                </a>
+                
+                <button type="submit" 
+                        class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg">
+                    <i class="fas fa-save mr-2"></i>Ayarları Kaydet
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    function testConnection() {
+        // TODO: AJAX ile API bağlantısını test et
+        alert('API bağlantı testi başlatılıyor...');
+    }
+</script>
+{% endblock %}

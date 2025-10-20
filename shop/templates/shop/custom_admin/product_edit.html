@@ -1,0 +1,324 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}{% if product %}Ürün Düzenle{% else %}Yeni Ürün Ekle{% endif %} - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">
+                {% if product %}Ürün Düzenle{% else %}Yeni Ürün Ekle{% endif %}
+            </h1>
+            <p class="text-gray-600 mt-1">
+                {% if product %}{{ product.name }} bilgilerini güncelleyin{% else %}Yeni bir ürün oluşturun{% endif %}
+            </p>
+        </div>
+        <a href="{% url 'shop:admin_products' %}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-2"></i>Geri Dön
+        </a>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        
+        <!-- Basic Information -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-info-circle text-purple-600 mr-2"></i>
+                Temel Bilgiler
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Ürün Adı <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" name="name" value="{{ product.name|default:'' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="Ürün adını girin">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        SKU
+                    </label>
+                    <input type="text" name="sku" value="{{ product.sku|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="Ürün kodu (otomatik oluşturulacak)">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <select name="category" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="">Kategori seçin</option>
+                        {% for category in categories %}
+                        <option value="{{ category.id }}" {% if product.category.id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Açıklama
+                    </label>
+                    <textarea name="description" rows="4"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                              placeholder="Ürün açıklaması">{{ product.description|default:'' }}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Kaynak
+                    </label>
+                    <select name="source" id="source-select"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="manual" {% if product.source == 'manual' or not product %}selected{% endif %}>Manuel</option>
+                        <option value="eprolo" {% if product.source == 'eprolo' %}selected{% endif %}>EPROLO</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Durum
+                    </label>
+                    <select name="is_active"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                        <option value="1" {% if product.is_active or not product %}selected{% endif %}>Aktif</option>
+                        <option value="0" {% if product and not product.is_active %}selected{% endif %}>Pasif</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pricing -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-tag text-purple-600 mr-2"></i>
+                Fiyatlandırma
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Maliyet Fiyatı (₺)
+                    </label>
+                    <input type="number" step="0.01" name="cost_price" value="{{ product.cost_price|default:'' }}" id="cost-price"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="0.00">
+                    <p class="text-xs text-gray-500 mt-1">Tedarikçiden alış fiyatı</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Kar Marjı (%)
+                    </label>
+                    <input type="number" step="0.01" name="profit_margin" value="{{ product.profit_margin|default:'30.00' }}" id="profit-margin"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="30.00">
+                    <p class="text-xs text-gray-500 mt-1">Varsayılan: %30</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Satış Fiyatı (₺) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" step="0.01" name="price" value="{{ product.price|default:'' }}" required id="sale-price"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="0.00">
+                    <p class="text-xs text-green-600 mt-1 font-medium" id="profit-display"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stock -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-warehouse text-purple-600 mr-2"></i>
+                Stok Bilgileri
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Stok Miktarı <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" name="stock" value="{{ product.stock|default:'0' }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="0">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Düşük Stok Uyarısı
+                    </label>
+                    <input type="number" name="low_stock_threshold" value="{{ product.low_stock_threshold|default:'5' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="5">
+                    <p class="text-xs text-gray-500 mt-1">Bu sayının altında uyarı verilir</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- EPROLO Integration -->
+        <div id="eprolo-fields" class="bg-white rounded-xl shadow-md p-6" style="display: {% if product.source == 'eprolo' %}block{% else %}none{% endif %};">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-link text-purple-600 mr-2"></i>
+                EPROLO Entegrasyonu
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        EPROLO Ürün ID
+                    </label>
+                    <input type="text" name="eprolo_product_id" value="{{ product.eprolo_product_id|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="EPROLO sistemindeki ürün ID">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        EPROLO Varyant ID
+                    </label>
+                    <input type="text" name="eprolo_variant_id" value="{{ product.eprolo_variant_id|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="Varyant ID">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        EPROLO SKU
+                    </label>
+                    <input type="text" name="eprolo_sku" value="{{ product.eprolo_sku|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="EPROLO SKU">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Tedarikçi
+                    </label>
+                    <input type="text" name="eprolo_supplier" value="{{ product.eprolo_supplier|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="Tedarikçi adı">
+                </div>
+
+                <div class="col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Depo
+                    </label>
+                    <input type="text" name="eprolo_warehouse" value="{{ product.eprolo_warehouse|default:'' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                           placeholder="Depo lokasyonu">
+                </div>
+
+                {% if product.eprolo_last_sync %}
+                <div class="col-span-2">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <p class="text-sm text-blue-800">
+                            <i class="fas fa-sync-alt mr-2"></i>
+                            Son senkronizasyon: {{ product.eprolo_last_sync|date:"d.m.Y H:i" }}
+                        </p>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Image Upload -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-image text-purple-600 mr-2"></i>
+                Ürün Görseli
+            </h2>
+            
+            <div class="space-y-4">
+                {% if product.image %}
+                <div>
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-48 h-48 object-cover rounded-lg border-2 border-gray-200">
+                </div>
+                {% endif %}
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Yeni Görsel Yükle
+                    </label>
+                    <input type="file" name="image" accept="image/*"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                    <p class="text-xs text-gray-500 mt-1">Önerilen boyut: 800x800px, Maksimum: 2MB</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex items-center justify-between">
+                <a href="{% url 'shop:admin_products' %}" class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                    <i class="fas fa-times mr-2"></i>İptal
+                </a>
+                
+                <div class="flex space-x-3">
+                    <button type="submit" name="save_and_continue" value="1"
+                            class="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                        <i class="fas fa-save mr-2"></i>Kaydet ve Düzenle
+                    </button>
+                    <button type="submit" 
+                            class="px-6 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all shadow-lg">
+                        <i class="fas fa-check mr-2"></i>{% if product %}Güncelle{% else %}Oluştur{% endif %}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Toggle EPROLO fields based on source selection
+    const sourceSelect = document.getElementById('source-select');
+    const eproloFields = document.getElementById('eprolo-fields');
+    
+    sourceSelect?.addEventListener('change', function() {
+        if (this.value === 'eprolo') {
+            eproloFields.style.display = 'block';
+        } else {
+            eproloFields.style.display = 'none';
+        }
+    });
+
+    // Calculate profit
+    const costPrice = document.getElementById('cost-price');
+    const profitMargin = document.getElementById('profit-margin');
+    const salePrice = document.getElementById('sale-price');
+    const profitDisplay = document.getElementById('profit-display');
+
+    function calculateProfit() {
+        const cost = parseFloat(costPrice.value) || 0;
+        const margin = parseFloat(profitMargin.value) || 0;
+        const sale = parseFloat(salePrice.value) || 0;
+
+        if (cost > 0 && sale > 0) {
+            const profit = sale - cost;
+            const profitPercent = ((profit / cost) * 100).toFixed(2);
+            profitDisplay.textContent = `Kar: ${profit.toFixed(2)} ₺ (%${profitPercent})`;
+        } else if (cost > 0 && margin > 0) {
+            const calculatedPrice = cost * (1 + margin / 100);
+            profitDisplay.textContent = `Önerilen fiyat: ${calculatedPrice.toFixed(2)} ₺`;
+        } else {
+            profitDisplay.textContent = '';
+        }
+    }
+
+    costPrice?.addEventListener('input', calculateProfit);
+    profitMargin?.addEventListener('input', calculateProfit);
+    salePrice?.addEventListener('input', calculateProfit);
+    
+    // Initial calculation
+    calculateProfit();
+</script>
+{% endblock %}

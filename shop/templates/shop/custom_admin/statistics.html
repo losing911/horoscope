@@ -1,0 +1,436 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}İstatistikler ve Raporlar - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">İstatistikler ve Raporlar</h1>
+            <p class="text-gray-600 mt-1">Mağaza performans analizleri</p>
+        </div>
+        <div class="flex items-center space-x-3">
+            <select id="period-select" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <option value="7">Son 7 Gün</option>
+                <option value="30" selected>Son 30 Gün</option>
+                <option value="90">Son 90 Gün</option>
+                <option value="365">Son 1 Yıl</option>
+            </select>
+            <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <i class="fas fa-download mr-2"></i>Rapor İndir
+            </button>
+        </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-blue-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Toplam Satış</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_sales }}</p>
+                    <p class="text-xs text-green-600 mt-1">
+                        <i class="fas fa-arrow-up mr-1"></i>+{{ sales_change }}% geçen aya göre
+                    </p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-lg">
+                    <i class="fas fa-chart-line text-2xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Toplam Gelir</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ total_revenue|floatformat:2 }} ₺</p>
+                    <p class="text-xs text-green-600 mt-1">
+                        <i class="fas fa-arrow-up mr-1"></i>+{{ revenue_change }}% geçen aya göre
+                    </p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-lg">
+                    <i class="fas fa-lira-sign text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-purple-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Ortalama Sipariş</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ avg_order_value|floatformat:2 }} ₺</p>
+                    <p class="text-xs text-green-600 mt-1">
+                        <i class="fas fa-arrow-up mr-1"></i>+{{ avg_change }}% geçen aya göre
+                    </p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-lg">
+                    <i class="fas fa-shopping-bag text-2xl text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border-l-4 border-orange-500">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Dönüşüm Oranı</p>
+                    <p class="text-3xl font-bold text-gray-900">{{ conversion_rate|floatformat:1 }}%</p>
+                    <p class="text-xs text-green-600 mt-1">
+                        <i class="fas fa-arrow-up mr-1"></i>+{{ conversion_change }}% geçen aya göre
+                    </p>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-lg">
+                    <i class="fas fa-percentage text-2xl text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Sales Trend -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-area text-purple-600 mr-2"></i>
+                Satış Trendi
+            </h2>
+            <canvas id="salesTrendChart" height="250"></canvas>
+        </div>
+
+        <!-- Revenue vs Profit -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-bar text-purple-600 mr-2"></i>
+                Gelir vs Kar
+            </h2>
+            <canvas id="revenueProfitChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- Charts Row 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Category Distribution -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-pie text-purple-600 mr-2"></i>
+                Kategori Dağılımı
+            </h2>
+            <canvas id="categoryChart" height="250"></canvas>
+        </div>
+
+        <!-- Order Status -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-donut text-purple-600 mr-2"></i>
+                Sipariş Durumu
+            </h2>
+            <canvas id="orderStatusChart" height="250"></canvas>
+        </div>
+
+        <!-- Payment Methods -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-credit-card text-purple-600 mr-2"></i>
+                Ödeme Yöntemleri
+            </h2>
+            <canvas id="paymentMethodChart" height="250"></canvas>
+        </div>
+    </div>
+
+    <!-- Top Products -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+            <i class="fas fa-trophy text-purple-600 mr-2"></i>
+            En Çok Satan Ürünler
+        </h2>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Sıra</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ürün</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Kategori</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Satış Adedi</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Toplam Gelir</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Ortalama Fiyat</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Trend</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    {% for product in top_products %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                {% if forloop.counter <= 3 %}
+                                <i class="fas fa-medal text-2xl mr-2 {% if forloop.counter == 1 %}text-yellow-500{% elif forloop.counter == 2 %}text-gray-400{% else %}text-orange-600{% endif %}"></i>
+                                {% endif %}
+                                <span class="font-bold text-gray-900">{{ forloop.counter }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-12 h-12 object-cover rounded-lg mr-3">
+                                {% else %}
+                                <div class="w-12 h-12 bg-gray-200 rounded-lg mr-3 flex items-center justify-center">
+                                    <i class="fas fa-image text-gray-400"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div class="font-medium text-gray-900">{{ product.name }}</div>
+                                    <div class="text-xs text-gray-500">SKU: {{ product.sku|default:"-" }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ product.category.name }}
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ product.sales_count }} adet
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 font-semibold text-gray-900">
+                            {{ product.total_revenue|floatformat:2 }} ₺
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            {{ product.avg_price|floatformat:2 }} ₺
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if product.trend > 0 %}
+                            <span class="text-green-600 font-semibold">
+                                <i class="fas fa-arrow-up mr-1"></i>{{ product.trend }}%
+                            </span>
+                            {% elif product.trend < 0 %}
+                            <span class="text-red-600 font-semibold">
+                                <i class="fas fa-arrow-down mr-1"></i>{{ product.trend|abs }}%
+                            </span>
+                            {% else %}
+                            <span class="text-gray-600">
+                                <i class="fas fa-minus mr-1"></i>0%
+                            </span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            Henüz satış verisi bulunmuyor.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Customer Statistics -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Customer Insights -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-users text-purple-600 mr-2"></i>
+                Müşteri İstatistikleri
+            </h2>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-600">Toplam Müşteri</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ total_customers }}</p>
+                    </div>
+                    <i class="fas fa-users text-3xl text-gray-400"></i>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-600">Yeni Müşteriler (Bu Ay)</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ new_customers }}</p>
+                    </div>
+                    <i class="fas fa-user-plus text-3xl text-green-400"></i>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-600">Tekrar Eden Müşteriler</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ returning_customers }}</p>
+                    </div>
+                    <i class="fas fa-user-check text-3xl text-blue-400"></i>
+                </div>
+
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                        <p class="text-sm text-gray-600">Müşteri Başına Ortalama Harcama</p>
+                        <p class="text-2xl font-bold text-gray-900">{{ avg_customer_value|floatformat:2 }} ₺</p>
+                    </div>
+                    <i class="fas fa-lira-sign text-3xl text-purple-400"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Traffic Sources -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-line text-purple-600 mr-2"></i>
+                Trafik Kaynakları
+            </h2>
+            
+            <div class="space-y-3">
+                {% for source in traffic_sources %}
+                <div class="flex items-center">
+                    <div class="flex-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm font-medium text-gray-700">{{ source.name }}</span>
+                            <span class="text-sm text-gray-600">{{ source.percentage }}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 h-2 rounded-full" style="width: {{ source.percentage }}%"></div>
+                        </div>
+                    </div>
+                    <span class="ml-4 text-sm text-gray-600">{{ source.visitors }}</span>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-center py-8">Trafik verisi mevcut değil</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sales Trend Chart
+    const salesCtx = document.getElementById('salesTrendChart');
+    if (salesCtx) {
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: {{ sales_labels|safe }},
+                datasets: [{
+                    label: 'Satış Adedi',
+                    data: {{ sales_data|safe }},
+                    borderColor: 'rgb(124, 58, 237)',
+                    backgroundColor: 'rgba(124, 58, 237, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Revenue vs Profit Chart
+    const revenueCtx = document.getElementById('revenueProfitChart');
+    if (revenueCtx) {
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: {{ revenue_labels|safe }},
+                datasets: [{
+                    label: 'Gelir',
+                    data: {{ revenue_data|safe }},
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)'
+                }, {
+                    label: 'Kar',
+                    data: {{ profit_data|safe }},
+                    backgroundColor: 'rgba(124, 58, 237, 0.7)'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    // Category Distribution Chart
+    const categoryCtx = document.getElementById('categoryChart');
+    if (categoryCtx) {
+        new Chart(categoryCtx, {
+            type: 'doughnut',
+            data: {
+                labels: {{ category_labels|safe }},
+                datasets: [{
+                    data: {{ category_data|safe }},
+                    backgroundColor: [
+                        'rgba(124, 58, 237, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(251, 146, 60, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Order Status Chart
+    const orderStatusCtx = document.getElementById('orderStatusChart');
+    if (orderStatusCtx) {
+        new Chart(orderStatusCtx, {
+            type: 'pie',
+            data: {
+                labels: ['Bekleyen', 'Onaylanan', 'Kargoda', 'Teslim', 'İptal'],
+                datasets: [{
+                    data: {{ order_status_data|safe }},
+                    backgroundColor: [
+                        'rgba(251, 191, 36, 0.8)',
+                        'rgba(59, 130, 246, 0.8)',
+                        'rgba(124, 58, 237, 0.8)',
+                        'rgba(34, 197, 94, 0.8)',
+                        'rgba(239, 68, 68, 0.8)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Payment Method Chart
+    const paymentCtx = document.getElementById('paymentMethodChart');
+    if (paymentCtx) {
+        new Chart(paymentCtx, {
+            type: 'polarArea',
+            data: {
+                labels: {{ payment_labels|safe }},
+                datasets: [{
+                    data: {{ payment_data|safe }},
+                    backgroundColor: [
+                        'rgba(124, 58, 237, 0.7)',
+                        'rgba(59, 130, 246, 0.7)',
+                        'rgba(34, 197, 94, 0.7)'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Period selector
+    document.getElementById('period-select')?.addEventListener('change', function() {
+        window.location.href = `?period=${this.value}`;
+    });
+</script>
+{% endblock %}
