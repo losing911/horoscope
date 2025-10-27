@@ -5,6 +5,64 @@
 
 {% block content %}
 <div class="container mt-5">
+    <!-- Premium/Token Warnings -->
+    {% if premium_required %}
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <i class="fas fa-crown me-2"></i>
+            <strong>Premium Üyelik Gerekli!</strong> Bu burç analizi sadece premium üyelere açıktır.
+            <a href="{% url 'accounts:profile' %}" class="alert-link">Premium'a Yükselt</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+        </div>
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <p class="text-muted mb-3">Bu burç analizi sadece premium üyelere açıktır.</p>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
+                            <i class="fas fa-crown me-2"></i>Premium'a Yükselt
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% elif insufficient_tokens %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-coins me-2"></i>
+            <strong>Yetersiz Jeton!</strong> Bu analiz için {{ needed_tokens }} jeton gereklidir. Mevcut: {{ user_tokens }}
+            <a href="{% url 'accounts:profile' %}" class="alert-link">Jeton Satın Al</a>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+        </div>
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                        <p class="text-muted mb-3">Bu analizi görmek için daha fazla jetona ihtiyacınız var.</p>
+                        <p class="mb-3">
+                            <strong>Gereken:</strong> {{ needed_tokens }} jeton<br>
+                            <strong>Mevcut:</strong> {{ user_tokens }} jeton
+                        </p>
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
+                            <i class="fas fa-shopping-cart me-2"></i>Jeton Satın Al
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Token Info Banner -->
+        {% if zodiac_sign.token_cost > 0 and user.is_authenticated %}
+            <div class="alert alert-info alert-dismissible fade show" role="alert">
+                <i class="fas fa-coins me-2"></i>
+                <strong>Jeton Kullanıldı:</strong> Bu analiz için {{ zodiac_sign.token_cost }} jeton kulllandı.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+            </div>
+        {% endif %}
+    {% endif %}
+    
+    {% if not premium_required and not insufficient_tokens %}
+    
     <!-- Sign Header -->
     <div class="row mb-5">
         <div class="col-12">
@@ -219,6 +277,8 @@
             </div>
         </div>
     </div>
+    
+    {% endif %}
 </div>
 {% endblock %}
 

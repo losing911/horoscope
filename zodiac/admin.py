@@ -47,8 +47,8 @@ class HoroscopeAdminSite(admin.AdminSite):
 
 @admin.register(ZodiacSign)
 class ZodiacSignAdmin(admin.ModelAdmin):
-    list_display = ['name', 'name_en', 'symbol', 'element', 'quality', 'ruling_planet', 'date_range', 'order']
-    list_filter = ['element', 'quality']
+    list_display = ['name', 'name_en', 'symbol', 'element', 'quality', 'token_cost', 'is_premium_only', 'order']
+    list_filter = ['element', 'quality', 'is_premium_only', 'token_cost']
     search_fields = ['name', 'name_en']
     ordering = ['order']
     fieldsets = (
@@ -63,6 +63,17 @@ class ZodiacSignAdmin(admin.ModelAdmin):
         }),
         ('Şans Faktörleri', {
             'fields': ('lucky_numbers', 'lucky_colors', 'lucky_day')
+        }),
+        ('💰 Jeton Ayarları', {
+            'fields': ('token_cost', 'is_premium_only'),
+            'description': '<div style="background:#e3f2fd;padding:12px;border-radius:8px;margin:10px 0;">'
+                          '<strong>📊 Jeton Maliyeti:</strong><br>'
+                          '• Jeton Maliyeti: Bu burçtan detaylı analiz almak için gereken jeton sayısı (0 = Ücretsiz)<br>'
+                          '• Sadece Premium: İşaretlenirse yalnızca premium üyelere açık<br>'
+                          '<strong>Örnekler:</strong><br>'
+                          '- Günlük Burç: 0 jeton (ücretsiz)<br>'
+                          '- Haftalık Analiz: 5 jeton<br>'
+                          '- Doğum Haritası: 20 jeton</div>'
         }),
         ('Görsel', {
             'fields': ('image_url',)

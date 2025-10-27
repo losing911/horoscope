@@ -60,6 +60,19 @@ class ZodiacSign(models.Model):
     image_url = models.URLField(blank=True, verbose_name="Görsel URL")
     order = models.IntegerField(default=0, verbose_name="Sıralama")
     
+    # Token maliyeti ayarları
+    token_cost = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name="Jeton Maliyeti",
+        help_text="Bu burçtan detaylı analiz almak için gereken jeton sayısı. 0 = Ücretsiz"
+    )
+    is_premium_only = models.BooleanField(
+        default=False,
+        verbose_name="Sadece Premium Üyeler",
+        help_text="Bu burç analizi sadece premium üyelere açık mı?"
+    )
+    
     class Meta:
         verbose_name = "Burç"
         verbose_name_plural = "Burçlar"

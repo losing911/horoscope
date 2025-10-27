@@ -57,6 +57,26 @@ def zodiac_sign_detail(request, sign_slug):
     zodiac_sign = get_object_or_404(ZodiacSign, slug=sign_slug)
     current_language = get_language()
     
+    # Jeton kontrolü
+    if request.user.is_authenticated:
+        if zodiac_sign.is_premium_only and not request.user.is_premium:
+            context = {
+                'title': f'{zodiac_sign.name} Burcu',
+                'zodiac_sign': zodiac_sign,
+                'premium_required': True,
+            }
+            return render(request, 'zodiac/sign_detail.html', context)
+        
+        if zodiac_sign.token_cost > 0 and request.user.tokens < zodiac_sign.token_cost:
+            context = {
+                'title': f'{zodiac_sign.name} Burcu',
+                'zodiac_sign': zodiac_sign,
+                'insufficient_tokens': True,
+                'needed_tokens': zodiac_sign.token_cost,
+                'user_tokens': request.user.tokens,
+            }
+            return render(request, 'zodiac/sign_detail.html', context)
+    
     # Bugünün burç yorumu
     today = timezone.now().date()
     daily_horoscope = DailyHoroscope.objects.filter(
@@ -84,6 +104,24 @@ def zodiac_sign_detail(request, sign_slug):
             )
         except Exception as e:
             print(f"Image generation error: {e}")
+    
+    # Token deduction (eğer premium view ise ve kullanıcı giriş yapmışsa)
+    if request.user.is_authenticated and zodiac_sign.token_cost > 0:
+        from accounts.models import TokenTransaction
+        
+        balance_before = request.user.tokens
+        request.user.tokens -= zodiac_sign.token_cost
+        request.user.save()
+        balance_after = request.user.tokens
+        
+        TokenTransaction.objects.create(
+            user=request.user,
+            transaction_type='usage',
+            amount=-zodiac_sign.token_cost,
+            balance_before=balance_before,
+            balance_after=balance_after,
+            description=f'{zodiac_sign.name} burcu detaylı analizi'
+        )
     
     context = {
         'title': f'{zodiac_sign.name} Burcu',
