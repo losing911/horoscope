@@ -67,7 +67,23 @@
 
 <div class="container mb-5">
     <div class="row g-4 mb-4">
-        <!-- İstatistikler -->
+        <!-- Jetonlar -->
+        <div class="col-md-4">
+            <div class="card stat-card">
+                <div class="card-body text-center">
+                    <div class="stat-icon bg-warning bg-opacity-10 mx-auto">
+                        <i class="fas fa-gem text-warning"></i>
+                    </div>
+                    <h3 class="mb-0">{{ user.tokens }}</h3>
+                    <p class="text-muted mb-0">Jetonlarım</p>
+                    <a href="#token-packages" class="btn btn-sm btn-warning mt-3">
+                        <i class="fas fa-shopping-cart me-1"></i>Jeton Satın Al
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tarot Okuma -->
         <div class="col-md-4">
             <div class="card stat-card">
                 <div class="card-body text-center">
@@ -80,26 +96,15 @@
             </div>
         </div>
         
+        <!-- Günlük Kart -->
         <div class="col-md-4">
             <div class="card stat-card">
                 <div class="card-body text-center">
-                    <div class="stat-icon bg-warning bg-opacity-10 mx-auto">
-                        <i class="fas fa-calendar-day text-warning"></i>
+                    <div class="stat-icon bg-info bg-opacity-10 mx-auto">
+                        <i class="fas fa-calendar-day text-info"></i>
                     </div>
                     <h3 class="mb-0">{{ user.dailycard_set.count }}</h3>
                     <p class="text-muted mb-0">Günlük Kart</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="col-md-4">
-            <div class="card stat-card">
-                <div class="card-body text-center">
-                    <div class="stat-icon bg-success bg-opacity-10 mx-auto">
-                        <i class="fas fa-star text-success"></i>
-                    </div>
-                    <h3 class="mb-0">{{ user.tarotreading_set.filter.count }}</h3>
-                    <p class="text-muted mb-0">Herkese Açık</p>
                 </div>
             </div>
         </div>
@@ -149,6 +154,9 @@
                     </h5>
                 </div>
                 <div class="list-group list-group-flush">
+                    <a href="#token-packages" class="list-group-item list-group-item-action">
+                        <i class="fas fa-gem me-2"></i>Jeton Satın Al
+                    </a>
                     <a href="{% url 'accounts:password_change' %}" class="list-group-item list-group-item-action">
                         <i class="fas fa-key me-2"></i>Şifre Değiştir
                     </a>
@@ -260,4 +268,74 @@
         </div>
     </div>
 </div>
+
+<!-- Jeton Paketleri Bölümü -->
+<section id="token-packages" class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="mb-3">
+                <i class="fas fa-gem me-2"></i>Jeton Paketleri
+            </h2>
+            <p class="text-muted">Premium hizmetleri kullanmak için jeton satın alın</p>
+        </div>
+        
+        {% if token_packages %}
+        <div class="row g-4">
+            {% for package in token_packages %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 token-card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="display-4 text-warning mb-3">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <h4 class="card-title mb-1">
+                            {{ package.name }}
+                        </h4>
+                        <p class="text-muted small mb-3">
+                            {{ package.total_tokens }} Jeton
+                        </p>
+                        <div class="price-box mb-4">
+                            <span class="display-5 text-primary fw-bold">
+                                ₺{{ package.price|floatformat:2 }}
+                            </span>
+                        </div>
+                        {% if package.description %}
+                        <p class="text-muted small mb-4">
+                            {{ package.description }}
+                        </p>
+                        {% endif %}
+                        <a href="{% url 'shop:add_to_cart' package.id %}" class="btn btn-warning w-100">
+                            <i class="fas fa-shopping-cart me-2"></i>Satın Al
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle me-2"></i>
+            Şu anda mevcut jeton paketi bulunmamaktadır.
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+.token-card {
+    transition: all 0.3s ease;
+}
+
+.token-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+.price-box {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+</style>
 {% endblock %}

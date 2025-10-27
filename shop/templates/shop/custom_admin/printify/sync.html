@@ -1,0 +1,235 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}Printify Senkronizasyon - Mağaza Yönetimi{% endblock %}
+
+{% block page_title %}🖨️ Printify Senkronizasyon{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'shop:admin_dashboard' %}">Ana Sayfa</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop:admin_printify' %}">Printify</a></li>
+        <li class="breadcrumb-item active">Senkronizasyon</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Senkronizasyon Araçları -->
+    <div class="col-lg-8 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">🚀 Senkronizasyon Araçları</h6>
+            </div>
+            <div class="card-body">
+                <!-- API Bağlantı Testi -->
+                <form method="post" class="mb-4">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="test_connection">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>API Bağlantı Testi</strong> - Printify API'sine bağlantınızı test edin
+                    </div>
+                    <button type="submit" class="btn btn-info">
+                        <i class="fas fa-wifi mr-2"></i>Bağlantıyı Test Et
+                    </button>
+                </form>
+
+                <hr>
+
+                <!-- Ürün Senkronizasyonu -->
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="sync_products">
+                    
+                    <h5>📦 Ürün Senkronizasyonu</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="category_id">Hedef Kategori</label>
+                                <select class="form-control" id="category_id" name="category_id">
+                                    <option value="">Varsayılan Kategori</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <small class="form-text text-muted">
+                                    Printify ürünlerinin hangi kategoriye aktarılacağını seçin
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="limit">Maksimum Ürün Sayısı</label>
+                                <input type="number" class="form-control" id="limit" name="limit" 
+                                       value="50" min="1" max="500">
+                                <small class="form-text text-muted">
+                                    Bir seferde kaç ürün senkronize edilecek
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-sync mr-2"></i>Ürün Senkronizasyonu Başlat
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mevcut Durum -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">📊 Mevcut Durum</h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <h4 class="text-primary">{{ printify_products_count }}</h4>
+                        <p class="text-muted">Printify Ürünü</p>
+                    </div>
+                    
+                    <a href="{% url 'shop:admin_products' %}?source=printify" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-boxes mr-2"></i>Ürünleri Görüntüle
+                    </a>
+                </div>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <h6>Kategori Durumu</h6>
+                    {% if categories %}
+                        <div class="text-success">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            {{ categories.count }} kategori Printify sync için aktif
+                        </div>
+                    {% else %}
+                        <div class="text-warning">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            Hiçbir kategori Printify sync için aktif değil
+                        </div>
+                        <a href="{% url 'shop:admin_categories' %}" class="btn btn-sm btn-warning mt-2">
+                            Kategorileri Düzenle
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Senkronizasyon Logları -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">📋 Senkronizasyon Logları</h6>
+            </div>
+            <div class="card-body">
+                {% if sync_logs %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Tür</th>
+                                    <th>Durum</th>
+                                    <th>Toplam</th>
+                                    <th>Başarılı</th>
+                                    <th>Başarısız</th>
+                                    <th>Başarı Oranı</th>
+                                    <th>Süre</th>
+                                    <th>Hata</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sync in sync_logs %}
+                                <tr>
+                                    <td>{{ sync.started_at|date:"d.m.Y H:i:s" }}</td>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            🖨️ {{ sync.get_sync_type_display }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if sync.status == 'completed' %}
+                                            <span class="badge badge-success">✓ Tamamlandı</span>
+                                        {% elif sync.status == 'failed' %}
+                                            <span class="badge badge-danger">✗ Başarısız</span>
+                                        {% elif sync.status == 'in_progress' %}
+                                            <span class="badge badge-primary">🔄 Devam Ediyor</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">⏳ {{ sync.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ sync.total_items }}</td>
+                                    <td class="text-success">{{ sync.successful_items }}</td>
+                                    <td class="text-danger">{{ sync.failed_items }}</td>
+                                    <td>
+                                        {% if sync.total_items > 0 %}
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar {% if sync.success_rate >= 90 %}bg-success{% elif sync.success_rate >= 70 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                     role="progressbar" 
+                                                     style="width: {{ sync.success_rate }}%">
+                                                    {{ sync.success_rate }}%
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sync.duration_seconds %}
+                                            {{ sync.duration_seconds }}s
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if sync.error_message %}
+                                            <span class="text-danger" title="{{ sync.error_message }}">
+                                                <i class="fas fa-exclamation-circle"></i>
+                                                {{ sync.error_message|truncatechars:30 }}
+                                            </span>
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Henüz senkronizasyon yapılmamış. Yukarıdaki butonları kullanarak başlatabilirsiniz.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yardım Bölümü -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card shadow border-left-info">
+            <div class="card-body">
+                <h5 class="text-info">💡 Yardım & İpuçları</h5>
+                <ul class="mb-0">
+                    <li><strong>İlk Kurulum:</strong> Önce Printify ayarlarında API token'ınızı tanımlayın</li>
+                    <li><strong>Kategori Eşleştirme:</strong> Kategoriler sayfasından hangi kategorilerin Printify sync'i için aktif olacağını belirleyin</li>
+                    <li><strong>Fiyatlandırma:</strong> Printify ürünleri USD olarak gelir, kar marjı ve kur ile TL'ye çevrilir</li>
+                    <li><strong>Stok Yönetimi:</strong> Printify print-on-demand olduğu için stok sınırsızdır</li>
+                    <li><strong>Sipariş Entegrasyonu:</strong> Printify'a otomatik sipariş gönderimi için ayarları düzenleyin</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

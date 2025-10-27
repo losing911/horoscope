@@ -69,8 +69,8 @@ def index(request):
         print(f"Günlük burç yorumları yükleme hatası: {e}")
     
     context = {
-        'title': 'Tarot Yorum - AI Destekli Tarot Falı ve Astroloji',
-        'description': 'Yapay zeka destekli tarot falı ve günlük burç yorumları',
+        'title': 'İçsel Yolculuk - AI Destekli Kişisel Gelişim ve Farkındalık',
+        'description': 'Yapay zeka destekli kişisel gelişim ve duygusal farkındalık rehberliği',
         'hero_section': hero_section,
         'recent_readings': recent_readings,
         'popular_spreads': popular_spreads,
@@ -81,22 +81,22 @@ def index(request):
 
 
 def spreads_list(request):
-    """Tarot yayılımları listesi"""
+    """Rehberlik yöntemleri listesi"""
     spreads = TarotSpread.objects.filter(is_active=True).order_by('difficulty_level', 'card_count')
     
     context = {
-        'title': 'Tarot Yayılımları',
+        'title': 'Rehberlik Yöntemleri',
         'spreads': spreads,
     }
     return render(request, 'tarot/spreads_list.html', context)
 
 
 def spread_detail(request, slug):
-    """Yayılım detayı ve okuma başlatma"""
+    """Yayılım detayı ve rehberlik seansı başlatma"""
     spread = get_object_or_404(TarotSpread, slug=slug, is_active=True)
     
     context = {
-        'title': f'{spread.name} - Tarot Yayılımı',
+        'title': f'{spread.name} - Rehberlik Yöntemi',
         'spread': spread,
     }
     return render(request, 'tarot/spread_detail.html', context)
@@ -105,7 +105,7 @@ def spread_detail(request, slug):
 @login_required
 @require_POST
 def create_reading(request):
-    """Yeni tarot okuma oluştur"""
+    """Yeni kişisel rehberlik seansı oluştur"""
     try:
         # Site ayarlarını kontrol et
         settings = SiteSettings.load()
@@ -233,6 +233,28 @@ def reading_detail(request, reading_id):
 
 
 @login_required
+def toggle_reading_public(request, reading_id):
+    """Okumayı herkese açık/gizli yap"""
+    reading = get_object_or_404(TarotReading, id=reading_id)
+    
+    # Sadece okuma sahibi değiştirebilir
+    if reading.user != request.user:
+        messages.error(request, 'Bu işlemi yapma yetkiniz yok.')
+        return redirect('tarot:reading_detail', reading_id=reading.id)
+    
+    # Durumu tersine çevir
+    reading.is_public = not reading.is_public
+    reading.save()
+    
+    if reading.is_public:
+        messages.success(request, 'Okuma herkese açık hale getirildi.')
+    else:
+        messages.success(request, 'Okuma gizli hale getirildi.')
+    
+    return redirect('tarot:reading_detail', reading_id=reading.id)
+
+
+@login_required
 def user_readings(request):
     """Kullanıcının okumalarını listele"""
     readings = TarotReading.objects.filter(user=request.user).order_by('-created_at')
@@ -250,14 +272,14 @@ def user_readings(request):
 
 @login_required
 def daily_card(request):
-    """Günlük kart"""
+    """Günlük ilham kaynağı"""
     today = timezone.now().date()
     
-    # Bugün çekilmiş kart var mı kontrol et
+    # Bugün çekilmiş sembol var mı kontrol et
     daily_card_obj = DailyCard.objects.filter(user=request.user, date=today).first()
     
     if not daily_card_obj:
-        # Yeni günlük kart çek
+        # Yeni günlük ilham kaynağı seç
         all_cards = list(TarotCard.objects.all())
         if all_cards:
             random_card = random.choice(all_cards)
@@ -278,7 +300,7 @@ def daily_card(request):
             except Exception as e:
                 print(f"Daily card interpretation error: {e}")
                 meaning = random_card.reversed_meaning if is_reversed else random_card.upright_meaning
-                interpretation = f"## Günün Kartı: {random_card.name}\n\nBugün sizin için {random_card.name} kartı çıktı.\n\n{meaning}"
+                interpretation = f"## Günün İlham Kaynağı: {random_card.name}\n\nBugün sizin için {random_card.name} rehberlik sembolü seçildi.\n\n{meaning}"
             
             daily_card_obj = DailyCard.objects.create(
                 user=request.user,
@@ -289,22 +311,31 @@ def daily_card(request):
             )
     
     context = {
-        'title': 'Günlük Kart',
+        'title': 'Günlük İlham Kaynağı',
         'daily_card': daily_card_obj,
     }
     return render(request, 'tarot/daily_card.html', context)
 
 
 def public_readings(request):
-    """Herkese açık okumalar"""
+    """Paylaşılan rehberlik deneyimleri"""
     readings = TarotReading.objects.filter(is_public=True).order_by('-created_at')
+    
+    # Yayılımlara göre grupla
+    readings_by_spread = {}
+    for reading in readings:
+        spread_name = reading.spread.name if reading.spread else "Diğer"
+        if spread_name not in readings_by_spread:
+            readings_by_spread[spread_name] = []
+        readings_by_spread[spread_name].append(reading)
     
     paginator = Paginator(readings, 12)
     page = request.GET.get('page')
     readings_page = paginator.get_page(page)
     
     context = {
-        'title': 'Herkese Açık Okumalar',
+        'title': 'Paylaşılan Rehberlik Deneyimleri',
         'readings': readings_page,
+        'readings_by_spread': readings_by_spread,
     }
     return render(request, 'tarot/public_readings.html', context)

@@ -9,9 +9,6 @@
             <div class="text-center mb-5">
                 <h1 class="display-6">{{ reading.spread.name }} Okuma</h1>
                 <p class="lead text-muted">{{ reading.created_at|date:"d F Y, H:i" }}</p>
-                {% if reading.ai_provider %}
-                    <span class="badge bg-info">{{ reading.ai_provider|title }} ile yorumlandı</span>
-                {% endif %}
             </div>
 
             <!-- Soru -->
@@ -118,7 +115,7 @@
                     <div class="card-body text-center">
                         <h6>Bu okumayı beğendiniz mi?</h6>
                         <p class="text-muted small">Okumayı herkese açık yaparak diğer kullanıcılarla paylaşabilirsiniz.</p>
-                        <form method="post" action="#" class="d-inline">
+                        <form method="post" action="{% url 'tarot:toggle_reading_public' reading.id %}" class="d-inline">
                             {% csrf_token %}
                             <button type="submit" class="btn btn-sm {% if reading.is_public %}btn-success{% else %}btn-outline-success{% endif %}">
                                 <i class="fas fa-{% if reading.is_public %}eye{% else %}eye-slash{% endif %} me-1"></i>

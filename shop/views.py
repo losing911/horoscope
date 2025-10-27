@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Q
 from decimal import Decimal
 from .models import Product, Category, Cart, CartItem, Order, OrderItem
+from accounts.models import TokenPackage, TokenTransaction
 
 
 def product_list(request):
@@ -268,3 +269,46 @@ def order_detail(request, order_number):
         'order': order,
     }
     return render(request, 'shop/order_detail.html', context)
+
+
+def token_packages(request):
+    """Jeton paketleri listesi"""
+    packages = TokenPackage.objects.filter(is_active=True).order_by('display_order', 'price')
+    
+    context = {
+        'packages': packages,
+        'user_tokens': request.user.tokens if request.user.is_authenticated else 0,
+    }
+    return render(request, 'shop/token_packages.html', context)
+
+
+@login_required
+def buy_tokens(request, package_id):
+    """Jeton satın al"""
+    package = get_object_or_404(TokenPackage, id=package_id, is_active=True)
+    
+    if request.method == 'POST':
+        # Gerçek ödeme entegrasyonu burada olacak (Stripe, iyzico vs.)
+        # Şimdilik direkt jeton ekliyoruz
+        
+        balance_before = request.user.tokens
+        request.user.add_tokens(package.total_tokens)
+        balance_after = request.user.tokens
+        
+        # İşlem kaydı oluştur
+        TokenTransaction.objects.create(
+            user=request.user,
+            transaction_type='purchase',
+            amount=package.total_tokens,
+            balance_before=balance_before,
+            balance_after=balance_after,
+            description=f'{package.name} satın alındı'
+        )
+        
+        messages.success(request, f'🎉 {package.total_tokens} jeton hesabınıza eklendi!')
+        return redirect('shop:token_packages')
+    
+    context = {
+        'package': package,
+    }
+    return render(request, 'shop/buy_tokens_confirm.html', context)

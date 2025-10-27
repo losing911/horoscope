@@ -13,6 +13,7 @@ urlpatterns = [
     # Okuma işlemleri
     path('create-reading/', views.create_reading, name='create_reading'),
     path('reading/<uuid:reading_id>/', views.reading_detail, name='reading_detail'),
+    path('reading/<uuid:reading_id>/toggle-public/', views.toggle_reading_public, name='toggle_reading_public'),
     path('my-readings/', views.user_readings, name='user_readings'),
     
     # Özel özellikler

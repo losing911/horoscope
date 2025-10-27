@@ -1,16 +1,38 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from django.db.models import Avg
-from .models import Category, Product, Cart, CartItem, Order, OrderItem, EproloSyncLog, EproloSettings
+from .models import Category, Product, Cart, CartItem, Order, OrderItem, EproloSyncLog, EproloSettings, PrintifySyncLog, PrintifySettings
 
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug', 'is_active', 'order', 'created_at']
-    list_filter = ['is_active']
+    list_display = ['name', 'slug', 'is_active', 'order', 'eprolo_sync_enabled', 'printify_sync_enabled', 'created_at']
+    list_filter = ['is_active', 'enable_eprolo_sync', 'enable_printify_sync']
     search_fields = ['name', 'description']
     prepopulated_fields = {'slug': ('name',)}
     ordering = ['order', 'name']
+    
+    fieldsets = (
+        ('Temel Bilgiler', {
+            'fields': ('name', 'slug', 'description', 'icon', 'image', 'is_active', 'order')
+        }),
+        ('🌐 EPROLO Entegrasyonu', {
+            'fields': ('enable_eprolo_sync', 'eprolo_category_id', 'eprolo_category_name', 'auto_activate_products', 'custom_profit_margin'),
+            'classes': ('collapse',),
+        }),
+        ('🖨️ Printify Entegrasyonu', {
+            'fields': ('enable_printify_sync', 'printify_category_mapping', 'printify_auto_activate', 'printify_profit_margin'),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    @admin.display(description='EPROLO Sync', boolean=True)
+    def eprolo_sync_enabled(self, obj):
+        return obj.enable_eprolo_sync
+    
+    @admin.display(description='Printify Sync', boolean=True)  
+    def printify_sync_enabled(self, obj):
+        return obj.enable_printify_sync
 
 
 @admin.register(Product)
@@ -19,7 +41,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['source', 'category', 'stock_status', 'is_featured', 'is_active', 'created_at']
     search_fields = ['name', 'description', 'zodiac_signs', 'eprolo_product_id', 'eprolo_sku']
     prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ['views', 'sales_count', 'discount_percentage', 'display_revenue', 'display_sales_quantity', 'eprolo_last_sync', 'eprolo_sync_detail', 'created_at', 'updated_at']
+    readonly_fields = ['views', 'sales_count', 'discount_percentage', 'display_revenue', 'display_sales_quantity', 'eprolo_last_sync', 'eprolo_sync_detail', 'printify_last_sync', 'created_at', 'updated_at']
     list_per_page = 50
     actions = ['mark_as_featured', 'mark_as_not_featured', 'update_from_eprolo']
     
@@ -31,6 +53,11 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('source', 'eprolo_product_id', 'eprolo_variant_id', 'eprolo_sku', 'eprolo_supplier', 'eprolo_warehouse', 'eprolo_last_sync', 'eprolo_sync_detail'),
             'classes': ('collapse',),
             'description': 'EPROLO ile senkronize edilen ürünler için otomatik doldurulur.'
+        }),
+        ('🖨️ Printify Entegrasyonu', {
+            'fields': ('printify_product_id', 'printify_shop_id', 'printify_variant_id', 'printify_blueprint_id', 'printify_print_provider_id', 'printify_status', 'printify_last_sync'),
+            'classes': ('collapse',),
+            'description': 'Printify ile senkronize edilen ürünler için otomatik doldurulur.'
         }),
         ('Fiyat ve Maliyet', {
             'fields': ('cost_price', 'profit_margin', 'price_usd', 'usd_to_try_rate', 'price', 'original_price', 'discount_percentage'),
@@ -95,6 +122,10 @@ class ProductAdmin(admin.ModelAdmin):
         if obj.source == 'eprolo':
             return format_html(
                 '<span style="background: #e3f2fd; color: #1976d2; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">🌐 EPROLO</span>'
+            )
+        elif obj.source == 'printify':
+            return format_html(
+                '<span style="background: #f3e5f5; color: #7b1fa2; padding: 2px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">🖨️ PRINTIFY</span>'
             )
         return format_html(
             '<span style="background: #f5f5f5; color: #666; padding: 2px 8px; border-radius: 3px; font-size: 11px;">✏️ Manuel</span>'
@@ -459,6 +490,148 @@ class EproloSettingsAdmin(admin.ModelAdmin):
     def has_add_permission(self, request):
         # Singleton - sadece bir kayıt olabilir
         return not EproloSettings.objects.exists()
+    
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(PrintifySyncLog)
+class PrintifySyncLogAdmin(admin.ModelAdmin):
+    """Printify Senkronizasyon Logları Admin"""
+    list_display = ['sync_type_badge', 'status_badge', 'stats_display', 'duration_display', 'started_at']
+    list_filter = ['sync_type', 'status', 'started_at']
+    search_fields = ['error_message']
+    readonly_fields = ['sync_type', 'status', 'total_items', 'successful_items', 'failed_items', 'error_message', 'started_at', 'completed_at', 'duration_seconds', 'success_rate_display']
+    date_hierarchy = 'started_at'
+    list_per_page = 50
+    
+    fieldsets = (
+        ('Genel Bilgiler', {
+            'fields': ('sync_type', 'status', 'started_at', 'completed_at', 'duration_seconds')
+        }),
+        ('İstatistikler', {
+            'fields': ('total_items', 'successful_items', 'failed_items', 'success_rate_display')
+        }),
+        ('Detaylar', {
+            'fields': ('error_message', 'log_data'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    def has_add_permission(self, request):
+        return False
+    
+    def has_change_permission(self, request, obj=None):
+        return False
+    
+    @admin.display(description='Senkronizasyon Tipi')
+    def sync_type_badge(self, obj):
+        colors = {
+            'products': '#4caf50',
+            'stock': '#ff9800', 
+            'orders': '#2196f3',
+            'webhooks': '#9c27b0',
+        }
+        
+        color = colors.get(obj.sync_type, '#999')
+        return format_html(
+            '<span style="background: {}; color: white; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: bold;">🖨️ {}</span>',
+            color, obj.get_sync_type_display()
+        )
+    
+    @admin.display(description='Durum')
+    def status_badge(self, obj):
+        if obj.status == 'completed':
+            color = '#4caf50'
+            icon = '✓'
+        elif obj.status == 'failed':
+            color = '#f44336'
+            icon = '✗'
+        elif obj.status == 'in_progress':
+            color = '#2196f3'
+            icon = '🔄'
+        else:
+            color = '#ff9800'
+            icon = '⏳'
+        
+        return format_html(
+            '<span style="background: {}; color: white; padding: 4px 10px; border-radius: 3px; font-size: 11px; font-weight: bold;">{} {}</span>',
+            color, icon, obj.get_status_display()
+        )
+    
+    @admin.display(description='İstatistikler')
+    def stats_display(self, obj):
+        return format_html(
+            '<div><strong>Toplam:</strong> {}</div>'
+            '<div style="color: green;"><strong>Başarılı:</strong> {}</div>'
+            '<div style="color: red;"><strong>Başarısız:</strong> {}</div>'
+            '<div style="font-size: 11px; color: #999;">Başarı Oranı: %{}</div>',
+            obj.total_items, obj.successful_items, obj.failed_items, obj.success_rate
+        )
+    
+    @admin.display(description='Süre')
+    def duration_display(self, obj):
+        if obj.duration_seconds:
+            return f'{obj.duration_seconds} saniye'
+        return '-'
+    
+    @admin.display(description='Başarı Oranı')
+    def success_rate_display(self, obj):
+        rate = obj.success_rate
+        if rate >= 90:
+            color = '#4caf50'
+        elif rate >= 70:
+            color = '#ff9800'
+        else:
+            color = '#f44336'
+        
+        return format_html(
+            '<span style="color: {}; font-weight: bold; font-size: 16px;">%{}</span>',
+            color, rate
+        )
+
+
+@admin.register(PrintifySettings)
+class PrintifySettingsAdmin(admin.ModelAdmin):
+    """Printify Ayarları Admin (Singleton)"""
+    
+    fieldsets = (
+        ('🖨️ API Bilgileri', {
+            'fields': ('api_token', 'shop_id', 'use_sandbox'),
+            'description': '🔑 Printify API bağlantı ayarları. Test için sandbox modu kullanabilirsiniz.'
+        }),
+        ('💰 Fiyatlandırma Ayarları', {
+            'fields': ('default_profit_margin', 'auto_update_prices', 'usd_to_try_rate')
+        }),
+        ('📦 Ürün Yönetimi', {
+            'fields': ('auto_import_products', 'auto_publish_products', 'default_category')
+        }),
+        ('📋 Sipariş Ayarları', {
+            'fields': ('auto_submit_orders', 'order_status_for_auto_submit')
+        }),
+        ('🔗 Webhook Ayarları', {
+            'fields': ('webhook_url', 'webhook_secret'),
+            'classes': ('collapse',)
+        }),
+        ('🔄 Senkronizasyon Bilgileri', {
+            'fields': ('last_product_sync', 'last_order_sync', 'sync_interval_hours'),
+            'classes': ('collapse',)
+        }),
+        ('🔔 Bildirim Ayarları', {
+            'fields': ('notify_on_sync_complete', 'notify_on_sync_error', 'notification_email'),
+            'classes': ('collapse',)
+        }),
+        ('⏰ Tarihler', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    readonly_fields = ['last_product_sync', 'last_order_sync', 'created_at', 'updated_at']
+    
+    def has_add_permission(self, request):
+        # Singleton - sadece bir kayıt olabilir
+        return not PrintifySettings.objects.exists()
     
     def has_delete_permission(self, request, obj=None):
         return False

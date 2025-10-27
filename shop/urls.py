@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views, admin_views, custom_admin_views
 
 app_name = 'shop'
@@ -6,7 +6,12 @@ app_name = 'shop'
 urlpatterns = [
     # Ürün listesi ve detay
     path('', views.product_list, name='product_list'),
-    path('product/<slug:slug>/', views.product_detail, name='product_detail'),
+    # Türkçe karakterleri destekleyen slug pattern
+    re_path(r'^product/(?P<slug>[\w-]+)/$', views.product_detail, name='product_detail'),
+    
+    # Jeton Paketleri
+    path('tokens/', views.token_packages, name='token_packages'),
+    path('tokens/buy/<int:package_id>/', views.buy_tokens, name='buy_tokens'),
     
     # Sepet işlemleri
     path('cart/', views.cart_view, name='cart'),
@@ -30,6 +35,9 @@ urlpatterns = [
     path('manage/eprolo/', custom_admin_views.admin_eprolo, name='admin_eprolo'),
     path('manage/eprolo/settings/', custom_admin_views.admin_eprolo_settings, name='admin_eprolo_settings'),
     path('manage/eprolo/sync/', custom_admin_views.admin_eprolo_sync, name='admin_eprolo_sync'),
+    path('manage/printify/', custom_admin_views.admin_printify, name='admin_printify'),
+    path('manage/printify/settings/', custom_admin_views.admin_printify_settings, name='admin_printify_settings'),
+    path('manage/printify/sync/', custom_admin_views.admin_printify_sync, name='admin_printify_sync'),
     path('manage/statistics/', custom_admin_views.admin_statistics, name='admin_statistics'),
     path('manage/settings/', custom_admin_views.admin_settings, name='admin_settings'),
     

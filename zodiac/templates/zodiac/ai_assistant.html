@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}AI Burç Asistanı{% endblock %}
+{% block title %}AI Kişisel Gelişim Danışmanı{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
     <div class="row mb-4">
         <div class="col-12 text-center">
-            <h1 class="display-4 mb-3">🤖 AI Burç Asistanı</h1>
-            <p class="lead text-muted">AstroTarot AI ile astroloji sorularınızı sorun</p>
+            <h1 class="display-4 mb-3">� AI Kişisel Gelişim Danışmanı</h1>
+            <p class="lead text-muted">Duygusal denge, motivasyon ve içsel farkındalık için AI destekli rehberlik</p>
         </div>
     </div>
 
@@ -16,7 +16,7 @@
         <div class="col-lg-8">
             <div class="card shadow-lg border-0">
                 <div class="card-header bg-gradient-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-robot me-2"></i>Burç Danışmanınız</h5>
+                    <h5 class="mb-0"><i class="fas fa-brain me-2"></i>Kişisel Gelişim Danışmanınız</h5>
                 </div>
                 
                 <div class="card-body p-4">
@@ -34,7 +34,7 @@
                                 {% endfor %}
                             </select>
                             <small class="form-text text-muted">
-                                Burcunuzu seçerseniz daha kişiselleştirilmiş cevaplar alırsınız.
+                                Burcunuzu seçerseniz daha kişiselleştirilmiş rehberlik alırsınız.
                             </small>
                         </div>
                         
@@ -47,11 +47,11 @@
                                 id="question" 
                                 name="question" 
                                 rows="5" 
-                                placeholder="Örnek: Bu ay aşk hayatımda ne gibi gelişmeler olabilir?"
+                                placeholder="Örnek: Duygusal dengeyi nasıl koruyabilirim?"
                                 required
                             ></textarea>
                             <small class="form-text text-muted">
-                                Aşk, kariyer, sağlık, finans veya genel astroloji hakkında soru sorabilirsiniz.
+                                Duygusal denge, motivasyon, içsel farkındalık, kişisel gelişim ve astroloji hakkında soru sorabilirsiniz.
                             </small>
                         </div>
                         
@@ -64,7 +64,7 @@
                         
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary btn-lg">
-                                <i class="fas fa-magic me-2"></i>AI Yorumu Al
+                                <i class="fas fa-lightbulb me-2"></i>AI Rehberlik Al
                             </button>
                         </div>
                     </form>
@@ -74,7 +74,7 @@
             {% if response_text %}
             <div class="card shadow-lg border-0 mt-4 animate__animated animate__fadeInUp">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>AI Cevab�</h5>
+                    <h5 class="mb-0"><i class="fas fa-comment-dots me-2"></i>AI Rehberliği</h5>
                 </div>
                 <div class="card-body p-4">
                     <div class="ai-response">
@@ -83,8 +83,8 @@
                     
                     <div class="mt-4 text-center">
                         <small class="text-muted">
-                            <i class="fas fa-robot me-1"></i>
-                            Bu yorum AstroTarot AI tarafından oluşturulmuştur.
+                            <i class="fas fa-brain me-1"></i>
+                            Bu rehberlik İçsel Yolculuk AI tarafından oluşturulmuştur.
                         </small>
                     </div>
                 </div>
@@ -100,11 +100,13 @@
                 <div class="card-body bg-white">
                     <h6 class="mb-3"><i class="fas fa-lightbulb text-warning me-2"></i>Örnek Sorular:</h6>
                     <ul class="list-unstyled mb-0">
-                        <li class="mb-2">❤️ "Bu hafta aşk hayatımda neler yaşayabilirim?"</li>
-                        <li class="mb-2">💼 "Kariyer değişikliği yapmak için uygun bir dönem mi?"</li>
-                        <li class="mb-2">💰 "Mali durumum hakkında ne söyleyebilirsin?"</li>
-                        <li class="mb-2">⚡ "Enerji seviyemi nasıl artırabilirim?"</li>
-                        <li class="mb-2">🌙 "Ayın geri hareketi beni nasıl etkileyecek?"</li>
+                        <li class="mb-2">💫 "Duygusal dengeyi nasıl koruyabilirim?"</li>
+                        <li class="mb-2">🎯 "Motivasyonumu artırmak için ne yapmalıyım?"</li>
+                        <li class="mb-2">🧘 "İçsel farkındalığımı geliştirmek için öneriler"</li>
+                        <li class="mb-2">� "Kişisel gelişimim için hangi alanlara odaklanmalıyım?"</li>
+                        <li class="mb-2">🌟 "Enerjimi yükseltmek için pratik öneriler neler?"</li>
+                        <li class="mb-2">❤️ "İlişkilerimde duygusal denge nasıl sağlarım?"</li>
+                        <li class="mb-2">💼 "Kariyer hedeflerime ulaşmak için motivasyon stratejileri"</li>
                     </ul>
                 </div>
             </div>

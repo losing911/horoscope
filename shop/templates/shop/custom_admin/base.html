@@ -133,6 +133,13 @@
                     <span class="ml-auto bg-blue-500 text-white text-xs px-2 py-1 rounded-full">API</span>
                 </a>
                 
+                <a href="{% url 'shop:admin_printify' %}" 
+                   class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-purple-50 transition {% if 'printify' in request.resolver_match.url_name|default:'' %}active{% endif %}">
+                    <i class="fas fa-print w-5"></i>
+                    <span class="font-medium">Printify</span>
+                    <span class="ml-auto bg-purple-500 text-white text-xs px-2 py-1 rounded-full">POD</span>
+                </a>
+                
                 <a href="{% url 'shop:admin_statistics' %}" 
                    class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-purple-50 transition {% if request.resolver_match.url_name == 'admin_statistics' %}active{% endif %}">
                     <i class="fas fa-chart-bar w-5"></i>

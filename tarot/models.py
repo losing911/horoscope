@@ -10,12 +10,12 @@ User = get_user_model()
 class HeroSection(models.Model):
     """Ana sayfa hero bölümü içerikleri"""
     # Ana Başlık
-    title_line1 = models.CharField(max_length=100, default="Geleceğinizin Sırları", verbose_name="Başlık Satır 1")
-    title_line2 = models.CharField(max_length=100, default="Tarot'ta Saklı", verbose_name="Başlık Satır 2 (Vurgulu)")
+    title_line1 = models.CharField(max_length=100, default="İçsel Farkındalığınızı", verbose_name="Başlık Satır 1")
+    title_line2 = models.CharField(max_length=100, default="Keşfedin", verbose_name="Başlık Satır 2 (Vurgulu)")
     
     # Alt Başlık
     subtitle = models.TextField(
-        default="Yapay zeka destekli tarot falı ile kartların gizli mesajlarını keşfedin. 78 kart, sonsuz anlam, kişiselleştirilmiş yorumlar.",
+        default="Yapay zeka destekli kişisel gelişim platformu. Duygusal denge, motivasyon ve içsel rehberlik için algoritmalarla desteklenen özel yöntemler.",
         verbose_name="Alt Başlık"
     )
     
@@ -39,10 +39,10 @@ class HeroSection(models.Model):
     )
     
     # Butonlar
-    primary_button_text = models.CharField(max_length=50, default="Hemen Fal Bak", verbose_name="Ana Buton Metni")
+    primary_button_text = models.CharField(max_length=50, default="Rehberliğe Başla", verbose_name="Ana Buton Metni")
     primary_button_url = models.CharField(max_length=200, default="/spreads/", verbose_name="Ana Buton URL")
     
-    secondary_button_text = models.CharField(max_length=50, default="Günlük Kart", verbose_name="İkinci Buton Metni")
+    secondary_button_text = models.CharField(max_length=50, default="Günlük İlham", verbose_name="İkinci Buton Metni")
     secondary_button_url = models.CharField(max_length=200, default="/daily-card/", verbose_name="İkinci Buton URL")
     
     # Görsel Ayarları

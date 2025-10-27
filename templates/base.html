@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Tarot Yorum - AI Destekli Tarot ve Astroloji{% endblock %}</title>
+    <title>{% block title %}İçsel Yolculuk - AI Destekli Kişisel Gelişim ve Farkındalık{% endblock %}</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="{% block description %}AI destekli tarot falı ve astroloji platformu. Ücretsiz tarot okuma, günlük kart ve burç yorumları.{% endblock %}">
-    <meta name="keywords" content="tarot, fal, astroloji, ai, tarot okuma, günlük kart, burç">
+    <meta name="description" content="{% block description %}Yapay zeka destekli kişisel gelişim ve farkındalık platformu. Duygusal denge, motivasyon, içsel rehberlik ve özel algoritmalar.{% endblock %}">
+    <meta name="keywords" content="kişisel gelişim, farkındalık, motivasyon, duygusal denge, içsel rehberlik, ai danışman, astroloji, burç">
     
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -41,8 +41,8 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top" style="background: rgba(13, 27, 42, 0.95); backdrop-filter: blur(10px);">
         <div class="container">
             <a class="navbar-brand" href="{% url 'tarot:index' %}">
-                <i class="fas fa-star me-2 text-warning"></i>
-                <span class="fw-bold">Tarot Yorum</span>
+                <i class="fas fa-brain me-2 text-warning"></i>
+                <span class="fw-bold">İçsel Yolculuk</span>
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -58,15 +58,15 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-cards me-1"></i>Tarot
+                            <i class="fas fa-lightbulb me-1"></i>Rehberlik Araçları
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="{% url 'tarot:spreads' %}">Tüm Yayılımlar</a></li>
-                            <li><a class="dropdown-item" href="{% url 'tarot:daily_card' %}">Günün Kartı</a></li>
-                            <li><a class="dropdown-item" href="{% url 'tarot:public_readings' %}">Herkese Açık Okumalar</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tarot:spreads' %}">Tüm Rehberlik Yöntemleri</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tarot:daily_card' %}">Günün İlham Kaynağı</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tarot:public_readings' %}">Paylaşılan Deneyimler</a></li>
                             {% if user.is_authenticated %}
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'tarot:user_readings' %}">Okumalarım</a></li>
+                            <li><a class="dropdown-item" href="{% url 'tarot:user_readings' %}">Rehberlik Geçmişim</a></li>
                             {% endif %}
                         </ul>
                     </li>
@@ -75,8 +75,12 @@
                             <i class="fas fa-shopping-bag me-1"></i>Mağaza
                         </a>
                         <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{% url 'shop:token_packages' %}">
+                                <i class="fas fa-coins me-2 text-warning"></i>Jeton Paketleri
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="{% url 'shop:product_list' %}">
-                                <i class="fas fa-th me-2"></i>Tüm Ürünler
+                                <i class="fas fa-th me-2"></i>Dijital Ürünler
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'shop:cart' %}">
                                 <i class="fas fa-shopping-cart me-2"></i>Sepetim
@@ -129,6 +133,12 @@
                             {% endif %}
                             
                             <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header"><i class="fas fa-robot text-success me-2"></i>AI Danışman</h6></li>
+                            <li><a class="dropdown-item" href="{% url 'zodiac:ai_assistant' %}">
+                                <i class="fas fa-brain me-2"></i>Kişisel Gelişim Danışmanı
+                            </a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
                             <li><h6 class="dropdown-header"><i class="fas fa-moon text-info me-2"></i>İleri Seviye Hesaplamalar</h6></li>
                             {% if user.is_authenticated %}
                             <li><a class="dropdown-item" href="{% url 'zodiac:moon_sign' %}">
@@ -142,9 +152,6 @@
                             </a></li>
                             <li><a class="dropdown-item" href="{% url 'zodiac:compatibility' %}">
                                 <i class="fas fa-heart me-2"></i>Burç Uyumu
-                            </a></li>
-                            <li><a class="dropdown-item" href="{% url 'zodiac:ai_assistant' %}">
-                                <i class="fas fa-robot me-2"></i>AI Burç Danışmanı
                             </a></li>
                             {% else %}
                             <li><a class="dropdown-item" href="{% url 'accounts:login' %}">
@@ -211,9 +218,15 @@
                 
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
+                        
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 <i class="fas fa-user-circle me-1"></i>{{ user.username }}
+                                {% if user.is_premium %}
+                                <span class="badge bg-warning text-dark ms-1">
+                                    <i class="fas fa-crown"></i>
+                                </span>
+                                {% endif %}
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end">
                                 <li>
@@ -320,12 +333,12 @@
                 <!-- Hakkımızda -->
                 <div class="col-lg-4 col-md-6 mb-4">
                     <h5>
-                        <i class="fas fa-star me-2 text-warning"></i>
-                        Tarot Yorum
+                        <i class="fas fa-brain me-2 text-warning"></i>
+                        İçsel Yolculuk
                     </h5>
                     <p class="mb-4">
-                        AI destekli tarot ve astroloji platformu. Evrenin sırlarını keşfedin, 
-                        geleceğinize ışık tutun. Modern teknoloji ile antik bilgeliği buluşturuyoruz.
+                        Yapay zeka destekli kişisel gelişim platformu. İçsel farkındalığınızı keşfedin, 
+                        duygusal dengenizi güçlendirin. Modern algoritmalar ile kişiye özel rehberlik sunuyoruz.
                     </p>
                     <div class="social-links">
                         <a href="#" title="Facebook">
@@ -353,13 +366,13 @@
                         <li>
                             <a href="{% url 'tarot:spreads' %}">
                                 <i class="fas fa-angle-right"></i>
-                                Tarot Yayılımları
+                                Rehberlik Yöntemleri
                             </a>
                         </li>
                         <li>
                             <a href="{% url 'tarot:daily_card' %}">
                                 <i class="fas fa-angle-right"></i>
-                                Günün Kartı
+                                Günlük İlham
                             </a>
                         </li>
                         <li>
@@ -452,7 +465,7 @@
                     <div class="col-md-6 text-center text-md-start mb-3 mb-md-0">
                         <p>
                             <i class="fas fa-copyright me-1"></i>
-                            2024 <strong>Tarot Yorum</strong>. Tüm hakları saklıdır.
+                            2024 <strong>İçsel Yolculuk</strong>. Tüm hakları saklıdır.
                         </p>
                     </div>
                     <div class="col-md-6 text-center text-md-end">

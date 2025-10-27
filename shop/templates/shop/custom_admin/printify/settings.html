@@ -1,0 +1,241 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}Printify Ayarları - Mağaza Yönetimi{% endblock %}
+
+{% block page_title %}🖨️ Printify Ayarları{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'shop:admin_dashboard' %}">Ana Sayfa</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'shop:admin_printify' %}">Printify</a></li>
+        <li class="breadcrumb-item active">Ayarlar</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<form method="post">
+    {% csrf_token %}
+    
+    <div class="row">
+        <!-- API Bilgileri -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">🔑 API Bilgileri</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="api_token">API Token</label>
+                        <input type="password" class="form-control" id="api_token" name="api_token" 
+                               value="{{ printify_settings.api_token }}" 
+                               placeholder="Printify API token'ınızı girin">
+                        <small class="form-text text-muted">
+                            Printify hesabınızdan "Apps & API" bölümünden token alabilirsiniz.
+                        </small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="shop_id">Shop ID</label>
+                        <input type="text" class="form-control" id="shop_id" name="shop_id" 
+                               value="{{ printify_settings.shop_id }}" 
+                               placeholder="Printify shop ID">
+                        <small class="form-text text-muted">
+                            Printify mağaza kimliği.
+                        </small>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="use_sandbox" name="use_sandbox" 
+                               {% if printify_settings.use_sandbox %}checked{% endif %}>
+                        <label class="form-check-label" for="use_sandbox">
+                            Sandbox Modu (Test Ortamı)
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fiyatlandırma Ayarları -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">💰 Fiyatlandırma</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="default_profit_margin">Varsayılan Kar Marjı (%)</label>
+                        <input type="number" class="form-control" id="default_profit_margin" name="default_profit_margin" 
+                               value="{{ printify_settings.default_profit_margin }}" 
+                               step="0.01" min="0" max="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="usd_to_try_rate">USD/TL Kuru</label>
+                        <input type="number" class="form-control" id="usd_to_try_rate" name="usd_to_try_rate" 
+                               value="{{ printify_settings.usd_to_try_rate }}" 
+                               step="0.01" min="1">
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="auto_update_prices" name="auto_update_prices" 
+                               {% if printify_settings.auto_update_prices %}checked{% endif %}>
+                        <label class="form-check-label" for="auto_update_prices">
+                            Fiyatları Otomatik Güncelle
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Ürün Yönetimi -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📦 Ürün Yönetimi</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="default_category">Varsayılan Kategori</label>
+                        <select class="form-control" id="default_category" name="default_category">
+                            <option value="">Kategori Seçin</option>
+                            {% for category in categories %}
+                            <option value="{{ category.id }}" 
+                                    {% if printify_settings.default_category_id == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" id="auto_import_products" name="auto_import_products" 
+                               {% if printify_settings.auto_import_products %}checked{% endif %}>
+                        <label class="form-check-label" for="auto_import_products">
+                            Ürünleri Otomatik İçe Aktar
+                        </label>
+                    </div>
+                    
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="auto_publish_products" name="auto_publish_products" 
+                               {% if printify_settings.auto_publish_products %}checked{% endif %}>
+                        <label class="form-check-label" for="auto_publish_products">
+                            Ürünleri Otomatik Yayınla
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sipariş Ayarları -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">📋 Sipariş Yönetimi</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="auto_submit_orders" name="auto_submit_orders" 
+                               {% if printify_settings.auto_submit_orders %}checked{% endif %}>
+                        <label class="form-check-label" for="auto_submit_orders">
+                            Siparişleri Otomatik Gönder
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="order_status_for_auto_submit">Otomatik Gönderim İçin Sipariş Durumu</label>
+                        <select class="form-control" id="order_status_for_auto_submit" name="order_status_for_auto_submit">
+                            <option value="confirmed" {% if printify_settings.order_status_for_auto_submit == 'confirmed' %}selected{% endif %}>Onaylandı</option>
+                            <option value="paid" {% if printify_settings.order_status_for_auto_submit == 'paid' %}selected{% endif %}>Ödendi</option>
+                            <option value="preparing" {% if printify_settings.order_status_for_auto_submit == 'preparing' %}selected{% endif %}>Hazırlanıyor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Webhook Ayarları -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">🔗 Webhook Ayarları</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="webhook_url">Webhook URL</label>
+                        <input type="url" class="form-control" id="webhook_url" name="webhook_url" 
+                               value="{{ printify_settings.webhook_url }}" 
+                               placeholder="https://yourdomain.com/webhook/printify/">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="webhook_secret">Webhook Secret</label>
+                        <input type="password" class="form-control" id="webhook_secret" name="webhook_secret" 
+                               value="{{ printify_settings.webhook_secret }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Senkronizasyon ve Bildirimler -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">🔔 Senkronizasyon & Bildirimler</h6>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label for="sync_interval_hours">Senkronizasyon Aralığı (Saat)</label>
+                        <input type="number" class="form-control" id="sync_interval_hours" name="sync_interval_hours" 
+                               value="{{ printify_settings.sync_interval_hours }}" 
+                               min="1" max="168">
+                    </div>
+                    
+                    <div class="form-check mb-2">
+                        <input type="checkbox" class="form-check-input" id="notify_on_sync_complete" name="notify_on_sync_complete" 
+                               {% if printify_settings.notify_on_sync_complete %}checked{% endif %}>
+                        <label class="form-check-label" for="notify_on_sync_complete">
+                            Senkronizasyon Tamamlandığında Bildir
+                        </label>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="notify_on_sync_error" name="notify_on_sync_error" 
+                               {% if printify_settings.notify_on_sync_error %}checked{% endif %}>
+                        <label class="form-check-label" for="notify_on_sync_error">
+                            Senkronizasyon Hatasında Bildir
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notification_email">Bildirim E-postası</label>
+                        <input type="email" class="form-control" id="notification_email" name="notification_email" 
+                               value="{{ printify_settings.notification_email }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Kaydet Butonu -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-body text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save mr-2"></i>Ayarları Kaydet
+                    </button>
+                    <a href="{% url 'shop:admin_printify' %}" class="btn btn-secondary btn-lg ml-2">
+                        <i class="fas fa-times mr-2"></i>İptal
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}

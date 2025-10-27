@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Jeton Paketleri - Premium Hizmetler{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <div class="mb-4">
+                <i class="fas fa-coins" style="font-size: 4rem; color: #FFD700;"></i>
+            </div>
+            <h1 class="display-4 fw-bold mb-3">Premium Jeton Paketleri</h1>
+            <p class="lead text-muted mb-4">
+                Jetonlarla premium rehberlik hizmetlerine sınırsız erişim sağlayın
+            </p>
+            {% if user.is_authenticated %}
+            <div class="alert alert-info d-inline-block">
+                <i class="fas fa-wallet me-2"></i>
+                Mevcut Jeton Bakiyeniz: <strong class="fs-5">{{ user_tokens }}</strong> jeton
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Premium Özellikler -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <div class="card-body p-4">
+                    <h4 class="text-white mb-4 text-center"><i class="fas fa-star me-2"></i>Premium Jetonlarla Neler Yapabilirsiniz?</h4>
+                    <div class="row g-3 text-white">
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-infinity fs-1 mb-2"></i>
+                            <p class="mb-0">Sınırsız Rehberlik Seansları</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-brain fs-1 mb-2"></i>
+                            <p class="mb-0">Gelişmiş AI Analizi</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-chart-line fs-1 mb-2"></i>
+                            <p class="mb-0">Detaylı Raporlar</p>
+                        </div>
+                        <div class="col-md-3 text-center">
+                            <i class="fas fa-lock-open fs-1 mb-2"></i>
+                            <p class="mb-0">Tüm Yöntemlere Erişim</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paketler -->
+    <div class="row g-4 mb-5">
+        {% for package in packages %}
+        <div class="col-lg-4 col-md-6">
+            <div class="card h-100 {% if package.name == 'Popüler Paket' %}border-warning shadow-lg{% else %}border-0 shadow-sm{% endif %}" 
+                 style="border-radius: 20px; border-width: 3px !important; position: relative; overflow: visible;">
+                
+                {% if package.name == 'Popüler Paket' %}
+                <div class="position-absolute top-0 start-50 translate-middle">
+                    <span class="badge bg-warning text-dark px-4 py-2" style="font-size: 0.9rem; border-radius: 20px;">
+                        <i class="fas fa-fire me-1"></i>EN POPÜLER
+                    </span>
+                </div>
+                {% endif %}
+                
+                <div class="card-body text-center p-4" style="padding-top: {% if package.name == 'Popüler Paket' %}3rem{% else %}2rem{% endif %} !important;">
+                    <h3 class="fw-bold mb-3">{{ package.name }}</h3>
+                    
+                    <div class="mb-4">
+                        <div class="display-3 fw-bold text-primary">{{ package.token_amount }}</div>
+                        <div class="text-muted">Jeton</div>
+                        {% if package.bonus_tokens > 0 %}
+                        <div class="mt-2">
+                            <span class="badge bg-success px-3 py-2">
+                                <i class="fas fa-gift me-1"></i>+{{ package.bonus_tokens }} Bonus Jeton
+                            </span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="h2 fw-bold mb-0">₺{{ package.price }}</div>
+                        <small class="text-muted">veya ${{ package.price_usd }}</small>
+                    </div>
+                    
+                    <div class="mb-4 text-muted small">
+                        <i class="fas fa-calculator me-1"></i>
+                        Jeton başına: ₺{{ package.per_token_price|floatformat:2 }}
+                    </div>
+                    
+                    <ul class="list-unstyled mb-4 text-start">
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>{{ package.total_tokens }} toplam jeton</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Sınırsız kullanım süresi</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Tüm premium özelliklere erişim</li>
+                        <li class="mb-2"><i class="fas fa-check text-success me-2"></i>7/24 kullanım</li>
+                    </ul>
+                    
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'shop:buy_tokens' package.id %}" 
+                           class="btn btn-{% if package.name == 'Popüler Paket' %}warning{% else %}primary{% endif %} btn-lg w-100" 
+                           style="border-radius: 30px;">
+                            <i class="fas fa-shopping-cart me-2"></i>Satın Al
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}" 
+                           class="btn btn-outline-primary btn-lg w-100" 
+                           style="border-radius: 30px;">
+                            <i class="fas fa-sign-in-alt me-2"></i>Giriş Yapın
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- SSS -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto">
+            <h3 class="text-center mb-4">Sıkça Sorulan Sorular</h3>
+            <div class="accordion" id="faqAccordion">
+                <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            Jetonlar nasıl kullanılır?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Satın aldığınız jetonlar hesabınıza otomatik olarak eklenir. Rehberlik seansları ve premium özellikleri kullanırken jetonlarınız otomatik olarak harcanır.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            Jetonların son kullanma tarihi var mı?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Hayır! Satın aldığınız jetonlar sınırsız süreyle geçerlidir ve dilediğiniz zaman kullanabilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            Ödeme güvenli mi?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Evet! Tüm ödemeler SSL sertifikası ile şifrelenmiş ve güvenli ödeme sistemleri üzerinden gerçekleştirilir.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item border-0 mb-3 shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                            1 jeton = Kaç kullanım?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            1 jeton = 1 detaylı rehberlik seansı. Basit sorgular daha az jeton harcar. Jeton tüketim detayları her hizmet için belirtilir.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="row">
+        <div class="col-12 text-center">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="card-body p-5 text-white">
+                    <h3 class="mb-3">Hemen Başlayın!</h3>
+                    <p class="mb-4">Premium özelliklerin keyfini çıkarmak için jetonlarınızı satın alın</p>
+                    {% if not user.is_authenticated %}
+                    <a href="{% url 'accounts:login' %}" class="btn btn-light btn-lg px-5" style="border-radius: 30px;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Giriş Yap
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.card {
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: #f8f9fa;
+    color: #6B1B3D;
+}
+
+.accordion-button:focus {
+    box-shadow: none;
+}
+</style>
+{% endblock %}

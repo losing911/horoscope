@@ -17,9 +17,10 @@ import json
 
 from .models import (
     Order, OrderItem, Product, Category, Cart, CartItem,
-    EproloSyncLog, EproloSettings
+    EproloSyncLog, EproloSettings, PrintifySyncLog, PrintifySettings
 )
 from .eprollo_service import EprolloAPIService
+from .printify_service import PrintifyService
 
 
 @staff_member_required
@@ -698,3 +699,139 @@ def admin_settings(request):
     }
     
     return render(request, 'shop/custom_admin/settings.html', context)
+
+
+@staff_member_required
+def admin_printify(request):
+    """Printify Ana Sayfa"""
+    
+    printify_settings = PrintifySettings.get_settings()
+    
+    # Son senkronizasyon logları
+    recent_syncs = PrintifySyncLog.objects.all()[:10]
+    
+    # İstatistikler
+    total_printify_products = Product.objects.filter(source='printify').count()
+    active_printify_products = Product.objects.filter(source='printify', is_active=True).count()
+    
+    # Son 30 günün sync istatistikleri
+    last_30_days = timezone.now() - timedelta(days=30)
+    sync_stats = PrintifySyncLog.objects.filter(started_at__gte=last_30_days).aggregate(
+        total_syncs=Count('id'),
+        successful_syncs=Count('id', filter=Q(status='completed')),
+        failed_syncs=Count('id', filter=Q(status='failed')),
+    )
+    
+    context = {
+        'printify_settings': printify_settings,
+        'recent_syncs': recent_syncs,
+        'total_printify_products': total_printify_products,
+        'active_printify_products': active_printify_products,
+        'sync_stats': sync_stats,
+    }
+    
+    return render(request, 'shop/custom_admin/printify/dashboard.html', context)
+
+
+@staff_member_required
+def admin_printify_settings(request):
+    """Printify Ayarları"""
+    
+    printify_settings = PrintifySettings.get_settings()
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        # Ayarları güncelle
+        printify_settings.api_token = request.POST.get('api_token', '')
+        printify_settings.shop_id = request.POST.get('shop_id', '')
+        printify_settings.use_sandbox = request.POST.get('use_sandbox') == 'on'
+        printify_settings.default_profit_margin = request.POST.get('default_profit_margin', '30.00')
+        printify_settings.auto_update_prices = request.POST.get('auto_update_prices') == 'on'
+        printify_settings.usd_to_try_rate = request.POST.get('usd_to_try_rate', '34.50')
+        printify_settings.auto_import_products = request.POST.get('auto_import_products') == 'on'
+        printify_settings.auto_publish_products = request.POST.get('auto_publish_products') == 'on'
+        printify_settings.auto_submit_orders = request.POST.get('auto_submit_orders') == 'on'
+        printify_settings.order_status_for_auto_submit = request.POST.get('order_status_for_auto_submit', 'confirmed')
+        printify_settings.webhook_url = request.POST.get('webhook_url', '')
+        printify_settings.webhook_secret = request.POST.get('webhook_secret', '')
+        printify_settings.sync_interval_hours = request.POST.get('sync_interval_hours', 24)
+        printify_settings.notify_on_sync_complete = request.POST.get('notify_on_sync_complete') == 'on'
+        printify_settings.notify_on_sync_error = request.POST.get('notify_on_sync_error') == 'on'
+        printify_settings.notification_email = request.POST.get('notification_email', '')
+        
+        default_category_id = request.POST.get('default_category')
+        if default_category_id:
+            printify_settings.default_category_id = default_category_id
+        
+        printify_settings.save()
+        
+        messages.success(request, 'Printify ayarları kaydedildi.')
+        return redirect('shop:admin_printify_settings')
+    
+    context = {
+        'printify_settings': printify_settings,
+        'categories': categories,
+    }
+    
+    return render(request, 'shop/custom_admin/printify/settings.html', context)
+
+
+@staff_member_required
+def admin_printify_sync(request):
+    """Printify Senkronizasyon"""
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'sync_products':
+            try:
+                category_id = request.POST.get('category_id')
+                limit = int(request.POST.get('limit', 50))
+                
+                service = PrintifyService()
+                sync_log = service.sync_products_from_printify(
+                    category_id=category_id if category_id else None,
+                    limit=limit
+                )
+                
+                if sync_log.status == 'completed':
+                    messages.success(
+                        request,
+                        f'Printify senkronizasyonu tamamlandı! '
+                        f'{sync_log.successful_items} ürün başarıyla senkronize edildi.'
+                    )
+                else:
+                    messages.error(
+                        request,
+                        f'Printify senkronizasyonu başarısız: {sync_log.error_message}'
+                    )
+                    
+            except Exception as e:
+                messages.error(request, f'Senkronizasyon hatası: {str(e)}')
+        
+        elif action == 'test_connection':
+            try:
+                service = PrintifyService()
+                if service.api.test_connection():
+                    messages.success(request, 'Printify API bağlantısı başarılı!')
+                else:
+                    messages.error(request, 'Printify API bağlantısı başarısız!')
+            except Exception as e:
+                messages.error(request, f'Bağlantı test hatası: {str(e)}')
+        
+        return redirect('shop:admin_printify_sync')
+    
+    # Son senkronizasyon logları
+    sync_logs = PrintifySyncLog.objects.all()[:20]
+    categories = Category.objects.filter(enable_printify_sync=True)
+    
+    # Printify ürün sayıları
+    printify_products_count = Product.objects.filter(source='printify').count()
+    
+    context = {
+        'sync_logs': sync_logs,
+        'categories': categories,
+        'printify_products_count': printify_products_count,
+    }
+    
+    return render(request, 'shop/custom_admin/printify/sync.html', context)

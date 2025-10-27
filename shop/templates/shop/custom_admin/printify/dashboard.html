@@ -1,0 +1,217 @@
+{% extends 'shop/custom_admin/base.html' %}
+
+{% block title %}Printify Dashboard - Mağaza Yönetimi{% endblock %}
+
+{% block page_title %}🖨️ Printify Dashboard{% endblock %}
+
+{% block breadcrumb %}
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'shop:admin_dashboard' %}">Ana Sayfa</a></li>
+        <li class="breadcrumb-item active">Printify</li>
+    </ol>
+</nav>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Printify İstatistikleri -->
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Printify Ürünleri</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_printify_products }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-print fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Aktif Ürünler</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_printify_products }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Son 30 Gün Sync</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ sync_stats.total_syncs|default:0 }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-sync fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Başarı Oranı</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">
+                            {% if sync_stats.total_syncs %}
+                                {% widthratio sync_stats.successful_syncs sync_stats.total_syncs 100 %}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-chart-line fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hızlı Aksiyonlar -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">🚀 Hızlı Aksiyonlar</h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'shop:admin_printify_sync' %}" class="btn btn-primary btn-lg btn-block">
+                            <i class="fas fa-sync mr-2"></i>Ürün Senkronizasyonu
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'shop:admin_printify_settings' %}" class="btn btn-info btn-lg btn-block">
+                            <i class="fas fa-cog mr-2"></i>Printify Ayarları
+                        </a>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <a href="{% url 'shop:admin_products' %}?source=printify" class="btn btn-success btn-lg btn-block">
+                            <i class="fas fa-boxes mr-2"></i>Printify Ürünleri
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- API Bağlantı Durumu -->
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">🔗 API Bağlantı Durumu</h6>
+            </div>
+            <div class="card-body">
+                {% if printify_settings.api_token %}
+                    <div class="alert alert-success" role="alert">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        <strong>API Token Tanımlı</strong> - Printify entegrasyonu aktif
+                    </div>
+                    <p><strong>Shop ID:</strong> {{ printify_settings.shop_id|default:"Tanımlanmamış" }}</p>
+                    <p><strong>Sandbox Modu:</strong> 
+                        {% if printify_settings.use_sandbox %}
+                            <span class="badge badge-warning">Aktif</span>
+                        {% else %}
+                            <span class="badge badge-success">Deaktif (Prodüksiyon)</span>
+                        {% endif %}
+                    </p>
+                {% else %}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        <strong>API Token Tanımlanmamış</strong> - Printify ayarlarında API token tanımlayın
+                    </div>
+                    <a href="{% url 'shop:admin_printify_settings' %}" class="btn btn-warning">
+                        <i class="fas fa-cog mr-2"></i>Ayarları Düzenle
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Son Senkronizasyon Logları -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">📋 Son Senkronizasyon Logları</h6>
+                <a href="{% url 'shop:admin_printify_sync' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye mr-1"></i>Tümünü Görüntüle
+                </a>
+            </div>
+            <div class="card-body">
+                {% if recent_syncs %}
+                    <div class="table-responsive">
+                        <table class="table table-bordered" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Tarih</th>
+                                    <th>Tür</th>
+                                    <th>Durum</th>
+                                    <th>Toplam</th>
+                                    <th>Başarılı</th>
+                                    <th>Başarısız</th>
+                                    <th>Süre</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for sync in recent_syncs %}
+                                <tr>
+                                    <td>{{ sync.started_at|date:"d.m.Y H:i" }}</td>
+                                    <td>
+                                        <span class="badge badge-info">{{ sync.get_sync_type_display }}</span>
+                                    </td>
+                                    <td>
+                                        {% if sync.status == 'completed' %}
+                                            <span class="badge badge-success">✓ {{ sync.get_status_display }}</span>
+                                        {% elif sync.status == 'failed' %}
+                                            <span class="badge badge-danger">✗ {{ sync.get_status_display }}</span>
+                                        {% elif sync.status == 'in_progress' %}
+                                            <span class="badge badge-primary">🔄 {{ sync.get_status_display }}</span>
+                                        {% else %}
+                                            <span class="badge badge-warning">⏳ {{ sync.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ sync.total_items }}</td>
+                                    <td class="text-success">{{ sync.successful_items }}</td>
+                                    <td class="text-danger">{{ sync.failed_items }}</td>
+                                    <td>{{ sync.duration_seconds|default:"-" }}s</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        Henüz senkronizasyon yapılmamış.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

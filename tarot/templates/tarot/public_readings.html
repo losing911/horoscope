@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}{{ title }} - Tarot Yorum{% endblock %}
+{% block title %}{{ title }} - İçsel Yolculuk{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -52,75 +52,95 @@
                 {{ title }}
             </h1>
             <p class="lead text-muted">
-                Diğer kullanıcıların paylaştığı tarot okumalarını keşfedin
+                Diğer kullanıcıların paylaştığı rehberlik seanslarını keşfedin
             </p>
         </div>
     </div>
 
     {% if readings %}
-        <div class="row g-4">
-            {% for reading in readings %}
-                <div class="col-md-6 col-lg-4">
-                    <div class="card reading-card h-100">
-                        <div class="reading-header">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="badge-spread">
-                                    <i class="fas fa-layer-group me-1"></i>
-                                    {{ reading.spread.name }}
-                                </span>
-                                <small>
-                                    <i class="far fa-clock me-1"></i>
-                                    {{ reading.created_at|timesince }} önce
-                                </small>
-                            </div>
+        <div>
+            {% regroup readings by spread.name as readings_by_spread %}
+            {% for spread_group in readings_by_spread %}
+                <div class="mb-5 pb-4 border-bottom">
+                    <!-- Kategori Başlığı -->
+                    <div class="row mb-4">
+                        <div class="col-12">
                             <div class="d-flex align-items-center">
-                                {% for card_data in reading.cards|slice:":5" %}
-                                    {% if card_data.card.image_url %}
-                                        <img 
-                                            src="{{ card_data.card.image_url }}" 
-                                            class="card-mini" 
-                                            alt="{{ card_data.card.name }}"
-                                            title="{{ card_data.card.name }}"
-                                        >
-                                    {% endif %}
-                                {% endfor %}
-                                {% if reading.cards|length > 5 %}
-                                    <span class="ms-2">+{{ reading.cards|length|add:"-5" }}</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="card-body">
-                            <div class="mb-3">
-                                <i class="fas fa-user-circle me-2 text-muted"></i>
-                                <strong>{{ reading.user.username }}</strong>
-                            </div>
-                            
-                            <h6 class="card-title mb-3">
-                                <i class="fas fa-question-circle me-2 text-primary"></i>
-                                {{ reading.question|truncatewords:15 }}
-                            </h6>
-                            
-                            <p class="card-text text-muted small">
-                                {{ reading.interpretation|truncatewords:20 }}
-                            </p>
-                            
-                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div style="width: 5px; height: 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 5px; margin-right: 15px;"></div>
                                 <div>
-                                    <span class="badge bg-primary me-1">
-                                        <i class="fas fa-cards me-1"></i>
-                                        {{ reading.cards|length }} Kart
-                                    </span>
-                                    <span class="badge bg-success">
-                                        <i class="fas fa-robot me-1"></i>
-                                        {{ reading.ai_provider|upper }}
-                                    </span>
+                                    <h3 class="mb-0">
+                                        <i class="fas fa-layer-group me-2 text-primary"></i>
+                                        {{ spread_group.grouper }}
+                                    </h3>
+                                    <small class="text-muted">{{ spread_group.list|length }} okuma</small>
                                 </div>
-                                <a href="{% url 'tarot:reading_detail' reading.id %}" class="btn btn-sm btn-outline-primary">
-                                    <i class="fas fa-eye me-1"></i>Görüntüle
-                                </a>
                             </div>
                         </div>
+                    </div>
+                    
+                    <!-- Kategori İçeriği -->
+                    <div class="row g-4">
+                        {% for reading in spread_group.list %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card reading-card h-100">
+                                    <div class="reading-header">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge-spread">
+                                                <i class="fas fa-star me-1"></i>
+                                                {{ reading.spread.difficulty_level|upper }}
+                                            </span>
+                                            <small>
+                                                <i class="far fa-clock me-1"></i>
+                                                {{ reading.created_at|timesince }} önce
+                                            </small>
+                                        </div>
+                                        <div class="d-flex align-items-center">
+                                            {% for card_data in reading.cards|slice:":5" %}
+                                                {% if card_data.card.image_url %}
+                                                    <img 
+                                                        src="{{ card_data.card.image_url }}" 
+                                                        class="card-mini" 
+                                                        alt="{{ card_data.card.name }}"
+                                                        title="{{ card_data.card.name }}"
+                                                    >
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if reading.cards|length > 5 %}
+                                                <span class="ms-2">+{{ reading.cards|length|add:"-5" }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <i class="fas fa-user-circle me-2 text-muted"></i>
+                                            <strong>{{ reading.user.username }}</strong>
+                                        </div>
+                                        
+                                        <h6 class="card-title mb-3">
+                                            <i class="fas fa-question-circle me-2 text-primary"></i>
+                                            {{ reading.question|truncatewords:15 }}
+                                        </h6>
+                                        
+                                        <p class="card-text text-muted small">
+                                            {{ reading.interpretation|truncatewords:20 }}
+                                        </p>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center mt-3">
+                                            <div>
+                                                <span class="badge bg-primary me-1">
+                                                    <i class="fas fa-cards me-1"></i>
+                                                    {{ reading.cards|length }} Kart
+                                                </span>
+                                            </div>
+                                            <a href="{% url 'tarot:reading_detail' reading.id %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye me-1"></i>Görüntüle
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 </div>
             {% endfor %}

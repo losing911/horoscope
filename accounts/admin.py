@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User
+from .models import User, TokenPackage, TokenTransaction
 from .legal_models import LegalDocument, UserConsent, DataDeletionRequest, ContactMessage
 from .forms import CustomUserCreationForm, CustomUserChangeForm
 
@@ -12,19 +12,25 @@ class CustomUserAdmin(UserAdmin):
     form = CustomUserChangeForm
     model = User
     
-    list_display = ('username', 'email', 'first_name', 'last_name', 'birth_date', 'zodiac_sign', 'preferred_ai_provider', 'is_staff')
-    list_filter = ('preferred_ai_provider', 'zodiac_sign', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
+    list_display = ('username', 'email', 'tokens', 'is_premium', 'daily_reading_limit', 'is_staff')
+    list_filter = ('is_premium', 'preferred_ai_provider', 'zodiac_sign', 'is_staff', 'is_superuser', 'is_active', 'date_joined')
     search_fields = ('username', 'first_name', 'last_name', 'email')
     
     fieldsets = UserAdmin.fieldsets + (
-        ('Tarot & Astroloji Bilgileri', {
-            'fields': ('birth_date', 'zodiac_sign', 'preferred_ai_provider', 'daily_reading_limit')
+        ('Premium & Jeton Sistemi', {
+            'fields': ('tokens', 'is_premium', 'premium_until', 'daily_reading_limit')
+        }),
+        ('Astroloji Bilgileri', {
+            'fields': ('birth_date', 'zodiac_sign', 'preferred_ai_provider')
         }),
     )
     
     add_fieldsets = UserAdmin.add_fieldsets + (
-        ('Tarot & Astroloji Bilgileri', {
-            'fields': ('email', 'birth_date', 'zodiac_sign', 'preferred_ai_provider', 'daily_reading_limit')
+        ('Premium & Jeton Sistemi', {
+            'fields': ('tokens', 'is_premium', 'premium_until', 'daily_reading_limit')
+        }),
+        ('Astroloji Bilgileri', {
+            'fields': ('email', 'birth_date', 'zodiac_sign', 'preferred_ai_provider')
         }),
     )
 
@@ -86,3 +92,31 @@ class ContactMessageAdmin(admin.ModelAdmin):
     def mark_as_replied(self, request, queryset):
         queryset.update(is_replied=True)
     mark_as_replied.short_description = "Yanıtlandı olarak işaretle"
+
+
+@admin.register(TokenPackage)
+class TokenPackageAdmin(admin.ModelAdmin):
+    """Jeton Paketleri Yönetimi"""
+    list_display = ('name', 'token_amount', 'bonus_tokens', 'total_tokens', 'price', 'price_usd', 'per_token_price', 'is_active', 'display_order')
+    list_filter = ('is_active',)
+    search_fields = ('name',)
+    list_editable = ('is_active', 'display_order')
+    ordering = ('display_order', 'price')
+
+
+@admin.register(TokenTransaction)
+class TokenTransactionAdmin(admin.ModelAdmin):
+    """Jeton İşlem Geçmişi"""
+    list_display = ('user', 'transaction_type', 'amount', 'balance_before', 'balance_after', 'created_at')
+    list_filter = ('transaction_type', 'created_at')
+    search_fields = ('user__username', 'user__email', 'description')
+    readonly_fields = ('created_at', 'balance_before', 'balance_after')
+    date_hierarchy = 'created_at'
+    
+    def has_add_permission(self, request):
+        # İşlem kayıtları manuel oluşturulamaz
+        return False
+    
+    def has_delete_permission(self, request, obj=None):
+        # İşlem kayıtları silinemez
+        return False

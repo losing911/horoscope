@@ -25,6 +25,12 @@ class Category(models.Model):
     auto_activate_products = models.BooleanField('Ürünleri Otomatik Aktif Et', default=False, help_text='EPROLO\'dan gelen ürünler otomatik olarak aktif edilsin mi?')
     custom_profit_margin = models.DecimalField('Özel Kar Marjı %', max_digits=5, decimal_places=2, blank=True, null=True, help_text='Bu kategori için özel kar marjı (boş bırakılırsa genel ayar kullanılır)')
     
+    # Printify Entegrasyonu
+    enable_printify_sync = models.BooleanField('Printify Senkronizasyonu', default=False, help_text='Bu kategoriye Printify ürünleri senkronize edilsin mi?')
+    printify_category_mapping = models.JSONField('Printify Kategori Eşleştirme', blank=True, null=True, help_text='Printify kategorileri ile eşleştirme bilgileri')
+    printify_auto_activate = models.BooleanField('Printify Ürünleri Otomatik Aktif Et', default=False, help_text='Printify\'dan gelen ürünler otomatik olarak aktif edilsin mi?')
+    printify_profit_margin = models.DecimalField('Printify Kar Marjı %', max_digits=5, decimal_places=2, blank=True, null=True, help_text='Printify ürünleri için özel kar marjı')
+    
     created_at = models.DateTimeField('Oluşturulma', auto_now_add=True)
     
     class Meta:
@@ -37,13 +43,27 @@ class Category(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name, allow_unicode=True)
+            # Türkçe karakterleri değiştir
+            replacements = {
+                'ı': 'i', 'İ': 'I', 'ğ': 'g', 'Ğ': 'G',
+                'ü': 'u', 'Ü': 'U', 'ş': 's', 'Ş': 'S',
+                'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C'
+            }
+            name = self.name
+            for turkish, english in replacements.items():
+                name = name.replace(turkish, english)
+            self.slug = slugify(name)
         super().save(*args, **kwargs)
     
     @property
     def eprolo_product_count(self):
         """Bu kategorideki EPROLO ürün sayısı"""
         return self.products.filter(source='eprolo').count()
+    
+    @property
+    def printify_product_count(self):
+        """Bu kategorideki Printify ürün sayısı"""
+        return self.products.filter(source='printify').count()
     
     @property
     def total_stock_value(self):
@@ -67,6 +87,7 @@ class Product(models.Model):
     SOURCE_CHOICES = [
         ('manual', 'Manuel Eklendi'),
         ('eprolo', 'EPROLO'),
+        ('printify', 'Printify'),
     ]
     
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='products', verbose_name='Kategori')
@@ -84,6 +105,16 @@ class Product(models.Model):
     eprolo_warehouse = models.CharField('EPROLO Depo', max_length=100, blank=True, null=True)
     eprolo_last_sync = models.DateTimeField('Son EPROLO Senkronizasyonu', blank=True, null=True)
     eprolo_data = models.JSONField('EPROLO Ham Veri', blank=True, null=True, help_text='EPROLO\'dan gelen ham JSON verisi')
+    
+    # Printify Bilgileri
+    printify_product_id = models.CharField('Printify Ürün ID', max_length=100, blank=True, null=True, db_index=True)
+    printify_shop_id = models.CharField('Printify Mağaza ID', max_length=100, blank=True, null=True)
+    printify_variant_id = models.CharField('Printify Varyant ID', max_length=100, blank=True, null=True)
+    printify_blueprint_id = models.CharField('Printify Blueprint ID', max_length=100, blank=True, null=True)
+    printify_print_provider_id = models.CharField('Printify Baskı Sağlayıcı ID', max_length=100, blank=True, null=True)
+    printify_status = models.CharField('Printify Durum', max_length=50, blank=True, null=True)
+    printify_last_sync = models.DateTimeField('Son Printify Senkronizasyonu', blank=True, null=True)
+    printify_data = models.JSONField('Printify Ham Veri', blank=True, null=True, help_text='Printify\'dan gelen ham JSON verisi')
     
     # Fiyat
     price = models.DecimalField('Fiyat (TL)', max_digits=10, decimal_places=2, help_text='USD fiyat girerseniz otomatik TL\'ye çevrilir')
@@ -131,7 +162,16 @@ class Product(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name, allow_unicode=True)
+            # Türkçe karakterleri değiştir
+            replacements = {
+                'ı': 'i', 'İ': 'I', 'ğ': 'g', 'Ğ': 'G',
+                'ü': 'u', 'Ü': 'U', 'ş': 's', 'Ş': 'S',
+                'ö': 'o', 'Ö': 'O', 'ç': 'c', 'Ç': 'C'
+            }
+            name = self.name
+            for turkish, english in replacements.items():
+                name = name.replace(turkish, english)
+            self.slug = slugify(name)
         
         # USD/TL dönüşümü - eğer price_usd varsa TL'ye çevir
         if self.price_usd and self.price_usd > 0:
@@ -438,6 +478,117 @@ class EproloSettings(models.Model):
     
     def __str__(self):
         return 'EPROLO Ayarları'
+    
+    def save(self, *args, **kwargs):
+        # Singleton pattern - sadece bir kayıt olsun
+        self.pk = 1
+        super().save(*args, **kwargs)
+    
+    @classmethod
+    def get_settings(cls):
+        """Ayarları getir (singleton)"""
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+
+class PrintifySyncLog(models.Model):
+    """Printify senkronizasyon kayıtları"""
+    
+    SYNC_TYPE_CHOICES = [
+        ('products', 'Ürün Senkronizasyonu'),
+        ('stock', 'Stok Senkronizasyonu'),
+        ('orders', 'Sipariş Senkronizasyonu'),
+        ('webhooks', 'Webhook Senkronizasyonu'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('pending', 'Beklemede'),
+        ('in_progress', 'Devam Ediyor'),
+        ('completed', 'Tamamlandı'),
+        ('failed', 'Başarısız'),
+        ('cancelled', 'İptal Edildi'),
+    ]
+    
+    sync_type = models.CharField('Senkronizasyon Türü', max_length=20, choices=SYNC_TYPE_CHOICES)
+    status = models.CharField('Durum', max_length=20, choices=STATUS_CHOICES, default='pending')
+    
+    started_at = models.DateTimeField('Başlangıç', auto_now_add=True)
+    completed_at = models.DateTimeField('Bitiş', blank=True, null=True)
+    duration_seconds = models.IntegerField('Süre (saniye)', default=0)
+    
+    total_items = models.IntegerField('Toplam Öğe', default=0)
+    successful_items = models.IntegerField('Başarılı Öğe', default=0)
+    failed_items = models.IntegerField('Başarısız Öğe', default=0)
+    
+    error_message = models.TextField('Hata Mesajı', blank=True)
+    log_data = models.JSONField('Detaylı Log', blank=True, null=True)
+    
+    class Meta:
+        verbose_name = 'Printify Sync Log'
+        verbose_name_plural = 'Printify Sync Logları'
+        ordering = ['-started_at']
+    
+    def __str__(self):
+        return f"{self.get_sync_type_display()} - {self.get_status_display()} ({self.started_at.strftime('%Y-%m-%d %H:%M')})"
+    
+    def save(self, *args, **kwargs):
+        if self.completed_at and self.started_at:
+            self.duration_seconds = int((self.completed_at - self.started_at).total_seconds())
+        super().save(*args, **kwargs)
+    
+    @property
+    def success_rate(self):
+        """Başarı oranı"""
+        if self.total_items > 0:
+            return round((self.successful_items / self.total_items) * 100, 2)
+        return 0
+
+
+class PrintifySettings(models.Model):
+    """Printify Ayarları (Singleton model - tek kayıt)"""
+    
+    # API Bilgileri
+    api_token = models.CharField('API Token', max_length=500, blank=True, help_text='Printify API token')
+    shop_id = models.CharField('Shop ID', max_length=100, blank=True, help_text='Printify shop ID')
+    use_sandbox = models.BooleanField('Sandbox Modu', default=True, help_text='Test ortamı için sandbox kullan')
+    
+    # Fiyatlandırma
+    default_profit_margin = models.DecimalField('Varsayılan Kar Marjı %', max_digits=5, decimal_places=2, default=Decimal('30.00'))
+    auto_update_prices = models.BooleanField('Fiyatları Otomatik Güncelle', default=False)
+    usd_to_try_rate = models.DecimalField('USD/TL Kuru', max_digits=6, decimal_places=2, default=Decimal('34.50'))
+    
+    # Ürün Yönetimi
+    auto_import_products = models.BooleanField('Ürünleri Otomatik İçe Aktar', default=False)
+    auto_publish_products = models.BooleanField('Ürünleri Otomatik Yayınla', default=False)
+    default_category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='Varsayılan Kategori', help_text='Printify ürünleri için varsayılan kategori')
+    
+    # Sipariş Yönetimi
+    auto_submit_orders = models.BooleanField('Siparişleri Otomatik Gönder', default=False)
+    order_status_for_auto_submit = models.CharField('Otomatik Gönderim İçin Sipariş Durumu', max_length=20, default='confirmed')
+    
+    # Webhook Ayarları
+    webhook_url = models.URLField('Webhook URL', blank=True, help_text='Printify webhook eventi için URL')
+    webhook_secret = models.CharField('Webhook Secret', max_length=200, blank=True)
+    
+    # Senkronizasyon
+    last_product_sync = models.DateTimeField('Son Ürün Senkronizasyonu', blank=True, null=True)
+    last_order_sync = models.DateTimeField('Son Sipariş Senkronizasyonu', blank=True, null=True)
+    sync_interval_hours = models.IntegerField('Senkronizasyon Aralığı (saat)', default=24)
+    
+    # Bildirimler
+    notify_on_sync_complete = models.BooleanField('Senkronizasyon Tamamlandığında Bildir', default=True)
+    notify_on_sync_error = models.BooleanField('Senkronizasyon Hatasında Bildir', default=True)
+    notification_email = models.EmailField('Bildirim E-postası', blank=True)
+    
+    created_at = models.DateTimeField('Oluşturulma', auto_now_add=True)
+    updated_at = models.DateTimeField('Güncellenme', auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Printify Ayarları'
+        verbose_name_plural = 'Printify Ayarları'
+    
+    def __str__(self):
+        return 'Printify Ayarları'
     
     def save(self, *args, **kwargs):
         # Singleton pattern - sadece bir kayıt olsun

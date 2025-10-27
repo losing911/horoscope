@@ -27,6 +27,8 @@ def register(request):
 @login_required
 def profile(request):
     """Kullanıcı profil sayfası"""
+    from accounts.models import TokenPackage
+    
     if request.method == 'POST':
         form = UserProfileForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -36,7 +38,13 @@ def profile(request):
     else:
         form = UserProfileForm(instance=request.user)
     
-    return render(request, 'accounts/profile.html', {'form': form})
+    # Token paketlerini al
+    token_packages = TokenPackage.objects.filter(is_active=True).order_by('display_order', 'price')
+    
+    return render(request, 'accounts/profile.html', {
+        'form': form,
+        'token_packages': token_packages
+    })
 
 
 def logout_view(request):
