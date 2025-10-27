@@ -136,6 +136,22 @@ def create_reading(request):
         # Yayılımı al
         spread = get_object_or_404(TarotSpread, id=spread_id, is_active=True)
         
+        # Jeton kontrolü
+        if spread.is_premium_only and not request.user.is_premium:
+            return JsonResponse({
+                'success': False,
+                'error': 'Bu yayılım sadece premium üyelere açıktır.'
+            })
+        
+        # Jeton yeterlilik kontrolü
+        if spread.token_cost > 0:
+            if request.user.tokens < spread.token_cost:
+                return JsonResponse({
+                    'success': False,
+                    'error': f'Bu işlem için {spread.token_cost} jeton gerekli. '
+                             f'Mevcut jetonunuz: {request.user.tokens}'
+                })
+        
         # Her zaman rastgele kartları çek
         all_cards = list(TarotCard.objects.all())
         if len(all_cards) < spread.card_count:
@@ -202,6 +218,25 @@ def create_reading(request):
             ai_provider=request.user.preferred_ai_provider,
             is_public=False
         )
+        
+        # Jeton işlemini yap (varsa)
+        if spread.token_cost > 0:
+            from accounts.models import TokenTransaction
+            
+            balance_before = request.user.tokens
+            request.user.tokens -= spread.token_cost
+            request.user.save()
+            balance_after = request.user.tokens
+            
+            TokenTransaction.objects.create(
+                user=request.user,
+                transaction_type='usage',
+                amount=-spread.token_cost,
+                balance_before=balance_before,
+                balance_after=balance_after,
+                description=f'{spread.name} yayılımı kullanımı',
+                related_reading=reading
+            )
         
         return JsonResponse({
             'success': True,

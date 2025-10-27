@@ -14,6 +14,14 @@
                     <span class="badge bg-{% if spread.difficulty_level == 'beginner' %}success{% elif spread.difficulty_level == 'intermediate' %}warning{% else %}danger{% endif %} fs-6">
                         {{ spread.get_difficulty_level_display }}
                     </span>
+                    {% if spread.is_premium_only %}
+                        <span class="badge bg-danger fs-6 me-2"><i class="fas fa-crown me-1"></i>Premium</span>
+                    {% endif %}
+                    {% if spread.token_cost > 0 %}
+                        <span class="badge bg-warning text-dark fs-6"><i class="fas fa-coins me-1"></i>{{ spread.token_cost }} Jeton</span>
+                    {% else %}
+                        <span class="badge bg-success fs-6"><i class="fas fa-gift me-1"></i>Ücretsiz</span>
+                    {% endif %}
                 </div>
             </div>
 
@@ -38,42 +46,90 @@
 
             <!-- Okuma Formu -->
             {% if user.is_authenticated %}
-                <div class="card">
-                    <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);">
-                        <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Sorunuzu Sorun</h5>
+                <!-- Jeton Uyarısı -->
+                {% if spread.is_premium_only and not user.is_premium %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fas fa-crown me-2"></i>
+                        <strong>Premium Üyelik Gerekli!</strong> Bu yayılım sadece premium üyelere açıktır.
+                        <a href="{% url 'accounts:profile' %}" class="alert-link">Premium'a Yükselt</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
                     </div>
-                    <div class="card-body">
-                        <form method="post" action="{% url 'tarot:create_reading' %}" id="readingForm">
-                            {% csrf_token %}
-                            <input type="hidden" name="spread_id" value="{{ spread.id }}">
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Bu yayılımı kullanmak için premium üyeliğe ihtiyacınız var.</p>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
+                                <i class="fas fa-crown me-2"></i>Premium'a Yükselt
+                            </a>
+                        </div>
+                    </div>
+                {% elif spread.token_cost > 0 and user.tokens < spread.token_cost %}
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-coins me-2"></i>
+                        <strong>Yetersiz Jeton!</strong> Bu yayılımı kullanmak için {{ spread.token_cost }} jeton gereklidir. Mevcut: {{ user.tokens }}
+                        <a href="{% url 'accounts:profile' %}" class="alert-link">Jeton Satın Al</a>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Kapat"></button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body text-center py-5">
+                            <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+                            <p class="text-muted mb-3">Bu yayılımı kullanmak için daha fazla jetona ihtiyacınız var.</p>
+                            <p class="mb-3">
+                                <strong>Gereken:</strong> {{ spread.token_cost }} jeton<br>
+                                <strong>Mevcut:</strong> {{ user.tokens }} jeton
+                            </p>
+                            <a href="{% url 'accounts:profile' %}" class="btn btn-primary">
+                                <i class="fas fa-shopping-cart me-2"></i>Jeton Satın Al
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="card">
+                        <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #6B1B3D 0%, #4A0E2A 100%);">
+                            <h5 class="mb-0"><i class="fas fa-question-circle me-2"></i>Sorunuzu Sorun</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Jeton Bilgisi -->
+                            {% if spread.token_cost > 0 %}
+                                <div class="alert alert-info">
+                                    <i class="fas fa-coins me-2"></i>
+                                    <strong>Jeton Maliyeti:</strong> Bu yayılım {{ spread.token_cost }} jeton tutacaktır. 
+                                    (Mevcut: {{ user.tokens }} jeton)
+                                </div>
+                            {% endif %}
                             
-                            <div class="mb-4">
-                                <label for="question" class="form-label">Kartlara sormak istediğiniz soru:</label>
-                                <textarea 
-                                    class="form-control" 
-                                    id="question"
-                                    name="question" 
-                                    rows="4" 
-                                    placeholder="Örnek: Aşk hayatımda beni neler bekliyor? Kariyerimde nasıl ilerlemeliyim? Bu durumla ilgili ne yapmalıyım?"
-                                    required
-                                ></textarea>
-                                <div class="form-text">Açık uçlu sorular daha iyi sonuçlar verir. "Evet/Hayır" soruları yerine "Nasıl" veya "Ne" ile başlayan sorular sorun.</div>
-                            </div>
+                            <form method="post" action="{% url 'tarot:create_reading' %}" id="readingForm">
+                                {% csrf_token %}
+                                <input type="hidden" name="spread_id" value="{{ spread.id }}">
+                                
+                                <div class="mb-4">
+                                    <label for="question" class="form-label">Kartlara sormak istediğiniz soru:</label>
+                                    <textarea 
+                                        class="form-control" 
+                                        id="question"
+                                        name="question" 
+                                        rows="4" 
+                                        placeholder="Örnek: Aşk hayatımda beni neler bekliyor? Kariyerimde nasıl ilerlemeliyim? Bu durumla ilgili ne yapmalıyım?"
+                                        required
+                                    ></textarea>
+                                    <div class="form-text">Açık uçlu sorular daha iyi sonuçlar verir. "Evet/Hayır" soruları yerine "Nasıl" veya "Ne" ile başlayan sorular sorun.</div>
+                                </div>
 
-                            <div class="alert alert-info">
-                                <i class="fas fa-magic me-2"></i>
-                                <strong>Mistik Kart Çekimi:</strong> Evrenin rehberliğinde rastgele {{ spread.card_count }} kart çekilecektir.
-                            </div>
-                            
-                            <div class="d-grid">
-                                <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                                <div class="alert alert-info">
                                     <i class="fas fa-magic me-2"></i>
-                                    Kartları Çek ve Oku
-                                </button>
-                            </div>
-                        </form>
+                                    <strong>Mistik Kart Çekimi:</strong> Evrenin rehberliğinde rastgele {{ spread.card_count }} kart çekilecektir.
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-warning btn-lg" id="submitBtn">
+                                        <i class="fas fa-magic me-2"></i>
+                                        Kartları Çek ve Oku
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                {% endif %}
             {% else %}
                 <div class="alert alert-info text-center">
                     <h5><i class="fas fa-info-circle me-2"></i>Rehberlik Seansı İçin Giriş Yapın</h5>

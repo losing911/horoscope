@@ -129,8 +129,8 @@ class TarotCardAdmin(admin.ModelAdmin):
 
 @admin.register(TarotSpread)
 class TarotSpreadAdmin(admin.ModelAdmin):
-    list_display = ('name', 'card_count', 'difficulty_level', 'is_active', 'created_at')
-    list_filter = ('difficulty_level', 'is_active')
+    list_display = ('name', 'card_count', 'difficulty_level', 'token_cost', 'is_premium_only', 'is_active', 'created_at')
+    list_filter = ('difficulty_level', 'is_active', 'is_premium_only', 'token_cost')
     search_fields = ('name', 'description')
     prepopulated_fields = {"slug": ("name",)}
     
@@ -141,9 +141,21 @@ class TarotSpreadAdmin(admin.ModelAdmin):
         ('Ayarlar', {
             'fields': ('difficulty_level', 'is_active')
         }),
+        ('💰 Jeton Ayarları', {
+            'fields': ('token_cost', 'is_premium_only'),
+            'description': '<div style="background:#e3f2fd;padding:12px;border-radius:8px;margin:10px 0;">'
+                          '<strong>📊 Jeton Maliyeti:</strong><br>'
+                          '• Jeton Maliyeti: Bu yayılımı kullanmak için gereken jeton sayısı (0 = Ücretsiz)<br>'
+                          '• Sadece Premium: İşaretlenirse yalnızca premium üyelere açık<br>'
+                          '<strong>Örnekler:</strong><br>'
+                          '- Günlük Kart: 0 jeton (ücretsiz)<br>'
+                          '- 3 Kartlı Yayılım: 5 jeton<br>'
+                          '- Hayat Yolculuğu: 15 jeton</div>'
+        }),
         ('Pozisyon Anlamları', {
             'fields': ('positions',),
-            'description': 'JSON formatında pozisyon anlamları'
+            'description': 'JSON formatında pozisyon anlamları',
+            'classes': ('collapse',)
         }),
     )
 

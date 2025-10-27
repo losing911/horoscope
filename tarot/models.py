@@ -241,6 +241,20 @@ class TarotSpread(models.Model):
         verbose_name="Zorluk Seviyesi"
     )
     is_active = models.BooleanField(default=True, verbose_name="Aktif")
+    
+    # Token maliyeti ayarları
+    token_cost = models.IntegerField(
+        default=0,
+        validators=[MinValueValidator(0)],
+        verbose_name="Jeton Maliyeti",
+        help_text="Bu yayılımı kullanmak için gereken jeton sayısı. 0 = Ücretsiz"
+    )
+    is_premium_only = models.BooleanField(
+        default=False,
+        verbose_name="Sadece Premium Üyeler",
+        help_text="Bu yayılım sadece premium üyelere açık mı?"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
