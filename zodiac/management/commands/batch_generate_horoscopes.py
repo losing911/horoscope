@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from zodiac.models import ZodiacSign, DailyHoroscope
 from zodiac.views import generate_daily_horoscope
 import logging
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +27,12 @@ class Command(BaseCommand):
             action='store_true',
             help='Mevcut yorumları yeniden oluştur',
         )
+        parser.add_argument(
+            '--delay',
+            type=int,
+            default=15,
+            help='Her yorum arasında bekleme süresi (saniye). Varsayılan: 15',
+        )
 
     def handle(self, *args, **options):
         # Tarih belirtildiyse onu kullan, yoksa bugünü al
@@ -39,12 +46,14 @@ class Command(BaseCommand):
             target_date = timezone.now().date()
         
         force = options['force']
+        delay = options['delay']
         
         self.stdout.write(self.style.SUCCESS(f'\n{"="*60}'))
         self.stdout.write(self.style.SUCCESS(f'  📅 GÜNLÜK BURÇ BATCH GENERATION'))
         self.stdout.write(self.style.SUCCESS(f'{"="*60}\n'))
         self.stdout.write(f'Tarih: {target_date}')
-        self.stdout.write(f'Force Mode: {"Evet" if force else "Hayır"}\n')
+        self.stdout.write(f'Force Mode: {"Evet" if force else "Hayır"}')
+        self.stdout.write(f'Delay: {delay} saniye\n')
         
         # Tüm burçları al
         signs = ZodiacSign.objects.all().order_by('name')
@@ -93,6 +102,11 @@ class Command(BaseCommand):
                     self.stdout.write(self.style.SUCCESS(
                         f'   ✅ Başarılı! (Provider: {provider_emoji} {horoscope.ai_provider})'
                     ))
+                    
+                    # Son burç değilse bekle
+                    if index < total_signs:
+                        self.stdout.write(f'   ⏳ {delay} saniye bekleniyor...')
+                        time.sleep(delay)
                 else:
                     error_count += 1
                     self.stdout.write(self.style.ERROR('   ❌ Yorum oluşturulamadı'))
