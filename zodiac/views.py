@@ -84,9 +84,9 @@ def zodiac_sign_detail(request, sign_slug):
         date=today
     ).first()
     
-    # Yoksa oluştur (dil-aware)
-    if not daily_horoscope or (daily_horoscope and current_language != 'tr'):
-        daily_horoscope = generate_daily_horoscope(zodiac_sign, today, current_language)
+    # Yoksa oluşturma (Sadece var olanı göster)
+    # if not daily_horoscope or (daily_horoscope and current_language != 'tr'):
+    #     daily_horoscope = generate_daily_horoscope(zodiac_sign, today, current_language)
     
     # AI ile burç görseli oluştur (isteğe bağlı)
     zodiac_image = None
@@ -147,9 +147,9 @@ def daily_horoscopes(request):
             date=today
         ).first()
         
-        # Yoksa oluştur (dil-aware)
-        if not horoscope or (horoscope and current_language != 'tr'):
-            horoscope = generate_daily_horoscope(sign, today, current_language)
+        # Yoksa oluşturma (Sadece var olanı göster)
+        # if not horoscope or (horoscope and current_language != 'tr'):
+        #     horoscope = generate_daily_horoscope(sign, today, current_language)
         
         horoscopes.append({
             'sign': sign,

@@ -103,6 +103,7 @@ Her başlığı büyük harfle yaz ve altına yorumu ekle."""
             
         except Exception as e:
             logger.error(f"❌ Günlük yorum hatası: {zodiac_sign.name} - {e}")
+            print(f"❌ HATA DETAYI ({zodiac_sign.name}): {str(e)}")  # Konsola hata detayını yaz
             return self._get_fallback_daily_horoscope(zodiac_sign)
     
     def generate_weekly_horoscope(self, zodiac_sign, week_start, language='tr'):
